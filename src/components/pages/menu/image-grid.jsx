@@ -7,6 +7,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
 import { Box } from '@material-ui/core';
+import { animateScroll } from 'react-scroll';
 
 // const useStyles = makeStyles((props) => ({
 //   root: {
@@ -27,6 +28,10 @@ import { Box } from '@material-ui/core';
 // }));
 const value = (size) => ( (100*parseInt(size)/400)+'vw');
 
+const scrollToRef = (ref) => animateScroll.scrollTo(ref.offsetTop);
+//window.scrollTo(0, ref.offsetTop);   
+
+
 const useStyles = makeStyles({
     title: {
         color: props => props.color,
@@ -41,7 +46,8 @@ const useStyles = makeStyles({
  * The example data is structured as follows:
  *
  * import image from 'path/to/image.jpg';
- * [etc...]
+ * import { animateScroll } from 'react-scroll';
+[etc...]
  *
  * const tileData = [
  *   {
@@ -56,9 +62,14 @@ const useStyles = makeStyles({
  */
 const TitlebarGridList = (props) => {
   let classes = useStyles(props.style);
-  const cols = props.category ? 2 : 1;
+  const cols = props.header ? 2 : 1;
+
+  const refs = props.refs;
+  const executeScroll = (ref) => scrollToRef(ref);
+
+
+
   //const [refs, setRefs] = useRef(
-    let x = [props.data.map(el => React.createRef())] //);
 
 
   //classes.title = {color: "#454545"};//, fontFamily: "#cc00a0", fontSize: 30};
@@ -68,9 +79,9 @@ const TitlebarGridList = (props) => {
     <Box>
       <GridList cols={cols} cellHeight={180} spacing={0} className={classes.gridList}>
         {props.data.map((tile,i) => (
-          <GridListTile style={null}>
+          <GridListTile style={null} onClick={(e)=>props.header && executeScroll(refs[i])}>
             {props.category && <a href={"#"+i} style={{width: '100%', height: '100%', position: 'absolute', zIndex: 1000}} onClick={(e) => e.preventDefault()}/>}
-            <img ref={x[i]} imgFullWidth src={tile.picture} alt={tile.name} />
+            <img imgFullWidth src={tile.picture} alt={tile.name} />
             <GridListTileBar
               title={tile.name}
               classes={{

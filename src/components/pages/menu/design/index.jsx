@@ -37,6 +37,16 @@ export class Form extends Component {
               size: 12,
               font: 'Times New Roman',
             },
+            alergens: {
+              color: '#000',
+              size: 12,
+              font: 'Times New Roman',
+            },
+            calories: {
+              color: '#000',
+              size: 12,
+              font: 'Times New Roman',
+            },
             size: {
               color: '#000',
               size: 12,
@@ -49,12 +59,15 @@ export class Form extends Component {
     setStateFromInput = (event, type) => {
         var obj = {};
         obj[event.target.name] = event.target.value;
-        this.setState(    { 
-          [type[0]]: { ...this.state[type[0]], [type[1]]: { ...this.state[type[0]][type[1]], [event.target.name]: event.target.value  }
-          
+        this.setState({ 
+          [type[0]]: { 
+            ...this.state[type[0]], 
+            [type[1]]: { 
+              ...this.state[type[0]][type[1]], 
+              [event.target.name]: event.target.value  
+            }
           }
-        }
-        );      
+        });      
     }
 
     fetchDesign = async () => {
@@ -128,6 +141,8 @@ export class Form extends Component {
                   ["category","name"],
                   ["item","name"],
                   ["item", "ingredients"],
+                  ["item", "alergens"],
+                  ["item", "calories"],
                   ["item", "size"],
                 ].map((el,i) => 
                     <div className="form form-label-center row">

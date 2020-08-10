@@ -6,12 +6,27 @@ import { injectIntl } from 'react-intl';
 import { withFirebase } from '../../firebase';
 //import Product from '../menu/product';
 import Button from "react-bootstrap/Button";
-import { Typography, Box } from '@material-ui/core';
+import { Typography, Box, Tooltip, Fab, Fade } from '@material-ui/core';
 import { Grid } from '@material-ui/core/';
 import GridImage from './image-grid.jsx';
 import Card from './_card.jsx';
+import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/styles';
+import { ArrowDropUp } from '@material-ui/icons/';
+import { animateScroll } from 'react-scroll';
 
 
+const styles = (theme) => ({
+  fab: {
+    margin: theme.spacing(2),
+  },
+  absolute: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(3),
+    zIndex: 1500
+  },
+});
 
 export class Menu extends Component {
     constructor(props) {
@@ -22,74 +37,11 @@ export class Menu extends Component {
             products: [],
             show_form : false,
             data: [],
+            refs: [],
+            showToolTip: false,
         }
     }
-/*
-    fetchCategoriesConfig = async (title) => {
-        let response = await fetch('https://bathtimestories.com/apim/menu/category/get.php', {
-                            method: 'POST',
-                            mode: 'cors',
-                            body: JSON.stringify({
-                              title: title,
-                            }),
-                            headers: {
-                              'Content-Type': 'application/json'
-                            }
-                          });
-          let apiData = await response.json();
-          return apiData;
-    }
 
-    fetchItemsConfig = async (title) => {
-      let response = await fetch('https://bathtimestories.com/apim/menu/item/get.php', {
-        method: 'POST',
-        mode: 'cors',
-        body: JSON.stringify({
-          title: title
-        }),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      let apiData = await response.json();
-      console.log(apiData);
-      return apiData;
-    }
-          
-
-    fetchCategories = async (title) => {
-          //console.log(apiData);
-          let response = await fetch('https://bathtimestories.com/apim/category/get.php', {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-              title: title,
-            }),
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          let apiData = await response.json();
-          return apiData;
-    }
-
-    fetchItems = async (title) => {
-        let response = await fetch('https://bathtimestories.com/apim/item/get.php', {
-                          method: 'POST',
-                          mode: 'cors',
-                          body: JSON.stringify({
-                            title: title,
-                          }),
-                          headers: {
-                            'Content-Type': 'application/json'
-                          }
-                        });
-        let apiData = await response.json();
-        console.log(apiData);
-        return apiData;
-    }
-
-*/
 
     
   fetchData = async (title) => {
@@ -145,11 +97,24 @@ export class Menu extends Component {
   }
 
 
+  handleToolTip = (event) => {
+    if(!this.state.showToolTip && window.scrollY > window.innerHeight/2)
+      this.setState({
+        showToolTip: true,
+      });
+    else if(this.state.showToolTip && window.scrollY  < window.innerHeight/2)
+      this.setState({
+        showToolTip: false,
+      });
+
+  }
+
 
     componentDidMount() {
       const title = this.props.match.params.title;
       this.fetchData(title);
       this.fetchDesign(title);
+      window.addEventListener('scroll', this.handleToolTip);
     }
  
     fetchMenu = async title => {
@@ -189,15 +154,27 @@ export class Menu extends Component {
       }
     }
 
+    scrollToTop = () => {
+      animateScroll.scrollToTop()
+      //window.scrollTo(0, 0);
+    }
+
 
     getContent = (HTML) => {
       var tmp = document.createElement('span');
       tmp.innerHTML = HTML;
       return tmp.textContent;
     }
+    
+    addRef = (element) => {
+      let refs = this.state.refs;
+      refs.push(element);
+      this.setState(refs);
+    }
 
     render() {
         const {data, category, item} = this.state;
+        const { classes } = this.props;
         const grid = data ? data.map((el,i) => ({name: el.name, picture: el.picture})) : [];
         const category_style = category && {color: category.name.color, fontFamily: category.name.color, fontSize: category.name.size};
         //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
@@ -208,14 +185,15 @@ export class Menu extends Component {
               grid.length ? 
               <GridImage
                 data={grid} 
-                category={true}
+                header={true}
+                refs={this.state.refs}
                 style={category_style}
                 /> : ''
             }
             {
               data.length && category ?
               data.map((el,i) =>
-                <div id={i} key={i} style={{backgroundImage: 'url("'+el.background+'")'}}>
+                <div ref={this.addRef} key={i} style={{backgroundImage: 'url("'+el.background+'")'}}>
                   <GridImage
                    data={[el]}
                    style={category_style}
@@ -230,24 +208,7 @@ export class Menu extends Component {
                     <Card
                       style={item}
                       data={_el}
-
                     />
-                    // <Grid container spacing={2} justify='space-between'>
-                    //   <Grid item xs={9}>
-                    //     <Typography gutterBottom variant="p" component="h3" style={{color: item.name.color, fontFamily: item.name.color, fontSize: item.name.size}}>
-                    //       {_el.name}
-                    //     </Typography>
-                    //     <Typography gutterBottom variant="p" component="p" style={{color: item.ingredients.color, fontFamily: item.ingredients.color, fontSize: item.ingredients.size}}>
-                    //       {_el.ingredients}
-                    //     </Typography>
-                    //     <Typography gutterBottom variant="p" component="p" style={{color: item.size.color, fontFamily: item.size.color, fontSize: item.size.size}}>
-                    //       {_el.size}
-                    //     </Typography>
-                    //   </Grid>
-                    //   <Grid item xs={3}> 
-                    //     <img width="100px" src={_el.pictures}/>
-                    //   </Grid>
-                    // </Grid>
 
                     )}
                     </Box>
@@ -264,6 +225,15 @@ export class Menu extends Component {
               //   }) : ''
                 
             }
+            { 
+            <Fade in={this.state.showToolTip}>
+              <Tooltip title="Add" aria-label="add" arrow={true} onClick={this.scrollToTop}>
+              <Fab color="secondary" className={classes.absolute}>
+                <ArrowDropUp/>
+              </Fab>
+            </Tooltip>
+          </Fade>
+          }
           </div>
           </>
 
@@ -278,6 +248,7 @@ export class Menu extends Component {
 
 export default compose(
   withFirebase,
+  withStyles(styles,  { withTheme: true }),
   connect(
     null
   )

@@ -78,7 +78,7 @@ const MediaCard = (props) => {
 
   let picture;
   try {
-     picture = props.data.pictures[0].img;
+     picture = props.data.picture;
   }
   catch(e) {
     picture = "https://eatforum.org/content/uploads/2018/05/table_with_food_top_view_900x700.jpg";
