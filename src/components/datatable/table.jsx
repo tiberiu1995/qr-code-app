@@ -10,6 +10,10 @@ import {ArrowDropDown, ArrowDropUp, Edit, FirstPage, LastPage, NavigateBefore, N
 import matchSorter from 'match-sorter'
 import Row from './row.jsx';
 import Select from '../utils/select.jsx';
+import { compose } from 'redux';
+import { withReducer } from 'recompose';
+import { connect } from 'react-redux';
+import { setPageIndex, _setPageSize } from '../../actions';
 
 // Define a default UI for filtering
 const DefaultColumnFilter = ({ column: { 
@@ -38,7 +42,7 @@ const fuzzyTextFilterFn = (rows, id, filterValue) => {
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = val => !val
 
-const CustomTable = ({ columns, data, hideFilters }) => {
+const CustomTable = ({ columns, data, hideFilters, settings }) => {
   const [records, setRecords] = useState(data);
 
   const filterTypes = React.useMemo(
@@ -97,7 +101,7 @@ const CustomTable = ({ columns, data, hideFilters }) => {
   } = useTable({
         columns,
         data: records,
-        initialState: { pageIndex: 0, pageSize: 5 },
+        initialState: { pageIndex: settings.pageIndex, pageSize: settings.pageSize },
         getRowId,
         defaultColumn, // Be sure to pass the defaultColumn option
         filterTypes,
@@ -184,16 +188,23 @@ const CustomTable = ({ columns, data, hideFilters }) => {
       </Table>
       { !hideFilters &&     
         <Box>
-          <Button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+          <Button 
+            onClick={() => { gotoPage(0); setPageIndex(0)}}
+            disabled={!canPreviousPage} >
             <FirstPage/>
           </Button>
-          <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          <Button 
+            onClick={() => {previousPage(); setPageIndex(pageIndex -1)}} 
+            disabled={!canPreviousPage}>
             <NavigateBefore/>
           </Button>
-          <Button onClick={() => nextPage()} disabled={!canNextPage}>
+          <Button onClick={() => {nextPage(); setPageIndex(pageIndex + 1)}} 
+            disabled={!canNextPage}>
             <NavigateNext/>
           </Button>
-          <Button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+          <Button 
+            onClick={() => { gotoPage(pageCount - 1); setPageIndex(pageCount - 1) }} 
+            disabled={!canNextPage}>
             <LastPage/>
           </Button>{" "}
           <span className="mx-2">
@@ -201,7 +212,7 @@ const CustomTable = ({ columns, data, hideFilters }) => {
           </span>
           <Select 
             value = {pageSize}
-            onChange = {e => { setPageSize(Number(e.target.value)); }} 
+            onChange = {e => { setPageSize(Number(e.target.value)); _setPageSize(Number(e.target.value)) }} 
             array = {[5, 10, 20, 50]}
             display = {(e)=>{return `Afiseaza ${e}`}} />
         </Box>
@@ -210,4 +221,10 @@ const CustomTable = ({ columns, data, hideFilters }) => {
   );
 };
 
-export default CustomTable;
+const mapStateToProps = (state, ownProps) => ({
+  settings: state.settings,
+})
+
+export default connect(mapStateToProps)(CustomTable);
+
+  //export default CustomTable;

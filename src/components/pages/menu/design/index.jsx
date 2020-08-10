@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import { TextField, FormLabel  } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import Select from '../../../utils/select.jsx';
+import { Grid } from '@material-ui/core/';
 
 export class Form extends Component {
     constructor(props) {
@@ -116,73 +117,78 @@ export class Form extends Component {
   // };
 
 	render() {
-	  const {show, onCancel, data} = this.props;
+    const {show, onCancel, data} = this.props;
 		return (
       <div className="p-3">
 			  <div className="container-fluid">
-				  <div className="col-xl-12">
-            <form className="needs-validation add-product-form">
-              { [
-                ["category","name"],
-                ["item","name"],
-                ["item", "ingredients"],
-                ["item", "size"],
-              ].map((el,i) => 
-                  <div className="form form-label-center row">
-                    <div className="form-group mb-3 col-lg-12">
-                      <label className="col-xl-3 col-sm-4">Font titlu {el[1]} {el[0]}</label>
-                      <div className="description-sm">
-                        <Select
-                          name="font"
-                          value={this.state[el[0]][el[1]].font}
-                          onChange={(e) => this.setStateFromInput(e,el)}
-                          array={[
-                            'Arial',
-                            'Courier New',
-                            'Georgia',
-                            'Palatino',
-                            'Tahoma',
-                            'Times New Roman',
-                            'Trebuchet MS',
-                            'Verdana',
-                          ]} />                 
-                    </div>
-                    </div>
+				  <Grid container cols={2}>
+            <Grid item>
+              <form className="needs-validation add-product-form">
+                { [
+                  ["category","name"],
+                  ["item","name"],
+                  ["item", "ingredients"],
+                  ["item", "size"],
+                ].map((el,i) => 
+                    <div className="form form-label-center row">
+                      <div className="form-group mb-3 col-lg-12">
+                        <label className="col-xl-3 col-sm-4">Font titlu {el[1]} {el[0]}</label>
+                        <div className="description-sm">
+                          <Select
+                            name="font"
+                            value={this.state[el[0]][el[1]].font}
+                            onChange={(e) => this.setStateFromInput(e,el)}
+                            array={[
+                              'Arial',
+                              'Courier New',
+                              'Georgia',
+                              'Palatino',
+                              'Tahoma',
+                              'Times New Roman',
+                              'Trebuchet MS',
+                              'Verdana',
+                            ]} />                 
+                      </div>
+                      </div>
                       <div className="form-group mb-3 col-lg-12">
                         <label  className="col-xl-3 col-sm-4">Culoare titlu {el}</label>
                         <div className="description-sm">
-                          <input 
-                            name="color"
-                            type="color" 
-                            onChange={(e) => this.setStateFromInput(e,el)}
-                            value={this.state[el[0]][el[1]].color} />
-                            {/* <ChromePicker 
-                              name="category_name_color"
-                              disableAlpha={true}
-                              color={ this.state.category_name_color }
-                              onChangeComplete={ this.handleColor }
-                            />                    */}
-                        </div>
+                            <input 
+                              name="color"
+                              type="color" 
+                              onChange={(e) => this.setStateFromInput(e,el)}
+                              value={this.state[el[0]][el[1]].color} />
+                              {/* <ChromePicker 
+                                name="category_name_color"
+                                disableAlpha={true}
+                                color={ this.state.category_name_color }
+                                onChangeComplete={ this.handleColor }
+                              />                    */}
+                          </div>
                       </div>    
                       <div className="form-group mb-3 col-lg-12">
-                        <label  className="col-xl-3 col-sm-4">Dimensiune titlu {el}</label >
-                        <div className="description-sm">
-                              <Select
-                              name="size"
-                              value={this.state[el[0]][el[1]].size}
-                              onChange={(e) => this.setStateFromInput(e,el)}
-                              array={[ 6, 8, 10, 12, 14, 16, 20, 24, 30 ]} />                  
-                        </div>
+                          <label  className="col-xl-3 col-sm-4">Dimensiune titlu {el}</label >
+                          <div className="description-sm">
+                                <Select
+                                name="size"
+                                value={this.state[el[0]][el[1]].size}
+                                onChange={(e) => this.setStateFromInput(e,el)}
+                                array={[ 8, 9, 10, 11, 12, 14, 16, 20, 24, 32 ]} />                  
+                          </div>
                       </div>              
                     </div>
-                )
-              }                                    														                                                                                                                                                                                                   
+                  )
+                }                                    														                                                                                                                                                                                                   
 
-              <Button variant="primary" onClick={this.saveDesign}>
-                Salveaza
-              </Button>
-            </form>	
-          </div>
+                <Button variant="primary" onClick={this.saveDesign}>
+                  Salveaza
+                </Button>
+              </form>
+            </Grid>
+            <Grid item>
+              <iframe src={`/my-menu/${this.props.match.params.title}/`} width="350" height="450"></iframe>	
+            </Grid>
+          </Grid>
         </div>
       </div>
     )

@@ -7,7 +7,7 @@ import { update } from 'immutability-helper';
 import Button from 'react-bootstrap/Button';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';  
-
+import { setPageIndex } from './../../../actions/index';
 
 const Categories = (props) => {
   const [data, setData] = useState([]);
@@ -15,6 +15,7 @@ const Categories = (props) => {
   //const id = props.match.params.id;
   const title = props.match.params.title;
   const [category, setCategory] = useState(undefined);
+  !category && setPageIndex(0);
 
     const fetchCategories = async () => {
       try{

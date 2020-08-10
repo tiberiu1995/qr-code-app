@@ -16,28 +16,32 @@ import {TableRow, TableCell} from "@material-ui/core/";
 
 const DND_ITEM_TYPE = 'row'
 
+//const percentage = (1+((window.innerWidth-400)/400));
+//const scale = (window.innerWidth/100);
+const value = (size) => ( (100*parseInt(size)/400)+'vw');
 
 const useStyles = makeStyles({
     name: {
         color: props => props.name.color,
-        size: props => props.name.size,
+        fontSize: props => value(props.name.size),//(parseInt(props.name.size)*scale),
         font: props => props.name.font,
         textAlign: 'center'
     },
     size: {
         color: props => props.size.color,
-        size: props => props.size.size,
+        fontSize: props => value(props.size.size),//(parseInt(props.size.size)*scale),
         font: props => props.size,
     },
     ingredients: {
         color: props => props.ingredients.color,
-        size: props => props.ingredients.size,
+        fontSize: props => value(props.ingredients.size),//(parseInt(props.ingredients.size)*scale),
         font: props => props.ingredients.font,
     },
   });
 
 
 const MediaCard = (props) => {
+
   const classes = useStyles(props.style);
 
 
@@ -51,13 +55,13 @@ const MediaCard = (props) => {
 
   return (
     <Card className="my-4 p-0" style={{borderRadius: 20}}>
-      <CardActionArea className="d-flex" style={{ height: 120}}>
-        <CardMedia className="d-block col-lg-3"
-          style={{ height:  120, width: 160}}
+      <CardActionArea className="d-flex">
+        <CardMedia className="d-block col-4 col-sm-4"
+          style={{ height:  100, backgroundSize: 'contain'}}
           image={ picture }
           title="Contemplative Reptile"
         />
-        <CardContent className="d-block col-lg-9">
+        <CardContent className="d-block col-8 col-sm-8">
           <Typography className={classes.name} gutterBottom variant="h5" component="h2">
             {props.data.name}
           </Typography>

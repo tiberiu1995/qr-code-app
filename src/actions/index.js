@@ -3,6 +3,20 @@ import store from "../store";
 //import { toast  } from 'react-toastify';
 //import 'react-toastify/dist/ReactToastify.min.css';  
 
+export const setPageIndex = page => {
+    store.dispatch({
+        type: 'PAGE_INDEX',
+        payload: page
+    })
+ }
+
+export const _setPageSize = page => {
+    store.dispatch({
+        type: 'PAGE_SIZE',
+        payload: page
+    })
+ }
+
 export const setUser = email => {
    store.dispatch({
     type: types.ADD_USER,

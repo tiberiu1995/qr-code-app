@@ -79,15 +79,20 @@ export class Form extends Component {
 						validator : new SimpleReactValidator(),
 							name: props.data.name,
 							description: props.data.description,
-							ingredients: props.data.ingredients,
+              ingredients: props.data.ingredients,
+              alergens: props.data.alergens,
+              calories: props.data.calories,
 							size: props.data.size,
-							pictures: props.data.pictures,
+              pictures: props.data.pictures,
+              category: props.categories.find(el => el.name === props.data.category).id
 					} :
 					this.state = {
 							validator : new SimpleReactValidator(),
 							name: 'Nume produs',
 							description: 'Descriere exemplu. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-							ingredients: 'Lorem, ipsum, dolor, sit, amet, consectetur, adipiscing, elit',
+              ingredients: 'Lorem, ipsum, dolor, sit, amet, consectetur, adipiscing, elit',
+              alergens: '',
+              calories: '',
 							size: 'Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei',
 							pictures: [
 									{ img: '' },
@@ -143,6 +148,8 @@ export class Form extends Component {
           name: this.state.name,
           description: this.state.description,
           ingredients: this.state.ingredients,
+          alergens: this.state.alergens,
+          calories: this.state.calories,
           size: this.state.size,
           pictures: this.state.pictures,
 					category: this.state.category || this.props.categories[0],
@@ -153,6 +160,8 @@ export class Form extends Component {
         name: 'Nume produs',
         description: 'Descriere exemplu. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         ingredients: 'Lorem, ipsum, dolor, sit, amet, consectetur, adipiscing, elit',
+        alergens: '',
+        calories: '',
         size: 'Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei',
         pictures: [
                 { img: '' },
@@ -274,7 +283,29 @@ export class Form extends Component {
 																			onChange={this.setStateFromInput}	/>
 																		{/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
 																</div>
-														</div>                                        
+														</div>  
+														<div className="form-group mb-3 col-lg-12">
+																<label className="">Alergeni</label>
+																<div className="description-sm">
+																		<TextField 
+                                      className="col-10" 
+                                      name="alergens"
+																			value = {this.state.alergens}
+																			onChange={this.setStateFromInput}	/>
+																		{/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
+																</div>
+														</div>   
+                            <div className="form-group mb-3 col-lg-12">
+																<label className="">Calorii</label>
+																<div className="description-sm">
+																		<TextField 
+                                      className="col-10" 
+                                      name="calories"
+																			value = {this.state.calories}
+																			onChange={this.setStateFromInput}	/>
+																		{/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
+																</div>
+														</div>                                                                     
 														<div className="form-group mb-3 col-lg-12">
 																<label className="">Descriere</label>
 																<div className="description-sm">

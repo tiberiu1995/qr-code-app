@@ -123,6 +123,8 @@ export class Menu extends Component {
               { id: _el.item_id,
                 name: _el.i_name,
                 ingredients: _el.ingredients,
+                alergens: _el.alergens,
+                calories: _el.calories,
                 pictures: _el.i_pictures,
                 size: _el.size
               }));

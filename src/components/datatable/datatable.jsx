@@ -14,21 +14,25 @@ const SelectColumnFilter = ({
 }) => {
   // Calculate the options for filtering
   // using the preFilteredRows
-  const options = React.useMemo(() => {
+  /*const options = React.useMemo(() => {
     const options = new Set()
     preFilteredRows.forEach(row => {
       options.add(row.values[id])
     })
     return [...options.values()]
-  }, [id, preFilteredRows])
+  }, [id, preFilteredRows])*/
+  const options = new Set();
+  preFilteredRows.forEach(row => {
+      options.add(row.values[id])
+  });
 
   // Render a multi-select box
   return (
       <Select 
-          default={{value: "", text: "Toate"}}
-          value={filterValue}
+          default={{value: "Toate", text: "Toate"}}
+          value={filterValue || "Toate"}
           onChange={e => { setFilter(e.target.value || undefined)}}
-          array={options}
+          array={[...options.values()]}
         />  
   )
 }
@@ -73,9 +77,9 @@ export const Datatable = (props) =>  {
       accessor: str => "Move",
       Cell: (row) => (
         <>
-           {<span>
+           {/* {<span>
             <i className="fa fa-arrows-v" style={{ width: 35, fontSize: 20, padding: 11,color:'black' }}/>
-          </span>}
+          </span>} */}
           <span onClick={() => {
               if (window.confirm('Are you sure you wish to delete this item?')) {
                 remove(row.row.original);

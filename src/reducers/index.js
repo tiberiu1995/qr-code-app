@@ -2,12 +2,13 @@ import { combineReducers } from 'redux';
 import { IntlReducer as Intl, IntlProvider } from 'react-redux-multilingual'
 
 // Import custom components
-import filtersReducer from './filters';
 import accountReducer from './account';
+import settingsReducer from './settings';
 
 const rootReducer = combineReducers({
     account: accountReducer,
-    filters: filtersReducer,
+    settings: settingsReducer,
+    //filters: filtersReducer,
     Intl
 });
 

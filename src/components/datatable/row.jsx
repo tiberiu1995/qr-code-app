@@ -5,7 +5,7 @@ import {TableRow, TableCell} from "@material-ui/core/";
 const DND_ITEM_TYPE = 'row'
 
 const Row = ({ row, index, moveRow }) => {
-  const dropRef = React.useRef(null)
+  /*const dropRef = React.useRef(null)
   const dragRef = React.useRef(null)
 
   const [, drop] = useDrop({
@@ -60,13 +60,13 @@ const Row = ({ row, index, moveRow }) => {
   const opacity = 1
 
   preview(drop(dropRef))
-  drag(dragRef)
+  drag(dragRef)*/
 
   return (
-    <TableRow ref={dropRef} style={{ opacity }}>
+    <TableRow /*ref={dropRef}*/ /*style={{ opacity }}*/>
       {row.cells.map(cell => {
         return cell.column.id==='move' ? 
-          <TableCell key={cell.value+cell.column.id} ref={dragRef} {...cell.getCellProps()}>{cell.render('Cell')}</TableCell> :
+          <TableCell key={cell.value+cell.column.id} /*ref={dragRef}*/ {...cell.getCellProps()}>{cell.render('Cell')}</TableCell> :
           <TableCell {...cell.getCellProps()}>{cell.render('Cell')}</TableCell>
       })}
       

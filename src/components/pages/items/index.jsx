@@ -7,6 +7,7 @@ import { update } from 'immutability-helper';
 import Button from 'react-bootstrap/Button';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';  
+import { setPageIndex } from './../../../actions/index';
 
 const style = {
 position: "top-right",
@@ -25,6 +26,7 @@ const Items = (props) => {
   const title = props.match.params.title;
   const [item, setItem] = useState(undefined);
   const [categories, setCategories] = useState([]);
+  !item && setPageIndex(0);
 
     const fetchItems = async () => {
       try{

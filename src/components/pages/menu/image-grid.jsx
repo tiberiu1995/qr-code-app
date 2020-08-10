@@ -25,14 +25,15 @@ import { Box } from '@material-ui/core';
 //     color: 'rgba(255, 255, 255, 0.54)',
 //   },
 // }));
-
+const value = (size) => ( (100*parseInt(size)/400)+'vw');
 
 const useStyles = makeStyles({
     title: {
         color: props => props.color,
-        size: props => props.size,
+        fontSize: props => value(props.size),
         font: props => props.font,
-        textAlign: 'center'
+        textAlign: 'center',
+        whiteSpace: 'break-spaces'
     },
   });
 
