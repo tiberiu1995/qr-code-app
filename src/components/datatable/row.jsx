@@ -1,8 +1,8 @@
-import React, { Component, Fragment, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import {TableRow, TableCell} from "@material-ui/core/";
+import React, { Component, Fragment, useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { TableRow, TableCell } from "@material-ui/core/";
 
-const DND_ITEM_TYPE = 'row'
+const DND_ITEM_TYPE = "row";
 
 const Row = ({ row, index, moveRow }) => {
   /*const dropRef = React.useRef(null)
@@ -64,14 +64,20 @@ const Row = ({ row, index, moveRow }) => {
 
   return (
     <TableRow /*ref={dropRef}*/ /*style={{ opacity }}*/>
-      {row.cells.map(cell => {
-        return cell.column.id==='move' ? 
-          <TableCell key={cell.value+cell.column.id} /*ref={dragRef}*/ {...cell.getCellProps()}>{cell.render('Cell')}</TableCell> :
-          <TableCell {...cell.getCellProps()}>{cell.render('Cell')}</TableCell>
+      {row.cells.map((cell) => {
+        return cell.column.id === "move" ? (
+          <TableCell
+            key={cell.value + cell.column.id}
+            /*ref={dragRef}*/ {...cell.getCellProps()}
+          >
+            {cell.render("Cell")}
+          </TableCell>
+        ) : (
+          <TableCell {...cell.getCellProps()}>{cell.render("Cell")}</TableCell>
+        );
       })}
-      
     </TableRow>
-  )
-}
+  );
+};
 
 export default Row;

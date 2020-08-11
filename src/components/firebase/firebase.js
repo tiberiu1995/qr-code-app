@@ -1,5 +1,5 @@
-import app from 'firebase/app';
-import 'firebase/auth';
+import app from "firebase/app";
+import "firebase/auth";
 
 const config = {
   apiKey: "AIzaSyAqebA0e5l-xgcEVvNsPypJ1_dRi2dHqMk",
@@ -9,7 +9,7 @@ const config = {
   storageBucket: "e-commerce-1-b4d7f.appspot.com",
   messagingSenderId: "368342962904",
   appId: "1:368342962904:web:43a406717179b3253ebdad",
-  measurementId: "G-08WBSCBEDH"
+  measurementId: "G-08WBSCBEDH",
 };
 
 class Firebase {
@@ -18,11 +18,11 @@ class Firebase {
     this.auth = app.auth();
   }
 
-  getUser = () =>
-  {return this.auth.currentUser};
+  getUser = () => {
+    return this.auth.currentUser;
+  };
 
-  doSendVerificationEmail = () => 
-    this.auth.currentUser.sendEmailVerification();
+  doSendVerificationEmail = () => this.auth.currentUser.sendEmailVerification();
 
   doCreateUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password);
@@ -32,11 +32,10 @@ class Firebase {
 
   doSignOut = () => this.auth.signOut();
 
-  doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
- 
-  doPasswordUpdate = password =>
+  doPasswordReset = (email) => this.auth.sendPasswordResetEmail(email);
+
+  doPasswordUpdate = (password) =>
     this.auth.currentUser.updatePassword(password);
-    
 }
 
 export default Firebase;

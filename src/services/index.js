@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-export const useScript = url => {
+export const useScript = (url) => {
   useEffect(() => {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
 
     script.src = url;
     script.async = true;
@@ -11,10 +11,10 @@ export const useScript = url => {
 
     return () => {
       document.body.removeChild(script);
-    }
+    };
   }, [url]);
 };
-  /*
+/*
   export const getAllProducts = async () => {
     try{
       let response = await fetch('https://bathtimestories.com/apim/product/get.php' , {
@@ -249,4 +249,3 @@ export const getFeatureImages = (products, type) => {
     return items;
 }
 */
-

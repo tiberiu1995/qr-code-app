@@ -1,4 +1,3 @@
-
 {
   "header": {
     "reportVersion": 1,
@@ -9,10 +8,7 @@
     "dumpEventTimeStamp": "1597045722236",
     "processId": 5024,
     "cwd": "F:\\qr-code-app",
-    "commandLine": [
-      "node",
-      "scripts/start.js"
-    ],
+    "commandLine": ["node", "scripts/start.js"],
     "nodejsVersion": "v12.16.1",
     "wordSize": 64,
     "arch": "x64",
@@ -213,9 +209,7 @@
   },
   "javascriptStack": {
     "message": "No stack.",
-    "stack": [
-      "Unavailable."
-    ]
+    "stack": ["Unavailable."]
   },
   "nativeStack": [
     {
@@ -386,8 +380,7 @@
       "writes": 720
     }
   },
-  "libuv": [
-  ],
+  "libuv": [],
   "environmentVariables": {
     "=F:": "F:\\qr-code-app",
     "ADSK_3DSMAX_x64_2018": "C:\\Program Files\\Autodesk\\3ds Max 2018\\",
