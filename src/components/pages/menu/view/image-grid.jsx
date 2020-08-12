@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import GridList from "@material-ui/core/GridList";
 import GridListTile from "@material-ui/core/GridListTile";
@@ -6,7 +6,7 @@ import GridListTileBar from "@material-ui/core/GridListTileBar";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import IconButton from "@material-ui/core/IconButton";
 import InfoIcon from "@material-ui/icons/Info";
-import { Box } from "@material-ui/core";
+import { Box, Fade, Collapse, Grow } from "@material-ui/core";
 import { animateScroll } from "react-scroll";
 
 // const useStyles = makeStyles((props) => ({
@@ -26,7 +26,7 @@ import { animateScroll } from "react-scroll";
 //     color: 'rgba(255, 255, 255, 0.54)',
 //   },
 // }));
-const value = (size) => (100 * parseInt(size)) / 400 + "vw";
+const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
 
 const scrollToRef = (ref) => animateScroll.scrollTo(ref.offsetTop);
 //window.scrollTo(0, ref.offsetTop);
@@ -40,6 +40,8 @@ const useStyles = makeStyles({
     whiteSpace: "break-spaces",
   },
 });
+
+
 
 /**
  * The example data is structured as follows:
@@ -59,12 +61,18 @@ const useStyles = makeStyles({
  *   },
  * ];
  */
+
+
+ 
 const TitlebarGridList = (props) => {
   let classes = useStyles(props.style);
+
   const cols = props.header ? 2 : 1;
 
   const refs = props.refs;
   const executeScroll = (ref) => scrollToRef(ref);
+
+
 
   //const [refs, setRefs] = useRef(
 
@@ -80,23 +88,13 @@ const TitlebarGridList = (props) => {
           className={classes.gridList}
         >
           {props.data.map((tile, i) => (
+            <Grow  timeout={1000} in={true}>
             <GridListTile
+              key={"tile"+i}
               style={null}
               onClick={(e) => props.header && executeScroll(refs[i])}
             >
-              {props.category && (
-                <a
-                  href={"#" + i}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    position: "absolute",
-                    zIndex: 1000,
-                  }}
-                  onClick={(e) => e.preventDefault()}
-                />
-              )}
-              <img imgFullWidth src={tile.picture} alt={tile.name} />
+              <img src={tile.picture} alt={tile.name} />
               <GridListTileBar
                 title={tile.name}
                 classes={{
@@ -112,6 +110,7 @@ const TitlebarGridList = (props) => {
                 //   }
               />
             </GridListTile>
+            </Grow >
           ))}
         </GridList>
       </Box>

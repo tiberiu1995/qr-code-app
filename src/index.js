@@ -11,22 +11,6 @@ import Layout from "./components/App.jsx";
 import * as serviceWorker from "./serviceWorker";
 
 import store from "./store";
-
-/*import aboutUs from './components/pages/about-us'
-import PageNotFound from './components/pages/404'
-import lookbook from './components/pages/lookbook'
-import Login from './components/pages/login'
-import Register from './components/pages/register' 
-import Search from './components/pages/search'
-import ForgetPassword from './components/pages/forget-password'
-import Contact from './components/pages/contact'
-import Dashboard from './components/pages/dashboard'
-import Faq from './components/pages/faq'
-import SignOut from './components/pages/signout'
-import MyAccount from './components/pages/my-account'
-import ChangePassword from './components/pages/change-password'
-import CookiePolicy from './components/pages/cookie-policy'*/
-
 import MenuForm from "./components/pages/new-menu";
 import MenuShow from "./components/pages/menu";
 
@@ -35,7 +19,8 @@ import PlaceItems from "./components/pages/menu/items/";
 import Categories from "./components/pages/category/";
 import Items from "./components/pages/items/";
 import Design from "./components/pages/menu/design/";
-import CustomerMenu from "./components/pages/menu/preview.jsx";
+import CustomerMenu from "./components/pages/menu/view/";
+import ItemReviews from "./components/pages/menu/view/review/";
 
 import messages from "./language.json";
 
@@ -75,6 +60,11 @@ class Root extends React.Component {
                     exact
                     path={`${process.env.PUBLIC_URL}/my-menu/:title`}
                     component={CustomerMenu}
+                  />
+                  <Route
+                    exact
+                    path={`${process.env.PUBLIC_URL}/my-menu/:title/reviews/:item`}
+                    component={ItemReviews}
                   />
                   <Layout>
                     {/*Routes For Extra Pages*/}
@@ -153,7 +143,6 @@ class Root extends React.Component {
                       component={Products}
                     />
 
-                    {/* <Route exact path={`${process.env.PUBLIC_URL}/`} component={aboutUs}/>                                                           */}
                   </Layout>
                 </Switch>
               </ScrollContext>

@@ -19,85 +19,25 @@ import { Box, Fade } from "@material-ui/core";
 
 import { useDrag, useDrop } from "react-dnd";
 import { TableRow, TableCell } from "@material-ui/core/";
+import { Link, withRouter } from "react-router-dom";
+import { compose } from 'redux';
 
-const DND_ITEM_TYPE = "row";
+const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
 
-//const percentage = (1+((window.innerWidth-400)/400));
-//const scale = (window.innerWidth/100);
-const value = (size) => (100 * parseInt(size)) / 400 + "vw";
+ const getStyle = ({color, font, size}) => ({color, fontSize: value(size), font})
 
 const useStyles = makeStyles({
-  name: {
-    color: (props) => props.name.color,
-    fontSize: (props) => value(props.name.size), //(parseInt(props.name.size)*scale),
-    font: (props) => props.name.font,
-    textAlign: "center",
-  },
-  size: {
-    color: (props) => props.size.color,
-    fontSize: (props) => value(props.size.size), //(parseInt(props.size.size)*scale),
-    font: (props) => props.size,
-  },
-  ingredients: {
-    color: (props) => props.ingredients.color,
-    fontSize: (props) => value(props.ingredients.size),
-    font: (props) => props.ingredients.font,
-  },
-  alergens: {
-    color: (props) => props.alergens.color,
-    fontSize: (props) => value(props.alergens.size), //(parseInt(props.ingredients.size)*scale),
-    font: (props) => props.alergens.font,
-  },
-  calories: {
-    color: (props) => props.calories.color,
-    fontSize: (props) => value(props.calories.size), //(parseInt(props.ingredients.size)*scale),
-    font: (props) => props.calories.font,
-  },
+  name: props => getStyle(props.name),
+  size: props => getStyle(props.size),
+  ingredients: props => getStyle(props.ingredients),
+  alergens: props => getStyle(props.alergens),
+  calories: props => getStyle(props.calories),
 });
 
 const MediaCard = (props) => {
   const classes = useStyles(props.style);
   const [showReviews, setShowReviews] = useState(false);
-
-  const reviews = [
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      date: Date.now(),
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-    {
-      name: "dolorem ipsum",
-      rating: 4,
-      text:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-  ];
+  const item_id = props.match.params.item;
 
   let picture;
   try {
@@ -108,7 +48,11 @@ const MediaCard = (props) => {
   }
 
   return (
-    <>
+    <Fade timeout={{
+      appear: 1000,
+      enter: 1000+props.id*2500,
+      exit: 0,
+     }} in={props.data.name !== ''}>
       <Card
         className="my-4 p-0"
         style={{ borderRadius: 20, position: "relative", zIndex: 150 }}
@@ -147,11 +91,22 @@ const MediaCard = (props) => {
             <Typography className={classes.size} gutterBottom component="p">
               {props.data.size}
             </Typography>
+            { !item_id && 
+              <Link to={{
+              pathname: "reviews/"+props.data.id,
+              state: ({
+                item: props.data,
+                style: props.style
+              })
+              }}>
+              Vezi recenzii
+              </Link>
+            }
           </CardContent>
         </CardActionArea>
       </Card>
 
-      {showReviews && (
+      {/* {showReviews && (
         <Fade in={showReviews}>
           <Card
             className="p-0"
@@ -196,15 +151,18 @@ const MediaCard = (props) => {
             </CardActionArea>
           </Card>
         </Fade>
-      )}
-      <RateReviewTwoTone
+      )} */}
+      {/* <RateReviewTwoTone
         onClick={(e) => setShowReviews(true)}
         fontSize={"large"}
         color="primary"
         style={{ position: "absolute", zIndex: 100, margin: "-1em", left: 60 }}
-      />
-    </>
+      /> */}
+    </Fade>
   );
 };
 
-export default MediaCard;
+export default 
+  compose(
+    withRouter
+  )(MediaCard);
