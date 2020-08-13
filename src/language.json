@@ -7,6 +7,13 @@
   "fr": {},
   "de": {},
   "ro": {
+    "item": "produs",
+    "name": "nume",
+    "size": "portie",
+    "calories": "calorii",
+    "alergens": "alergeni",
+    "ingredients": "ingrediente",
+    "category": "categorie",
     "my.account": "Contul meu",
     "my.orders": "Comenzile mele",
     "register": "Cont nou",

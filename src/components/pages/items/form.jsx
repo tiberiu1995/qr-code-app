@@ -10,14 +10,9 @@ import Select from "./../../utils/select.jsx";
 import {
   TextField,
   Button,
-  InputLabel,
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
 } from "@material-ui/core/";
+import FileInput from "../../utils/FileInput.jsx";
 const crop = (url, aspectRatio) => {
   // we return a Promise that gets resolved with our canvas element
   return new Promise((resolve) => {
@@ -104,41 +99,20 @@ export class Form extends Component {
         });
   }
 
-  handleChange = (event) => {
-    this.setState({ stock: event.target.value });
-  };
-
-  handleEditorChange = (content, editor, name) => {
-    this.setState({ [name]: content });
-    //console.log('Content was updated:', content);
-  };
-  _handleSubmit(e) {
-    e.preventDefault();
+  componentDidMount() {
+    /* let search = window.location.search;
+        let params = new URLSearchParams(search);
+        this.id = params.get('id');
+        if(this.id) {
+          this.fetchSingleProduct(this.id);
+          this.edit = true;
+        }*/
   }
 
-  _handleImgChange(e, i) {
-    e.preventDefault();
-
-    let reader = new FileReader();
-    let file = e.target.files[0];
-    const { pictures } = this.state;
-
-    reader.onloadend = async () => {
-      const canvas = await crop(reader.result, 4 / 3);
-      pictures[i].img = canvas.toDataURL();
-      //pictures[i].img = reader.result;
-      this.setState({
-        file: file,
-        pictures,
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-
-  getContent = (HTML) => {
-    var tmp = document.createElement("span");
-    tmp.innerHTML = HTML;
-    return tmp.textContent;
+  setStateFromInput = (event) => {
+    var obj = {};
+    obj[event.target.name] = event.target.value;
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   addItem = async (e) => {
@@ -174,20 +148,40 @@ export class Form extends Component {
     this.props.addItem(data);
   };
 
-  setStateFromInput = (event) => {
-    var obj = {};
-    obj[event.target.name] = event.target.value;
-    this.setState({ [event.target.name]: event.target.value });
+
+  handleChange = (event) => {
+    this.setState({ stock: event.target.value });
   };
 
-  componentDidMount() {
-    /* let search = window.location.search;
-        let params = new URLSearchParams(search);
-        this.id = params.get('id');
-        if(this.id) {
-          this.fetchSingleProduct(this.id);
-          this.edit = true;
-        }*/
+  handleEditorChange = (content, editor, name) => {
+    this.setState({ [name]: content });
+    //console.log('Content was updated:', content);
+  };
+  _handleSubmit(e) {
+    e.preventDefault();
+  }
+
+  _handleImgChange(e, i) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+    const { pictures } = this.state;
+
+    reader.onloadend = async () => {
+      const canvas = await crop(reader.result, 4 / 3);
+      pictures[i].img = canvas.toDataURL();
+      //pictures[i].img = reader.result;
+      this.setState({
+        file: file,
+        pictures,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  deleteImg(i) {
+    this.setState({pictures: [{ img: "" }]});
   }
 
   render() {
@@ -203,52 +197,39 @@ export class Form extends Component {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Nou</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
         </Modal.Header>
         <ModalBody className="p-3">
           <div className="container-fluid">
             <div className="col-sm-12">
               <div className="row">
                 <div className="col-lg-12">
-                  <ul className="file-upload-product row">
-                    {this.state.pictures.map((res, i) => {
-                      return (
-                        <li key={"p" + i} className="col-lg-3 row">
-                          <div className="box-input-file row mx-0 col-lg-12 bg-white">
-                            <input
-                              className="upload mx-auto"
-                              type="file"
-                              onChange={(e) => this._handleImgChange(e, i)}
-                            />
-                            <img
-                              src={res.img}
-                              style={{ width: 133, height: 100 }}
-                            />
-                            <a
-                              id="result1"
-                              onClick={(e) => this._handleSubmit(e.target.id)}
-                            ></a>
-                          </div>
-                          {/* <div className="row mx-0 col-lg-12 d-flex justify-content-center">
-																					<button onClick={(e)=>this.deleteImg(e,i)}>delete</button>
-																				</div>*/}
-                        </li>
-                      );
-                    })}
-                  </ul>
                   {/* <button onClick={(e) => this.addImageSlot(e)}>+ image slot</button>*/}
                 </div>
               </div>
               <div className="container-fluid">
                 <div className="col-xl-12">
                   <form className="needs-validation add-product-form">
+                    <ul className="file-upload-product row">
+                      {this.state.pictures.map((res, i) => {
+                        return (
+                          <li key={"p" + i} className="col-lg-3 row">
+                            <FileInput 
+                              source={res.img} 
+                              onChange={(event) => this._handleImgChange(event,i)} 
+                              deleteImg={(event) => this.deleteImg(i)}
+                              onClick={(event) => this._handleSubmit(event)}/>
+                          </li>
+                        );
+                      })}
+                    </ul>
                     <div className="form form-label-center row">
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Nume</label>
                         <div className="">
                           <TextField
-                            className="col-10"
+                            className="col-12"
                             name="name"
+                            label="Nume"
                             value={this.state.name}
                             onChange={this.setStateFromInput}
                           />
@@ -260,10 +241,10 @@ export class Form extends Component {
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Categorie</label>
                         <div className="description-sm">
                           {this.props.categories && (
                             <Select
+                              label="Categorie"
                               default={{ value: 0, text: "Alege o categorie" }}
                               value={this.state.category || 0}
                               onChange={this.setStateFromInput}
@@ -275,18 +256,6 @@ export class Form extends Component {
                               array={this.props.categories}
                             />
                           )}
-
-                          {/* <select 
-                                      className="col-10" 
-                                      name="category" 
-                                      value={this.state.category}
-                                      onChange={this.setStateFromInput} >
-																			<option defaultValue={0}>Alege o categorie</option>
-																			{ this.props.categories.map((i,j) =>
-																					<option key={j} value={i.name}>{i.name}</option>
-																				)
-																			}
-																		</select> */}
                           {this.state.validator.message(
                             "category",
                             this.state.category,
@@ -295,47 +264,47 @@ export class Form extends Component {
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Ingrediente</label>
                         <div className="description-sm">
                           <TextField
-                            className="col-10"
+                            className="col-12"
                             name="ingredients"
+                            multiline
+                            label="Ingrediente"
                             value={this.state.ingredients}
                             onChange={this.setStateFromInput}
                           />
-                          {/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Alergeni</label>
                         <div className="description-sm">
                           <TextField
-                            className="col-10"
+                            label="Alergeni"
+                            multiline
+                            className="col-12"
                             name="alergens"
                             value={this.state.alergens}
                             onChange={this.setStateFromInput}
                           />
-                          {/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Calorii</label>
                         <div className="description-sm">
                           <TextField
-                            className="col-10"
+                            className="col-12"
                             name="calories"
+                            label="Calorii"
                             value={this.state.calories}
                             onChange={this.setStateFromInput}
                           />
-                          {/* {this.state.validator.message('ingredients', this.state.ingredients, 'required')}                     */}
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label className="">Descriere</label>
                         <div className="description-sm">
                           <TextField
                             name="description"
-                            className="col-10"
+                            label="Descriere"
+                            multiline
+                            className="col-12"
                             value={this.state.description}
                             onChange={this.setStateFromInput}
                           />
@@ -347,11 +316,11 @@ export class Form extends Component {
                         </div>
                       </div>
                       <div className="form-group mb-3 col-lg-12">
-                        <label>Portie</label>
                         <div className="description-sm">
                           <TextField
                             name="size"
-                            className="col-10"
+                            label="Portie/preturi"
+                            className="col-12"
                             value={this.state.size}
                             onChange={this.setStateFromInput}
                           />

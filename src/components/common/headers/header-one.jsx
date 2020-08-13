@@ -86,7 +86,7 @@ class HeaderOne extends Component {
           {this.state.isLoading ? <Pace color="#27ae60" /> : null}
           <div className="mobile-fix-option"></div>
           {/*Top Header Component*/}
-          <div className="main-menu text-light bg-primary">
+          <div className="main-menu text-light">
             <div className="menu-left">
               {/*<div className="navbar">
 								<a href="javascript:void(0)" onClick={this.openNav}>

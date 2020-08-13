@@ -7,6 +7,8 @@ import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
 import Button from "react-bootstrap/Button";
 import { TextField, FormLabel } from "@material-ui/core";
+import FileInput from './../../utils/FileInput';
+import { TransferWithinAStationSharp } from "@material-ui/icons";
 
 export class Form extends Component {
   constructor(props) {
@@ -28,26 +30,15 @@ export class Form extends Component {
         });
   }
 
-  _handleSubmit(e) {
-    e.preventDefault();
+  componentDidMount() {
+    this.props.data && this.getBase64Image(this.props.data.picture, "picture");
   }
 
-  _handleImgChange(e, type) {
-    e.preventDefault();
-
-    let reader = new FileReader();
-    let file = e.target.files[0];
-    //const { picture } = this.state;
-
-    reader.onloadend = async () => {
-      const canvas = reader.result;
-      //pictures[i].img = reader.result;
-      type === "picture"
-        ? this.setState({ picture: canvas })
-        : this.setState({ background: canvas });
-    };
-    reader.readAsDataURL(file);
-  }
+  setStateFromInput = (event) => {
+    var obj = {};
+    obj[event.target.name] = event.target.value;
+    this.setState({ [event.target.name]: event.target.value });
+  };
 
   addItem = async (e) => {
     e.preventDefault();
@@ -73,21 +64,25 @@ export class Form extends Component {
     this.props.addItem(data);
   };
 
-  setStateFromInput = (event) => {
-    var obj = {};
-    obj[event.target.name] = event.target.value;
-    this.setState({ [event.target.name]: event.target.value });
-  };
+  _handleSubmit(e) {
+    e.preventDefault();
+  }
 
-  componentDidMount() {
-    this.props.data && this.getBase64Image(this.props.data.picture, "picture");
-    /*let search = window.location.search;
-        let params = new URLSearchParams(search);
-        this.id = params.get('id');
-        if(this.id) {
-          this.fetchSingleProduct(this.id);
-          this.edit = true;
-        }*/
+  _handleImgChange(e, type) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+    //const { picture } = this.state;
+
+    reader.onloadend = async () => {
+      const canvas = reader.result;
+      //pictures[i].img = reader.result;
+      type === "picture"
+        ? this.setState({ picture: canvas })
+        : this.setState({ background: canvas });
+    };
+    reader.readAsDataURL(file);
   }
 
   getBase64Image = async (picture, type) => {
@@ -112,6 +107,10 @@ export class Form extends Component {
     img.src = picture;
   };
 
+  deleteImg(type) {
+    this.setState({[type]: "" });
+  }
+
   render() {
     const { show, onCancel, data } = this.props;
     return (
@@ -125,18 +124,18 @@ export class Form extends Component {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Nou</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
         </Modal.Header>
         <ModalBody className="p-3">
           <div className="container-fluid">
             <div className="col-xl-12">
-              <form className="needs-validation add-product-form">
                 <div className="form form-label-center row">
                   <div className="form-group mb-3 col-lg-12">
-                    <label className="col-xl-3 col-sm-4">Nume</label>
+
                     <div className="description-sm">
                       <TextField
                         name="name"
+                        label="Nume"
                         value={this.state.name}
                         onChange={this.setStateFromInput}
                       />
@@ -149,11 +148,12 @@ export class Form extends Component {
                   </div>
                   <div className="form-group mb-3 col-lg-12">
                     <FormLabel className="col-xl-3 col-sm-4">
-                      Descriere
                     </FormLabel>
                     <div className="description-sm">
                       <TextField
                         name="description"
+                        label="Descriere"
+                        multiline
                         value={this.state.description}
                         onChange={this.setStateFromInput}
                       />
@@ -168,44 +168,23 @@ export class Form extends Component {
                     <label className="col-xl-3 col-sm-4">
                       Imagine categorie
                     </label>
-                    <div className="box-input-file row mx-0 col-lg-12 bg-white">
-                      <input
-                        className="upload mx-auto"
-                        type="file"
-                        onChange={(e) => this._handleImgChange(e, "picture")}
-                      />
-                      <img
-                        src={this.state.picture}
-                        style={{ width: 133, height: 100 }}
-                      />
-                      <a
-                        id="result1"
-                        onClick={(e) => this._handleSubmit(e.target.id)}
-                      />
-                    </div>
+                    <FileInput 
+                            source={this.state.picture} 
+                            onChange={(event) => this._handleImgChange(event,"picture")} 
+                            deleteImg={(event) => this.deleteImg("picture")}
+                            onClick={(event) => this._handleSubmit(event)}/>
                   </div>
                   <div className="form-group mb-3 col-lg-12">
                     <label className="col-xl-3 col-sm-4">
                       Imagine fundal categorie
                     </label>
-                    <div className="box-input-file row mx-0 col-lg-12 bg-white">
-                      <input
-                        className="upload mx-auto"
-                        type="file"
-                        onChange={(e) => this._handleImgChange(e, "background")}
-                      />
-                      <img
-                        src={this.state.background}
-                        style={{ width: 133, height: 100 }}
-                      />
-                      <a
-                        id=""
-                        onClick={(e) => this._handleSubmit(e.target.id)}
-                      />
-                    </div>
-                  </div>
+                    <FileInput 
+                            source={this.state.background} 
+                            onChange={(event) => this._handleImgChange(event,"background")} 
+                            deleteImg={(event) => this.deleteImg("background")}
+                            onClick={(event) => this._handleSubmit(event)} />
+                   </div>
                 </div>
-              </form>
             </div>
           </div>
         </ModalBody>

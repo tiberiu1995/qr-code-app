@@ -31,6 +31,7 @@ import ScanQR from "./components/pages/scan-qr";
 import { Container } from "./components/test/test";
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
+import blue from '@material-ui/core/colors/blue';
 
 class Root extends React.Component {
   constructor(props) {
@@ -38,7 +39,11 @@ class Root extends React.Component {
     this.state = {
       authUser: null,
     };
-    this.theme = createMuiTheme();
+    this.theme = createMuiTheme({
+      palette: {
+        primary: blue,
+      },
+    });
   }
 
   componentDidMount() {}

@@ -5,12 +5,15 @@ import ModalBody from "react-bootstrap/ModalBody";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
-import Button from "react-bootstrap/Button";
-import { TextField, FormLabel } from "@material-ui/core";
+import { TextField, FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles } from "@material-ui/core";
 import { ChromePicker } from "react-color";
 import Select from "../../../utils/select.jsx";
-import { Grid } from "@material-ui/core/";
+import { Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch.js";
+import { injectIntl } from "react-intl";
+import { Save } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/styles";
+
 
 export class Form extends Component {
   constructor(props) {
@@ -114,85 +117,99 @@ export class Form extends Component {
   // };
 
   render() {
-    const { show, onCancel, data } = this.props;
+    const { show, onCancel, data, intl} = this.props;
+    const translate = intl.formatMessage;
     return (
       <div className="p-3">
         <div className="container-fluid">
-          <Grid container cols={2}>
-            <Grid item>
-              <form className="needs-validation add-product-form">
+          <Grid container cols={2} spacing={2}>
+            <Grid item xs={6} s={6}>
+              <Paper elevation={1}>
+                <form className="needs-validation add-product-form">
                 {[
-                  ["category", "name"],
-                  ["item", "name"],
-                  ["item", "ingredients"],
-                  ["item", "alergens"],
-                  ["item", "calories"],
-                  ["item", "size"],
-                ].map((el, i) => (
-                  <div className="form form-label-center row">
-                    <div className="form-group mb-3 col-lg-12">
-                      <label className="col-xl-3 col-sm-4">
-                        Font titlu {el[1]} {el[0]}
-                      </label>
-                      <div className="description-sm">
-                        <Select
-                          name="font"
-                          value={this.state[el[0]][el[1]].font}
-                          onChange={(e) => this.setStateFromInput(e, el)}
-                          array={[
-                            "Arial",
-                            "Courier New",
-                            "Georgia",
-                            "Palatino",
-                            "Tahoma",
-                            "Times New Roman",
-                            "Trebuchet MS",
-                            "Verdana",
-                          ]}
-                        />
+                    ["category", "name"],
+                    ["item", "name"],
+                    ["item", "ingredients"],
+                    ["item", "alergens"],
+                    ["item", "calories"],
+                    ["item", "size"],
+                  ].map((el, i) => (
+                    <Box>
+                      <Divider/>
+                      <Typography align="center" gutterBottom>
+                        Stilizare {translate({id: el[1]})} {translate({id: el[0]})}  
+                      </Typography>
+                      <Box m={2}
+                        display="flex"
+                        justifyContent="space-evenly" 
+                        className="form form-label-center" >
+                      <div className="form-group mb-3">
+                        <div className="description-sm">
+                          <Select
+                            name="font"
+                            label="Font"
+                            value={this.state[el[0]][el[1]].font}
+                            onChange={(e) => this.setStateFromInput(e, el)}
+                            array={[
+                              "Arial",
+                              "Courier New",
+                              "Georgia",
+                              "Palatino",
+                              "Tahoma",
+                              "Times New Roman",
+                              "Trebuchet MS",
+                              "Verdana",
+                            ]}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                      <label className="col-xl-3 col-sm-4">
-                        Culoare titlu {el}
-                      </label>
-                      <div className="description-sm">
-                        <input
-                          name="color"
-                          type="color"
-                          onChange={(e) => this.setStateFromInput(e, el)}
-                          value={this.state[el[0]][el[1]].color}
-                        />
-                        {/* <ChromePicker 
-                                name="category_name_color"
-                                disableAlpha={true}
-                                color={ this.state.category_name_color }
-                                onChangeComplete={ this.handleColor }
-                              />                    */}
+                      <div className="form-group mb-3">
+                        <div className="description-sm">
+                        <FormControl>
+                          <FormLabel className="MuiInputLabel-shrink">Culoare</FormLabel>
+                          <input
+                            name="color"
+                            label="Culoare"
+                            type="color"
+                            style={{width: 100}}
+                            onChange={(e) => this.setStateFromInput(e, el)}
+                            value={this.state[el[0]][el[1]].color}
+                          />
+                        </FormControl>
+                        </div>
                       </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                      <label className="col-xl-3 col-sm-4">
-                        Dimensiune titlu {el}
-                      </label>
-                      <div className="description-sm">
-                        <Select
-                          name="size"
-                          value={this.state[el[0]][el[1]].size}
-                          onChange={(e) => this.setStateFromInput(e, el)}
-                          array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
-                        />
+                      <div className="form-group mb-3">
+                        <div className="description-sm">
+                          <Select
+                            name="size"
+                            label="Dimensiune"
+                            value={this.state[el[0]][el[1]].size}
+                            onChange={(e) => this.setStateFromInput(e, el)}
+                            array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
+                            display={(val) => (val+' px') }
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </Box>
+                    </Box>
+                  ))}
+                  <Box display="flex" justifyContent="center" >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      style={{margin: this.props.theme.spacing(2), justifyContent: 'center'}}
+                      startIcon={<Save />}
+                      onClick={this.saveDesign}
+                    >
+                      Save
+                    </Button>
+                  </Box>
 
-                <Button variant="primary" onClick={this.saveDesign}>
-                  Salveaza
-                </Button>
-              </form>
+                </form>
+              </Paper>
             </Grid>
-            <Grid item>
+            <Grid item xs={6} s={6}>
               <iframe
                 title="preview"
                 src={`/my-menu/${this.props.match.params.title}/`}
@@ -207,4 +224,4 @@ export class Form extends Component {
   }
 }
 
-export default Form;
+export default withStyles(null, { withTheme: true })(injectIntl(Form));
