@@ -21,6 +21,9 @@ import {
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 import clsx from "clsx";
+import { compose } from 'recompose';
+import { withFirebase } from './../../../firebase/context';
+import { connect } from 'react-redux';
 
 
 const DesktopNavBar = (props) => {
@@ -63,7 +66,8 @@ const DesktopNavBar = (props) => {
   return (
       <AppBar >
       <List component="nav">
-        <ListItem component="div">
+        { props.email ?
+          <ListItem component="div">
           <ListItemText>
             <Typography variant="h5" align="center">
               <Link className={clsx(classes.link)}
@@ -98,9 +102,55 @@ const DesktopNavBar = (props) => {
             </Typography>
           </ListItemText>
         </ListItem>
+        :
+        <ListItem component="div">
+        <ListItemText>
+          <Typography variant="h5" align="center">
+            <Link className={clsx(classes.link)}
+              to={`${process.env.PUBLIC_URL}/home`} 
+              >
+              <i
+                className={"fa fa-sliders mx-1 "+clsx(classes.link)}
+                aria-hidden="true"
+              />
+              Home
+            </Link>
+          </Typography>
+        </ListItemText>
+        <ListItemText>
+          <Typography variant="h5" align="center"> 
+            <Link className={clsx(classes.link)}
+              to={`${process.env.PUBLIC_URL}/pricing`} 
+              >
+              <i className={"fa fa-tasks mx-1 "+clsx(classes.link)}  aria-hidden="true" />
+              Pricing
+            </Link>
+          </Typography>
+        </ListItemText>
+        <ListItemText>
+          <Typography variant="h5" align="center">
+            <Link className={clsx(classes.link)}
+              to={`${process.env.PUBLIC_URL}/log-in`}
+            >
+              <i className={"fa fa-user mx-1 "+clsx(classes.link)} aria-hidden="true" />
+              Log In
+            </Link>
+          </Typography>
+        </ListItemText>
+      </ListItem>      
+      }
       </List>
       </AppBar>
   )
 };
 
-export default withStyles(null, { withTheme: true })(DesktopNavBar);
+const mapStateToProps = (state) => ({
+  //symbol: state.data.symbol,
+  email: state.account.email,
+  token: state.account.token
+});
+
+export default compose(
+  connect(mapStateToProps),
+  withStyles(null, { withTheme: true }))(DesktopNavBar);
+

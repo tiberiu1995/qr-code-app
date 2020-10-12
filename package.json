@@ -55,6 +55,7 @@
     "postcss-preset-env": "6.0.6",
     "postcss-safe-parser": "4.0.1",
     "qrcode.react": "^1.0.0",
+    "query-string": "^6.13.1",
     "react": "16.8.0",
     "react-anchor-link-smooth-scroll": "^1.0.12",
     "react-app-polyfill": "^0.1.3",

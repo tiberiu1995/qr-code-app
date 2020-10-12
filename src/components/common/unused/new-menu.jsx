@@ -4,18 +4,18 @@ import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
-import { withFirebase } from "../firebase";
-import Breadcrumb from "../common/breadcrumb";
+import { withFirebase } from "../../firebase";
+import Breadcrumb from "../breadcrumb";
 import SimpleReactValidator from "simple-react-validator";
-import Product from "../menu/product";
+import Product from "../../menu/product";
 import Button from "react-bootstrap/Button";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { Card } from "../menu/card.jsx";
+import { Card } from "../../menu/card.jsx";
 import QRCode from "qrcode.react";
-import Datatable from "../datatable/datatable.jsx";
-import { fetchMenu, fetchData } from "../utils/fetch";
+import Datatable from "../../datatable/datatable.jsx";
+import { fetchMenu, fetchData } from "../../utils/fetch";
 
 //import data from './../../../../all_in_one_multikart_react/front-end/src/admin/assets/data/digital-category';
 

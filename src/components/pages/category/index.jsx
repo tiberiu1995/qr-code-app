@@ -5,16 +5,18 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { Datatable } from "../../datatable/datatable";
+import Datatable from "../../datatable/datatable";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import Form from "./form";
 import { update } from "immutability-helper";
-import Button from "react-bootstrap/Button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { setPageIndex } from "./../../../actions/index";
 import { fetchData } from "../../utils/fetch";
+import { Button, Box } from "@material-ui/core";
+import { Save, Add } from "@material-ui/icons";
+import Header from "../menu/menu-header.jsx";
 
 const Categories = (props) => {
   const [data, setData] = useState([]);
@@ -89,8 +91,9 @@ const Categories = (props) => {
   const closeModal = () => showForm(false);
 
   return (
-    <div className="my-1 mx-auto text-center col-lg-10">
+    <div className="my-1 mx-auto col-lg-10">
       <div className="form-group mb-3">
+        <Header/>
         {
           <Form
             key={new Date().valueOf()}
@@ -105,9 +108,18 @@ const Categories = (props) => {
         ) : (
           <h4>Nu ai adaugat nicio categorie</h4>
         )}
-        <Button className="m-2" onClick={showModal}>
-          Adauga <i className="fa fa-plus" aria-hidden="true" />
-        </Button>
+        <Box m={2} display="flex" justifyContent="center" >
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            style={{justifyContent: 'center'}}
+            startIcon={<Add />}
+            onClick={showModal}
+          >
+            Adauga categorie
+          </Button>
+        </Box>
       </div>
       {/* <Button className="m-2" onClick={saveData}>Salveaza <i className="fa fa-check" aria-hidden="true"/></Button> */}
     </div>

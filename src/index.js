@@ -11,8 +11,8 @@ import Layout from "./components/App.jsx";
 import * as serviceWorker from "./serviceWorker";
 
 import store from "./store";
-import MenuForm from "./components/pages/new-menu";
-import MenuShow from "./components/pages/menu";
+import MenuForm from "./components/pages/menu/form.jsx";
+//import MenuShow from "./components/pages/menu";
 
 import Menus from "./components/pages/menu/";
 import PlaceItems from "./components/pages/menu/items/";
@@ -21,6 +21,8 @@ import Items from "./components/pages/items/";
 import Design from "./components/pages/menu/design/";
 import CustomerMenu from "./components/pages/menu/view/";
 import ItemReviews from "./components/pages/menu/view/review/";
+import LoginForm from "./components/pages/log-in";
+import Account from "./components/pages/my-account";
 
 import messages from "./language.json";
 
@@ -47,7 +49,15 @@ class Root extends React.Component {
   }
 
   componentDidMount() {}
+  /*
+    /menu/  - all menus
+    /menu/:title  - admin menu
+    /my-menu/:title - visitor menu
 
+
+
+
+  */
   render() {
     return (
       <Provider store={store}>
@@ -63,51 +73,30 @@ class Root extends React.Component {
                   {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/`} component={MenuShow}/> */}
                   <Route
                     exact
-                    path={`${process.env.PUBLIC_URL}/my-menu/:title`}
+                    path={`${process.env.PUBLIC_URL}/my-menu/:title/`}
                     component={CustomerMenu}
                   />
                   <Route
                     exact
-                    path={`${process.env.PUBLIC_URL}/my-menu/:title/reviews/:item`}
+                    path={`${process.env.PUBLIC_URL}/my-menu/:title/reviews/:item/`}
                     component={ItemReviews}
                   />
                   <Layout>
-                    {/*Routes For Extra Pages*/}
-                    <Route
-                      path={`${process.env.PUBLIC_URL}/test`}
-                      component={Container}
-                    />
-                    {/* <Route path={`${process.env.PUBLIC_URL}/pages/about-us`} component={aboutUs}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/404`} component={PageNotFound}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/lookbook`} component={lookbook}/>
-                      <Route path={`${process.env.PUBLIC_URL}/login`} component={Login}/>
-                      <Route path={`${process.env.PUBLIC_URL}/register`} component={Register}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/search`} component={Search}/>
-                      <Route path={`${process.env.PUBLIC_URL}/forget-password`} component={ForgetPassword}/>
-                      <Route path={`${process.env.PUBLIC_URL}/change-password`} component={ChangePassword}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/contact`} component={Contact}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/dashboard`} component={Dashboard}/>
-                      <Route path={`${process.env.PUBLIC_URL}/pages/faq`} component={Faq}/>
-                      <Route path={`${process.env.PUBLIC_URL}/signout`} component={SignOut}/>
-                      <Route path={`${process.env.PUBLIC_URL}/my-account`} component={MyAccount}/>
-                      <Route path={`${process.env.PUBLIC_URL}/cookie-policy`} component={CookiePolicy}/> */}
-
-                    {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/:title`} component={MenuForm}/>   */}
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/menu/new`}
+                      path={`${process.env.PUBLIC_URL}/menu/new/`}
                       component={MenuForm}
                     />
 
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/menu`}
+                      path={`${process.env.PUBLIC_URL}/menu/`}
                       component={Menus}
                     />
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/menu/:title`}
-                      component={Menus}
+                      path={`${process.env.PUBLIC_URL}/menu/:title/`}
+                      component={MenuForm}
                     />
                     <Route
                       exact
@@ -144,10 +133,14 @@ class Root extends React.Component {
 
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/products`}
-                      component={Products}
-                    />
-
+                      path={`${process.env.PUBLIC_URL}/log-in`}
+                      component={LoginForm}
+                    />                      
+                    <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/my-account`}
+                      component={Account}
+                    />  
                   </Layout>
                 </Switch>
               </ScrollContext>

@@ -96,14 +96,14 @@ const MediaCard = (props) => {
             className="text-center"
             gutterBottom
             variant="h5"
-            component="h2"
+            component="h5"
           >
             {props.data.name}
           </Typography>
           <Typography
             className="float-left"
             gutterBottom
-            variant="p"
+            variant="subtitle1"
             component="p"
           >
             {props.data.ingredients}

@@ -24,7 +24,7 @@ import { compose } from 'redux';
 
 const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
 
- const getStyle = ({color, font, size}) => ({color, fontSize: value(size), font})
+ const getStyle = ({color, font, size}) => ({color, fontSize: value(size), fontFamily: font})
 
 const useStyles = makeStyles({
   name: props => getStyle(props.name),
@@ -91,16 +91,19 @@ const MediaCard = (props) => {
             <Typography className={classes.size} gutterBottom component="p">
               {props.data.size}
             </Typography>
-            { !item_id && 
-              <Link to={{
-              pathname: "reviews/"+props.data.id,
-              state: ({
-                item: props.data,
-                style: props.style
-              })
-              }}>
-              Vezi recenzii
-              </Link>
+            { !item_id ? 
+                ( !props.isPreview ? 
+                  <Link to={{
+                    pathname: `${props.location.pathname}reviews/${props.data.id}/`,
+                    state: ({
+                      item: props.data,
+                      style: props.style
+                    })
+                    }}>
+                    Vezi recenzii
+                  </Link> :
+                  'Vezi recenzii'
+                ) : ''
             }
           </CardContent>
         </CardActionArea>

@@ -30,11 +30,14 @@ import DesktopNavBar from "./DesktopNavBar";
 const NavBar = (props) => {
 
   const theme = props.theme;
-  const up_sm = useMediaQuery(theme.breakpoints.up("sm"));
+  const desktop = useMediaQuery('(min-width:900px)');
+  const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
+  const mobile = useMediaQuery('(max-width:499px)');
+  //const up_sm = useMediaQuery(theme.breakpoints.up("sm"));
 
 
   return (
-    up_sm ? 
+    desktop ? 
       <DesktopNavBar/> :
       <MobileNavBar/>
   )

@@ -1,13 +1,13 @@
 import React, { Component, Fragment } from "react";
-import Breadcrumb from "../common/breadcrumb";
+import Breadcrumb from "../breadcrumb";
 import SimpleReactValidator from "simple-react-validator";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
-import { withFirebase } from "../firebase";
-import Product from "../menu/product";
+import { withFirebase } from "../../firebase";
+import Product from "../../menu/product";
 import Button from "react-bootstrap/Button";
-import { fetchMenu } from "../utils/fetch";
+import { fetchMenu } from "../../utils/fetch";
 
 export class Menu extends Component {
   constructor(props) {

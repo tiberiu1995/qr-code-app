@@ -107,7 +107,7 @@ const Reviews = (props) => {
                   <br/>
                   {'Pe '+moment(parseInt(el.date)*1000).format("DD/MM/YYYY")}
                   <br/>
-                  <Rating name="read-only" value={el.rating} readOnly />  
+                  <Rating name="read-only" value={parseInt(el.rating)} readOnly />  
                   <br/>
                   {el.text}
                   <br/>

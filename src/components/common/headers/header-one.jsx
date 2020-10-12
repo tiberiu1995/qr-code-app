@@ -83,29 +83,7 @@ class HeaderOne extends Component {
     return (
       <div>
         <header id="sticky" className="sticky">
-          {this.state.isLoading ? <Pace color="#27ae60" /> : null}
-          <div className="mobile-fix-option"></div>
-          {/*Top Header Component*/}
-          <div className="main-menu text-light">
-            <div className="menu-left">
-              {/*<div className="navbar">
-								<a href="javascript:void(0)" onClick={this.openNav}>
-									<div className="bar-style"> <i className="fa fa-bars sidebar-bar" aria-hidden="true"></i></div>
-								</a>
-								<SideBar/>
-							</div>*/}
-              <div className="brand-logo">
-                <LogoImage logo={this.props.logoName} />
-              </div>
-            </div>
-            <div className="menu-left">
-              {/*Top Navigation Bar Component*/}
               <NavBar />
-              <div>
-                <div className="icon-nav"></div>
-              </div>
-            </div>
-          </div>
         </header>
       </div>
     );

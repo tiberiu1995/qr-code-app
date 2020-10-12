@@ -5,21 +5,31 @@ import ModalBody from "react-bootstrap/ModalBody";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import ModalTitle from "react-bootstrap/ModalTitle";
-import { TextField, FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles } from "@material-ui/core";
+import { TextField, FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles, SvgIcon, useMediaQuery } from "@material-ui/core";
 import { ChromePicker } from "react-color";
 import Select from "../../../utils/select.jsx";
 import { Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch.js";
 import { injectIntl } from "react-intl";
-import { Save } from "@material-ui/icons";
+import { Save, PhoneAndroid, Smartphone } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
+import { Prompt } from 'react-router-dom';
+import Header from "../menu-header.jsx";
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import clsx from 'clsx';
 
 
-export class Form extends Component {
+const queryString = require('query-string'); 
+
+
+
+class Form extends Component {
   constructor(props) {
     super(props);
     this.edit = false;
     this.state = {
+      isEdited: false,
       validator: new SimpleReactValidator(),
       name: "Nume categorie",
       description: "Descriere",
@@ -61,7 +71,9 @@ export class Form extends Component {
   }
 
   setStateFromInput = (event, type) => {
+    !this.state.isEdited && this.setState({isEdited: true});
     var obj = {};
+    //console.log(`/my-menu/${this.props.match.params.title}?category=${JSON.stringify(this.state.category)}&item=${JSON.stringify(this.state.item)}`);
     obj[event.target.name] = event.target.value;
     this.setState({
       [type[0]]: {
@@ -118,12 +130,41 @@ export class Form extends Component {
 
   render() {
     const { show, onCancel, data, intl} = this.props;
+    let iframe = {
+        background: 'white', 
+        position: 'absolute', 
+    }
+    this.props.media.mobile ? 
+      iframe = {...iframe, top: '12%', left: '15%', height: '76%',width: '70%'} :
+      iframe = {...iframe, top: 83, left: '50%',  transform: 'translateX(-50%)', width: 300};
+    
     const translate = intl.formatMessage;
+
+    const {category, item} = this.state;
+    const previewQuery = 
+    `cnc=${category.name.color.replace("#",'')}&cns=${category.name.size}&cnf=${category.name.font.replace(/\s/g, "_")}&
+inc=${item.name.color.replace("#",'')}&ins=${item.name.size}&inf=${item.name.font.replace(/\s/g, "_")}&
+iic=${item.ingredients.color.replace("#",'')}&iis=${item.ingredients.size}&iif=${item.ingredients.font.replace(/\s/g, "_")}&
+iac=${item.alergens.color.replace("#",'')}&ias=${item.alergens.size}&iaf=${item.alergens.font.replace(/\s/g, "_")}&
+icc=${item.calories.color.replace("#",'')}&ics=${item.calories.size}&icf=${item.calories.font.replace(/\s/g, "_")}&
+isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.font.replace(/\s/g, "_")}`;
+
     return (
       <div className="p-3">
+        <Prompt
+          when={this.state.isEdited}
+          message={`Are you sure you want to exit without saving?`}
+        />
         <div className="container-fluid">
-          <Grid container cols={2} spacing={2}>
-            <Grid item xs={6} s={6}>
+          <Header/>
+          <Grid 
+            container 
+            direction="row"
+            justify="center"
+            alignItems="center"
+            cols={2} 
+            spacing={2} >
+            <Grid align="center" item xs={12} sm={12} md={6}>
               <Paper elevation={1}>
                 <form className="needs-validation add-product-form">
                 {[
@@ -134,16 +175,16 @@ export class Form extends Component {
                     ["item", "calories"],
                     ["item", "size"],
                   ].map((el, i) => (
-                    <Box>
+                    <Box key={'db'+i}>
                       <Divider/>
                       <Typography align="center" gutterBottom>
                         Stilizare {translate({id: el[1]})} {translate({id: el[0]})}  
                       </Typography>
                       <Box m={2}
-                        display="flex"
+                        display={this.props.media.mobile ? "block" : "flex"}
                         justifyContent="space-evenly" 
                         className="form form-label-center" >
-                      <div className="form-group mb-3">
+                      <div style={{width:175}}  className="form-group mb-3">
                         <div className="description-sm">
                           <Select
                             name="font"
@@ -166,7 +207,7 @@ export class Form extends Component {
                       <div className="form-group mb-3">
                         <div className="description-sm">
                         <FormControl>
-                          <FormLabel className="MuiInputLabel-shrink">Culoare</FormLabel>
+                          <FormLabel className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
                           <input
                             name="color"
                             label="Culoare"
@@ -209,13 +250,16 @@ export class Form extends Component {
                 </form>
               </Paper>
             </Grid>
-            <Grid item xs={6} s={6}>
+            <Grid align="center" item xs={12} sm={12} md={6} style={{position: 'relative'}}>
+              <img src="https://bathtimestories.com/wp-content/uploads/2020/07/smartphone.png"  style={{maxWidth: 400, width: '100%'}}/>
               <iframe
-                title="preview"
-                src={`/my-menu/${this.props.match.params.title}/`}
-                width="350"
-                height="450"
-              ></iframe>
+
+                  title="preview"
+                  src={`/my-menu/${this.props.match.params.title}?${previewQuery}/`}
+                  width="338"
+                  height="450"
+                  style={iframe}
+                />
             </Grid>
           </Grid>
         </div>
@@ -224,4 +268,14 @@ export class Form extends Component {
   }
 }
 
-export default withStyles(null, { withTheme: true })(injectIntl(Form));
+
+const mapStateToProps = (state) => ({
+  media: state.media
+});
+
+
+export default 
+  compose(
+    withStyles(null, { withTheme: true }),
+    connect(mapStateToProps)
+    )(injectIntl(Form));

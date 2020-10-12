@@ -16,6 +16,8 @@ import { animateScroll } from "react-scroll";
 import { fetchMenuView, fetchMenu, fetchMenuDesign, fetchData } from '../../../utils/fetch';
 import Reviews from './review';
 
+const queryString = require('query-string');
+
 const styles = (theme) => ({
   fab: {
     margin: theme.spacing(2),
@@ -49,16 +51,57 @@ const scrollToBottom = () => {
 export class Menu extends Component {
   constructor(props) {
     super(props);
-    this.edit = false;
+    //const parsed = window.location.href.split('%22').join('"').split('%20').join(' ');
+   // console.log(queryString.parse(props.location.search));
     this.state = {
-      //validator : new SimpleReactValidator(),
       products: [],
       show_form: false,
       data: [],
       refs: [],
       showToolTip: false,
+      item: "",
+      category: "",
       mobileView: window.innerWidth<600,
     };
+    const params = queryString.parse(props.location.search);
+    if (Object.keys(params).length){
+    this.state.isPreview = true;
+    this.state.category = {
+      name: {
+        color: "#"+params.cnc,
+        size: params.cns,
+        font: params.cnf.replace(/_/g, " "),
+      },
+    };
+    this.state.tem = {
+        name: {
+          color: "#"+params.inc,
+          size: params.ins,
+          font: params.inf.replace(/_/g, " "),
+        },
+        ingredients: {
+          color: "#"+params.iic,
+          size: params.iis,
+          font: params.iif.replace(/_/g, " "),
+        },
+        alergens: {
+          color: "#"+params.iac,
+          size: params.ias,
+          font: params.iaf.replace(/_/g, " "),
+        },
+        calories: {
+          color: "#"+params.icc,
+          size: params.ics,
+          font: params.icf.replace(/_/g, " "),
+        },
+        size: {
+          color: "#"+params.isc,
+          size: params.iss,
+          font: params.isf.replace(/_/g, " "),
+        },
+    };
+  }
+    this.edit = false;
   }
 
   updateWindowDimensions = () => {
@@ -72,7 +115,8 @@ export class Menu extends Component {
     window.addEventListener("resize", this.updateWindowDimensions);
     const title = this.props.match.params.title;
     this.fetchData(title);
-    this.fetchDesign(title);
+    if(!this.state.item)
+      this.fetchDesign(title);
     window.addEventListener("scroll", this.handleToolTip);
   }
 
@@ -175,8 +219,8 @@ export class Menu extends Component {
         Cuprins
         <br/>
         <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
-        <div className="my-1 display-menu" stylw={{position: "relative"}}>
-          {grid.length ? (
+        <div className="my-1 display-menu" style={{position: "relative"}}>
+          {grid.length && category_style ? (
             <GridImage
               data={grid}
               header={true}
@@ -187,7 +231,7 @@ export class Menu extends Component {
             ""
           )}
           {
-            data.length && category
+            data.length && item && category_style
               ? data.map((el, i) => (
                   <div
                     ref={this.addRef}
@@ -200,7 +244,7 @@ export class Menu extends Component {
                   </Typography> */}
                     <Box p={2.5}>
                       {el.items.map((_el, _i) => (
-                        <Card key={'card'+_i} style={item} id={_i} data={_el} />
+                        <Card isPreview={this.state.isPreview} key={'card'+_i} style={item} id={_i} data={_el} />
                       ))}
                     </Box>
                   </div>

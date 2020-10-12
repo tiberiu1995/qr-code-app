@@ -1,11 +1,72 @@
 import React, { Component, Fragment, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { TableRow, TableCell } from "@material-ui/core/";
+import { TableRow, TableCell, useMediaQuery } from "@material-ui/core/";
+import { Box } from '@material-ui/core';
+import { ArrowDropDown } from "@material-ui/icons";
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { injectIntl } from 'react-intl';
 
 const DND_ITEM_TYPE = "row";
 
-const Row = ({ row, index, moveRow }) => {
-  /*const dropRef = React.useRef(null)
+const Row = ({ media, row, index, moveRow }) => {
+  const lt600 = useMediaQuery('(max-width:599px)');
+
+  
+  const data = () => {
+   if(!lt600) 
+    return row.cells.map((cell) => 
+         <TableCell {...cell.getCellProps()}>
+           {cell.render("Cell")}
+         </TableCell>
+     );
+    else
+     return row.cells.map((cell) => ["name", "category", "picture", "move", "title", "cat_no", "item_no"].includes(cell.column.id) &&
+     <TableCell padding={media.mobile ? "none" : "default" } {...cell.getCellProps()}>
+       {cell.render("Cell")}
+     </TableCell>);
+  }
+
+  return (
+    <TableRow>
+      { data() }
+    </TableRow>
+  );
+};
+
+
+const mapStateToProps = (state) => ({
+  media: state.media
+});
+
+
+export default 
+  compose(
+    connect(mapStateToProps)
+    )(injectIntl(Row));
+
+{/*<TableCell colSpan={3}>
+        <Box display="flex" justifyContent="space-between">
+        { row.cells.map((cell) => {
+          return ["name", "category"].includes(cell.column.id) ? 
+            <Box {...cell.getCellProps()}>
+              {cell.render("Cell")}
+            </Box> : ''
+        })
+        }
+        </Box>
+        <Box display="flex" justifyContent="space-between">
+        { row.cells.map((cell) => {
+          return ["picture", "move"].includes(cell.column.id) ? 
+            <Box {...cell.getCellProps()}>
+              {cell.render("Cell")}
+            </Box> : ''
+        })
+      }
+        </Box>
+      </TableCell> */}
+
+{/*const dropRef = React.useRef(null)
   const dragRef = React.useRef(null)
 
   const [, drop] = useDrop({
@@ -61,23 +122,5 @@ const Row = ({ row, index, moveRow }) => {
 
   preview(drop(dropRef))
   drag(dragRef)*/
-
-  return (
-    <TableRow /*ref={dropRef}*/ /*style={{ opacity }}*/>
-      {row.cells.map((cell) => {
-        return cell.column.id === "move" ? (
-          <TableCell
-            key={cell.value + cell.column.id}
-            /*ref={dragRef}*/ {...cell.getCellProps()}
-          >
-            {cell.render("Cell")}
-          </TableCell>
-        ) : (
-          <TableCell {...cell.getCellProps()}>{cell.render("Cell")}</TableCell>
-        );
-      })}
-    </TableRow>
-  );
-};
-
-export default Row;
+///*ref={dragRef}*/
+}      

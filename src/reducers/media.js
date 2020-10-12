@@ -4,27 +4,25 @@
     RECEIVE_PRODUCTS,
     RELATED_PRODUCTS } from "../constants/ActionTypes";
 */
-import { ADD_USER, ADD_MSG } from "../constants/ActionTypes";
+//import { ADD_USER, ADD_MSG } from "../constants/ActionTypes";
 import { connect } from "react-redux";
 import { Link, withRouter } from "react-router-dom";
 import { compose, withReducer } from "recompose";
 import { withFirebase } from "../components/firebase";
 
 const initialState = {
-  user: "---",
+  mobile: "",
+  tablet: "",
+  desktop: ""
 };
 
-const accountReducer = (state = initialState, action) => {
+const mediaReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "ADD_EMAIL":
-      return { ...state, email: action.email };
-    case "ADD_TOKEN":
-      return { ...state, token: action.token };
-    case ADD_MSG:
-      return { ...state, message: action.message };
+    case "MEDIA_QUERY":
+      return { ...state,  ...action.payload };
     default:
       return state;
   }
 };
 
-export default accountReducer;
+export default mediaReducer;

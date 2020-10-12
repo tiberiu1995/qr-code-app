@@ -35,7 +35,7 @@ const useStyles = makeStyles({
   title: {
     color: (props) => props.color,
     fontSize: (props) => value(props.size),
-    font: (props) => props.font,
+    fontFamily: (props) => props.font,
     textAlign: "center",
     whiteSpace: "break-spaces",
   },
@@ -88,7 +88,7 @@ const TitlebarGridList = (props) => {
           className={classes.gridList}
         >
           {props.data.map((tile, i) => (
-            <Grow  timeout={1000} in={true}>
+            <Grow key={"ig-g"+i} timeout={1000} in={true}>
             <GridListTile
               key={"tile"+i}
               style={null}

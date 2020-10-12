@@ -5,22 +5,15 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { Link, withRouter } from "react-router-dom";
-import { MenuItem } from "@material-ui/core/";
+import { MenuItem, useMediaQuery } from "@material-ui/core/";
 import Table from "./table.jsx";
 import Select from "../utils/select.jsx";
+import { Image } from "@material-ui/icons";
 
 const SelectColumnFilter = ({
-  column: { filterValue, setFilter, preFilteredRows, id },
+  column: { filterValue, preFilteredRows, setFilter, id },
 }) => {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  /*const options = React.useMemo(() => {
-    const options = new Set()
-    preFilteredRows.forEach(row => {
-      options.add(row.values[id])
-    })
-    return [...options.values()]
-  }, [id, preFilteredRows])*/
+
   const options = new Set();
   preFilteredRows.forEach((row) => {
     options.add(row.values[id]);
@@ -29,6 +22,7 @@ const SelectColumnFilter = ({
   // Render a multi-select box
   return (
     <Select
+      label={id}//{formatMessage({id: id})}
       default={{ value: "Toate", text: "Toate" }}
       value={filterValue || "Toate"}
       onChange={(e) => {
@@ -39,40 +33,45 @@ const SelectColumnFilter = ({
   );
 };
 
-export const Datatable = (props) => {
-  const { edit, myData, remove, hideFilters } = props;
-
+const Datatable = (props) => {
+  const { edit, myData, remove, hideFilters, intl: { formatMessage} } = props;
+  const translate = formatMessage;
+  const desktop = useMediaQuery('(min-width:900px)');
+  const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
+  const lt600 = useMediaQuery('(max-width:599px)');
+  const mobile = useMediaQuery('(max-width:499px)');
   const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
   const columns = [];
   for (var key in myData[0]) {
+    if (["description", "ingredients", "alergens", "calories", "id"].includes(key))
+      continue;
+   // if(matches && !["name", "category", "picture"].includes(key))
+   //   continue;
     let column = {
-      Header: <b>{capitalize(key.toString())}</b>,
+      Header: <b>{capitalize(
+        translate({id: key.toString()})
+        )}</b>,
       accessor: key,
-      //sortType: (key =="id") ? 'basic' : 'alphanumeric',
       width: 10,
       filterable: true,
       style: { textAlign: "center" },
     };
-    if (key === "pictures") {
-      column.Cell = ({ cell: { value } }) => (
-        <img src={value[0].img} width="100px" />
-      );
+    if (key === "cat_no" || key === "item_no" || key === "id") {
       column.filterable = false;
-    }
-    if (key === "picture" || key === "background") {
-      column.Cell = ({ cell: { value } }) => <img src={value} width="100px" />;
-      column.filterable = false;
-    }
-    if (key === "id") {
-      column.filterable = false;
+      column.sortable = false;
     }
     if (key === "category") {
       column.Filter = SelectColumnFilter;
       column.filter = "includes";
     }
+    if (key === "picture" || key === "background") {
+      column.Cell = ({ cell: { value } }) => (value.includes('jpeg') ? <img src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
+      column.filterable = false;
+    }
     columns.push(column);
+
   }
   columns.push({
     id: "move",
@@ -119,4 +118,4 @@ export const Datatable = (props) => {
   return <Table data={myData} hideFilters={hideFilters} columns={columns} />;
 };
 
-export default compose(withRouter, connect(null))(Datatable);
+export default compose(withRouter, connect(null))(injectIntl(Datatable));

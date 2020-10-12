@@ -80,7 +80,7 @@ export class Form extends Component {
           alergens: props.data.alergens,
           calories: props.data.calories,
           size: props.data.size,
-          pictures: props.data.pictures,
+          picture: props.data.picture,
           category: props.categories.find(
             (el) => el.name === props.data.category
           ).id,
@@ -95,7 +95,7 @@ export class Form extends Component {
           alergens: "",
           calories: "",
           size: "Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei",
-          pictures: [{ img: "" }],
+          picture: '',
         });
   }
 
@@ -129,7 +129,7 @@ export class Form extends Component {
       alergens: this.state.alergens,
       calories: this.state.calories,
       size: this.state.size,
-      pictures: this.state.pictures,
+      picture: this.state.picture,
       category: this.state.category || this.props.categories[0],
       id: this.props.data ? this.props.data.id : "",
     };
@@ -143,7 +143,7 @@ export class Form extends Component {
       alergens: "",
       calories: "",
       size: "Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei",
-      pictures: [{ img: "" }],
+      picture: '',
     });
     this.props.addItem(data);
   };
@@ -161,27 +161,27 @@ export class Form extends Component {
     e.preventDefault();
   }
 
-  _handleImgChange(e, i) {
+  _handleImgChange(e) {
     e.preventDefault();
 
     let reader = new FileReader();
     let file = e.target.files[0];
-    const { pictures } = this.state;
+    let picture = '';
 
     reader.onloadend = async () => {
       const canvas = await crop(reader.result, 4 / 3);
-      pictures[i].img = canvas.toDataURL();
+      picture = canvas.toDataURL();
       //pictures[i].img = reader.result;
       this.setState({
         file: file,
-        pictures,
+        picture,
       });
     };
     reader.readAsDataURL(file);
   }
 
-  deleteImg(i) {
-    this.setState({pictures: [{ img: "" }]});
+  deleteImg() {
+    this.setState({picture: ''});
   }
 
   render() {
@@ -210,19 +210,11 @@ export class Form extends Component {
               <div className="container-fluid">
                 <div className="col-xl-12">
                   <form className="needs-validation add-product-form">
-                    <ul className="file-upload-product row">
-                      {this.state.pictures.map((res, i) => {
-                        return (
-                          <li key={"p" + i} className="col-lg-3 row">
-                            <FileInput 
-                              source={res.img} 
-                              onChange={(event) => this._handleImgChange(event,i)} 
-                              deleteImg={(event) => this.deleteImg(i)}
-                              onClick={(event) => this._handleSubmit(event)}/>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                      <FileInput 
+                          source={this.state.picture} 
+                          onChange={(event) => this._handleImgChange(event)} 
+                          deleteImg={(event) => this.deleteImg()}
+                          onClick={(event) => this._handleSubmit(event)}/>
                     <div className="form form-label-center row">
                       <div className="form-group mb-3 col-lg-12">
                         <div className="">

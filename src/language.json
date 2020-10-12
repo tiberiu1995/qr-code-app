@@ -1,12 +1,16 @@
 {
   "en": {
     "my.account": "My account",
-    "my.orders": "My orders"
+    "my.orders": "My orders",
+    "cat_no": "No. of categories",
+    "item_no": "No. of products"
   },
   "es": {},
   "fr": {},
   "de": {},
   "ro": {
+    "cat_no": "Nr. de categorii",
+    "item_no": "Nr. de produse",
     "item": "produs",
     "name": "nume",
     "size": "portie",
@@ -34,6 +38,9 @@
     "payment.method": "Modalitate de plata",
     "total": "Valoare totala",
     "total.items": "Total produse",
-    "shipping.rate": "Cost de livrare"
+    "shipping.rate": "Cost de livrare",
+    "title": "Titlu",
+    "id": "Id",
+    "picture": "imagine"
   }
 }

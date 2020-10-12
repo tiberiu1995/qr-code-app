@@ -3,6 +3,13 @@ import store from "../store";
 //import { toast  } from 'react-toastify';
 //import 'react-toastify/dist/ReactToastify.min.css';
 
+export const setMedia = (media) => {
+  store.dispatch({
+    type: "MEDIA_QUERY",
+    payload: media,
+  });
+}
+
 export const setPageIndex = (page) => {
   store.dispatch({
     type: "PAGE_INDEX",
@@ -19,7 +26,7 @@ export const _setPageSize = (page) => {
 
 export const setUser = (email) => {
   store.dispatch({
-    type: types.ADD_USER,
+    type: "ADD_EMAIL",
     email: email,
   });
 };
@@ -27,7 +34,7 @@ export const setUser = (email) => {
 export const setToken = (token) => {
   store.dispatch({
     type: "ADD_TOKEN",
-    email: token,
+    token: token,
   });
 };
 

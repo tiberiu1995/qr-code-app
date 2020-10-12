@@ -19,6 +19,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
+  useMediaQuery
 } from "@material-ui/core/";
 import {
   ArrowDropDown,
@@ -36,22 +38,24 @@ import { compose } from "redux";
 import { withReducer } from "recompose";
 import { connect } from "react-redux";
 import { setPageIndex, _setPageSize } from "../../actions";
+import { injectIntl } from "react-intl";
+import { makeStyles } from '@material-ui/styles';
+import clsx from 'clsx';
 
-// Define a default UI for filtering
-const DefaultColumnFilter = ({
-  column: { filterValue, preFilteredRows, setFilter },
-}) => {
-  const count = preFilteredRows.length;
-  return (
-    <TextField
-      value={filterValue || ""}
-      onChange={(e) => {
-        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
-      }}
-      placeholder={`Cauta...`}
-    />
-  );
-};
+const useStyles = makeStyles({
+  pagination: {
+    '& .MuiFormControl-root': {
+      marginLeft: 16,
+      marginRight: 16,
+
+    }
+  },
+  arrows: {
+    '& svg': {
+      fontSize: 16
+    }
+  }
+});
 
 const fuzzyTextFilterFn = (rows, id, filterValue) => {
   return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
@@ -60,8 +64,27 @@ const fuzzyTextFilterFn = (rows, id, filterValue) => {
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = (val) => !val;
 
-const CustomTable = ({ columns, data, hideFilters, settings }) => {
+const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
   const [records, setRecords] = useState(data);
+  const classes = useStyles();
+  // Define a default UI for filtering
+  const DefaultColumnFilter = ({
+    column: { filterValue, preFilteredRows, setFilter, id },
+  }) => {
+    const count = preFilteredRows.length;
+
+    return (
+      <TextField
+        value={filterValue || ""}
+        label={translate({id: id})}
+        onChange={(e) => {
+          setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+        }}
+        placeholder={`Cauta...`}
+        variant="outlined"
+      />
+    );
+  };
 
   const filterTypes = React.useMemo(
     () => ({
@@ -147,66 +170,164 @@ const CustomTable = ({ columns, data, hideFilters, settings }) => {
     data = newRecords;
   };
 
+  const translate = intl.formatMessage;
+  const desktop = useMediaQuery('(min-width:900px)');
+  const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
+  const lt600 = useMediaQuery('(max-width:599px)');
+  const mobile = useMediaQuery('(max-width:499px)');
+
+  const filtering = () => headerGroups.map((headerGroup) => (
+    <Box mb={2.5} display={ lt600 ? "grid" : "flex"} justifyContent="left"  {...headerGroup.getHeaderGroupProps()}>
+      <Box mx={2.5}>
+        <Typography align="left" variant="subtitle1">
+          Filtreaza dupa...
+        </Typography>
+      </Box>
+      { !lt600 ?
+        headerGroup.headers.map((column) =>  (
+          column.canFilter && column.filterable &&
+            <Box mx={2.5} {...column.getHeaderProps(column.getSortByToggleProps())} >
+              {column.render("Filter")}
+            </Box>
+          )
+        ) :
+        <Box display="flex">
+        { headerGroup.headers.map((column) => ["name", "category"].includes(column.id) && (
+            column.canFilter && column.filterable &&
+              <Box mx={2.5} {...column.getHeaderProps(column.getSortByToggleProps())} >
+                {column.render("Filter")}
+              </Box>
+            )
+          )}
+        </Box>
+      }
+      </Box>
+  ));
+
+  const header = () => {
+    let arr =  lt600 ? ["name", "category", "title", "cat_no", "item_no"] : ["name", "category", "size", "title", "cat_no", "item_no"];
+    return headerGroups.map((headerGroup) => (
+      <TableRow {...headerGroup.getHeaderGroupProps()}>
+        {headerGroup.headers.map((column) => (
+          arr.includes(column.id) && 
+          <TableCell padding={mobile ? "none" : "default" }
+            {...column.getHeaderProps(column.getSortByToggleProps())} >
+            <Box display="flex" alignItems="center">
+              {column.render("Header")}
+              <Box display="grid" className={clsx(classes.arrows)}>
+              { sortingArrows(column) }
+              </Box>
+             
+            </Box>
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+  }
+
+  const sortingArrows = (column) => {
+    if (column.canSort ){
+      if (column.isSorted){
+        if(column.isSortedDesc) 
+          return <ArrowDropDown/>
+          else return <ArrowDropUp/>;
+      };
+      return  <>  
+          <ArrowDropUp />
+          <ArrowDropDown/>
+        </>;
+    }
+    return '';
+  };
+
+  const pagionation = () => (
+    lt600 ? 
+      <>
+        <Select
+        value={pageIndex+1}
+        onChange={(e) => {
+          gotoPage(Number(e.target.value-1));
+        }}
+        array={Array.from({length: pageOptions.length}, (_, i) => i + 1)}
+        display={(e) => {
+          return `Pagina ${e}`;
+        }} />
+        <Select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            _setPageSize(Number(e.target.value));
+          }}
+          array={[5, 10, 20, 50]}
+          display={(e) => {
+            return `Afiseaza ${e}`;
+          }} />
+      </> :
+      <>
+        <Button
+          style={{padding: 10}}
+          onClick={() => {
+            gotoPage(0);
+            setPageIndex(0);
+          }}
+          disabled={!canPreviousPage}
+        >
+          <FirstPage />
+        </Button>
+        <Button
+          onClick={() => {
+            previousPage();
+            setPageIndex(pageIndex - 1);
+          }}
+          disabled={!canPreviousPage}
+        >
+          <NavigateBefore />
+        </Button> 
+        <span className="mx-2">
+          Pagina {pageIndex + 1} din {pageOptions.length}
+        </span>           
+        <Button
+          onClick={() => {
+            nextPage();
+            setPageIndex(pageIndex + 1);
+          }}
+          disabled={!canNextPage}
+        >
+          <NavigateNext />
+        </Button>
+        <Button
+          onClick={() => {
+            gotoPage(pageCount - 1);
+            setPageIndex(pageCount - 1);
+          }}
+          disabled={!canNextPage}>
+          <LastPage />
+        </Button>
+        {" "}
+        <Select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            _setPageSize(Number(e.target.value));
+          }}
+          array={[5, 10, 20, 50]}
+          display={(e) => {
+            return `Afiseaza ${e}`;
+          }}/>
+    </>
+    )
+
   return (
+
     <DndProvider backend={HTML5Backend}>
-      <Table {...getTableProps()}>
-        <TableHead>
-          {headerGroups.map((headerGroup) => (
-            <>
-              <TableRow {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <TableCell
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                  >
-                    <div>
-                      {column.canFilter && column.filterable
-                        ? column.render("Header")
-                        : null}
-                    </div>
-                    <div>
-                      {!hideFilters && column.canFilter && column.filterable
-                        ? column.render("Filter")
-                        : null}
-                    </div>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </>
-          ))}
-        </TableHead>
-      </Table>
+      {!hideFilters || <Box {...getTableProps()}>
+        { filtering() }
+      </Box>
+      }
 
       <Table {...getTableProps()}>
         <TableHead>
-          {headerGroups.map((headerGroup) => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <TableCell
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                >
-                  <span>
-                    {column.render("Header")}
-                    {column.canSort ? (
-                      column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <ArrowDropDown fontSize="small" />
-                        ) : (
-                          <ArrowDropUp fontSize="small" />
-                        )
-                      ) : (
-                        <>
-                          <ArrowDropDown fontSize="small" />
-                          <ArrowDropUp fontSize="small" />
-                        </>
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </span>
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+          { header() }
         </TableHead>
         <TableBody {...getTableBodyProps()}>
           {page.map(
@@ -223,58 +344,12 @@ const CustomTable = ({ columns, data, hideFilters, settings }) => {
           )}
         </TableBody>
       </Table>
-      {!hideFilters && (
+      {!hideFilters || (
         <Box>
-          <Button
-            onClick={() => {
-              gotoPage(0);
-              setPageIndex(0);
-            }}
-            disabled={!canPreviousPage}
-          >
-            <FirstPage />
-          </Button>
-          <Button
-            onClick={() => {
-              previousPage();
-              setPageIndex(pageIndex - 1);
-            }}
-            disabled={!canPreviousPage}
-          >
-            <NavigateBefore />
-          </Button>
-          <Button
-            onClick={() => {
-              nextPage();
-              setPageIndex(pageIndex + 1);
-            }}
-            disabled={!canNextPage}
-          >
-            <NavigateNext />
-          </Button>
-          <Button
-            onClick={() => {
-              gotoPage(pageCount - 1);
-              setPageIndex(pageCount - 1);
-            }}
-            disabled={!canNextPage}
-          >
-            <LastPage />
-          </Button>{" "}
-          <span className="mx-2">
-            Pagina {pageIndex + 1} din {pageOptions.length}
-          </span>
-          <Select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value));
-              _setPageSize(Number(e.target.value));
-            }}
-            array={[5, 10, 20, 50]}
-            display={(e) => {
-              return `Afiseaza ${e}`;
-            }}
-          />
+          <Box m={2} display="flex" alignItems="center" justifyContent="center" className={clsx(classes.pagination)} >
+            { pagionation()
+              }
+          </Box>
         </Box>
       )}
     </DndProvider>
@@ -285,6 +360,6 @@ const mapStateToProps = (state, ownProps) => ({
   settings: state.settings,
 });
 
-export default connect(mapStateToProps)(CustomTable);
+export default connect(mapStateToProps)(injectIntl(CustomTable));
 
 //export default CustomTable;

@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { Datatable } from "../../../datatable/datatable";
-import { Link, withRouter } from "react-router-dom";
+import { Link, withRouter, Prompt } from "react-router-dom";
 import { compose } from "recompose";
 import update from "immutability-helper";
 import { toast, ToastContainer } from "react-toastify";
@@ -25,6 +25,7 @@ const Categories = (props) => {
   const category = props.match.params.category;
   const [right, setRight] = useState([]);
   const [left, setLeft] = useState([]);
+  const [isEdited, setEdited] = useState(false);
   //const [categories, setCategories] = useState([]);
 
   const moveRow = (dragIndex, hoverIndex) => {
@@ -37,6 +38,7 @@ const Categories = (props) => {
         [hoverIndex, 0, dragRecord],
       ],
     });
+    setEdited(true);
     setRight(newRecords);
   };
 
@@ -116,6 +118,7 @@ const Categories = (props) => {
     let l = left;
     let r = right;
     let index = right.findIndex((el) => el.id == value);
+    setEdited(true);
     setLeft(
       update(left, {
         $push: [right[index]],
@@ -133,6 +136,7 @@ const Categories = (props) => {
     let l = left;
     let r = right;
     let index = l.findIndex((el) => el.id == value);
+    setEdited(true);
     setRight(
       update(right, {
         $push: [left[index]],
@@ -151,6 +155,10 @@ const Categories = (props) => {
 
   return (
     <div className="my-1 mx-auto text-center">
+      <Prompt
+        when={isEdited}
+        message={`Are you sure you want to exit without saving?`}
+      />
       <Box m={5}>
         <Grid container spacing={4} justify={"center"}>
           <Grid item xs={12} sm={6} style={{ maxWidth: 600 }}>
