@@ -73,7 +73,7 @@ export class Menu extends Component {
         font: params.cnf.replace(/_/g, " "),
       },
     };
-    this.state.tem = {
+    this.state.item = {
         name: {
           color: "#"+params.inc,
           size: params.ins,
@@ -210,7 +210,7 @@ export class Menu extends Component {
       : [];
     const category_style = category && {
       color: category.name.color,
-      fontFamily: category.name.color,
+      fontFamily: category.name.font,
       fontSize: category.name.size,
     };
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");

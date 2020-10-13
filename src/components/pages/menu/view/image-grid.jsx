@@ -98,7 +98,7 @@ const TitlebarGridList = (props) => {
               <GridListTileBar
                 title={tile.name}
                 classes={{
-                  root: classes.titleBar,
+                  root: classes.title,
                   title: classes.title,
                 }}
                 //style={{color: "#cc00a0", fontFamily: "#cc00a0", fontSize: 30}}

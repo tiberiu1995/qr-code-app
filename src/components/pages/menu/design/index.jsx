@@ -22,7 +22,29 @@ import clsx from 'clsx';
 
 const queryString = require('query-string'); 
 
+const style = theme => ({
+  [theme.breakpoints.down('xs')]: {
+    form: {
+      '& .MuiFormLabel-root': {
+          visibility: 'hidden'
+      },
+      '& .MuiBox-root .MuiBox-root .MuiBox-root': {
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap'
 
+      }
+    }
+  },
+  [theme.breakpoints.up('sm')]: {
+      form: {
+      '& h6': {
+        display: 'none'
+      }
+    }
+  }
+});
 
 class Form extends Component {
   constructor(props) {
@@ -129,7 +151,7 @@ class Form extends Component {
   // };
 
   render() {
-    const { show, onCancel, data, intl} = this.props;
+    const { show, onCancel, data, intl, media, classes} = this.props;
     let iframe = {
         background: 'white', 
         position: 'absolute', 
@@ -150,7 +172,7 @@ icc=${item.calories.color.replace("#",'')}&ics=${item.calories.size}&icf=${item.
 isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.font.replace(/\s/g, "_")}`;
 
     return (
-      <div className="p-3">
+      <Box m={{'sm': 2}}>
         <Prompt
           when={this.state.isEdited}
           message={`Are you sure you want to exit without saving?`}
@@ -164,9 +186,9 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
             alignItems="center"
             cols={2} 
             spacing={2} >
-            <Grid align="center" item xs={12} sm={12} md={6}>
+            <Grid align="center" item xs={12} lg={6}>
               <Paper elevation={1}>
-                <form className="needs-validation add-product-form">
+                <form className={"needs-validation add-product-form " + clsx(classes.form)}>
                 {[
                     ["category", "name"],
                     ["item", "name"],
@@ -181,11 +203,13 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                         Stilizare {translate({id: el[1]})} {translate({id: el[0]})}  
                       </Typography>
                       <Box m={2}
-                        display={this.props.media.mobile ? "block" : "flex"}
+                        display={media.mobile ? "block" : "flex"}
                         justifyContent="space-evenly" 
                         className="form form-label-center" >
-                      <div style={{width:175}}  className="form-group mb-3">
-                        <div className="description-sm">
+                        <Box mb={2}>
+                          <Typography align="center" gutterBottom component="h6">
+                            Font
+                          </Typography>
                           <Select
                             name="font"
                             label="Font"
@@ -202,25 +226,32 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                               "Verdana",
                             ]}
                           />
-                        </div>
-                      </div>
-                      <div className="form-group mb-3">
-                        <div className="description-sm">
-                        <FormControl>
-                          <FormLabel className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
-                          <input
-                            name="color"
-                            label="Culoare"
-                            type="color"
-                            style={{width: 100}}
-                            onChange={(e) => this.setStateFromInput(e, el)}
-                            value={this.state[el[0]][el[1]].color}
-                          />
-                        </FormControl>
-                        </div>
-                      </div>
-                      <div className="form-group mb-3">
-                        <div className="description-sm">
+                        </Box>
+                        <Box mb={2}>
+                          <Typography align="center" gutterBottom component="h6">
+                            Culoare
+                          </Typography>
+                          <FormControl>
+                            <FormLabel className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
+                            <input
+                              name="color"
+                              label="Culoare"
+                              type="color"
+                              style={{
+                                width: 50,
+                                height: 50,
+                                marginTop: -18,
+                                marginLeft: 12,
+                              }}
+                              onChange={(e) => this.setStateFromInput(e, el)}
+                              value={this.state[el[0]][el[1]].color}
+                            />
+                          </FormControl>
+                        </Box>
+                        <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
+                          <Typography align="center" gutterBottom component="h6">
+                            Dimensiune
+                          </Typography>
                           <Select
                             name="size"
                             label="Dimensiune"
@@ -228,10 +259,9 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             onChange={(e) => this.setStateFromInput(e, el)}
                             array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
                             display={(val) => (val+' px') }
-                          />
-                        </div>
-                      </div>
-                    </Box>
+                            />
+                        </Box>
+                      </Box>
                     </Box>
                   ))}
                   <Box display="flex" justifyContent="center" >
@@ -250,7 +280,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                 </form>
               </Paper>
             </Grid>
-            <Grid align="center" item xs={12} sm={12} md={6} style={{position: 'relative'}}>
+            <Grid align="center" item xs={12} lg={6} style={{position: 'relative'}}>
               <img src="https://bathtimestories.com/wp-content/uploads/2020/07/smartphone.png"  style={{maxWidth: 400, width: '100%'}}/>
               <iframe
 
@@ -263,7 +293,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
             </Grid>
           </Grid>
         </div>
-      </div>
+      </Box>
     );
   }
 }
@@ -276,6 +306,6 @@ const mapStateToProps = (state) => ({
 
 export default 
   compose(
-    withStyles(null, { withTheme: true }),
+    withStyles(style, { withTheme: true }),
     connect(mapStateToProps)
     )(injectIntl(Form));

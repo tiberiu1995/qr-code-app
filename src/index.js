@@ -45,6 +45,15 @@ class Root extends React.Component {
       palette: {
         primary: blue,
       },
+      breakpoints: {
+        values: {
+          xs: 0,
+          sm: 500,
+          md: 600,
+          lg: 900,
+          xl: 1300
+        }
+      }
     });
   }
 

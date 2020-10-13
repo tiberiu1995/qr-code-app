@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
+import { Box } from '@material-ui/core';
 const Header = (props) => {
     const goHome = () => {
         props.history.push(`/menu/${props.match.params.title}/`);
@@ -21,7 +22,7 @@ const Header = (props) => {
         props.history.push(`/menu/${props.match.params.title}/design/`);
       };
 
-return <>
+return <Box display="flex" justifyContent="center">
     <Button className="m-2" onClick={goHome}>
         Acasa
     </Button>
@@ -34,7 +35,7 @@ return <>
     <Button className="m-2" onClick={showDesign}>
         Design
     </Button>
-    </>
+    </Box>
 }
 
 export default compose(withRouter)(Header);
