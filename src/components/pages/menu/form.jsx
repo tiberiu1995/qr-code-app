@@ -11,7 +11,7 @@ import React, {
   import { compose } from "recompose";
   //import Form from "./form0";
   import update from "immutability-helper";
-  import { Button, Box, useMediaQuery } from "@material-ui/core";
+  import { Button, Box, useMediaQuery, FormControlLabel, Switch } from "@material-ui/core";
   import { toast, ToastContainer } from "react-toastify";
   import "react-toastify/dist/ReactToastify.min.css";
   import MediaCard from "./../../cardboard/_card";
@@ -26,6 +26,12 @@ import React, {
   const Form = (props) => {
     const [data, setData] = useState([]);
     const [isEdited, setEdited] = useState(false);
+    const [values, setValues] = useState({
+      enableReviews: true,
+      enableAlergens: true,
+      enableCalories: true,
+      enableToC: true,
+    });
     //const id = props.match.params.id;
     const title = props.match.params.title;
     const [categoriesConfig, setCategoriesConfig] = useState([]);
@@ -63,7 +69,15 @@ import React, {
     const fetchCategoriesConfig = async () => {
       try {
         let apiData = await fetchData({ title: title }, "menu/category/get.php");
-        let config = apiData; //[0].category_configuration.split(',')
+        //let categories = apiData.categories;
+        setValues({
+          ...values, 
+          enableAlergens: apiData.enables.enableAlergens == true,
+          enableCalories: apiData.enables.enableCalories == true,
+          enableReviews: apiData.enables.enableReviews == true,
+          enableToC: apiData.enables.enableToC == true,
+        });
+        let config = apiData.categories; //[0].category_configuration.split(',')
         console.log(apiData);
         apiData = await fetchData({ title: title }, "category/get.php");
         let categories = apiData;
@@ -115,6 +129,10 @@ import React, {
         const obj = {
           data: right.map((el) => el.id),
           title: title,
+          reviews: values.enableReviews + 0,
+          alergens: values.enableAlergens + 0,
+          calories: values.enableCalories + 0,
+          toc: values.enableToC + 0
         }
         const apiData = await fetchData( obj, "menu/category/" + endpoint + ".php");
         console.log(apiData);
@@ -186,6 +204,10 @@ import React, {
     const desktop = useMediaQuery('(min-width:900px)');
     const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
     const mobile = useMediaQuery('(max-width:499px)');
+
+    const toggleChecked = (event) => {
+      setValues({...values, [event.target.name]: event.target.checked })
+    }
   
     return (
       <div className="my-1 mx-auto text-center">
@@ -198,14 +220,14 @@ import React, {
             <>
               <Header/>
               <Grid container spacing={4} justify={"center"}>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
+                <Grid item xs={12} sm={12} md={6} lg={6}>
                   {left.length ? (
                     <CustomList data={left} handleToggle={addItem} />
                   ) : (
                     ""
                   )}
                 </Grid>
-                <Grid item xs={12} sm={6} md={6} lg={6}>
+                <Grid item xs={12} sm={12} md={6} lg={6}>
                   <DndProvider backend={HTML5Backend}>
                     {right.length
                       ? right.map((el, i) => (
@@ -222,6 +244,31 @@ import React, {
                   </DndProvider>
                 </Grid>
               </Grid>
+
+              <FormControlLabel
+                value="reviews"
+                control={<Switch color="primary" name="enableReviews" checked={values.enableReviews} onChange={toggleChecked} />}
+                label="Permite recenzii"
+                labelPlacement="start"
+              />
+              <FormControlLabel
+                value="alergens"
+                control={<Switch color="primary"  name="enableAlergens" checked={values.enableAlergens} onChange={toggleChecked} />}
+                label="Afiseaza alergeni"
+                labelPlacement="start"
+              />
+             <FormControlLabel
+                value="calories"
+                control={<Switch color="primary"  name="enableCalories" checked={values.enableCalories} onChange={toggleChecked}  />}
+                label="Afiseaza calorii"
+                labelPlacement="start"
+              />
+            <FormControlLabel
+                value="toc"
+                control={<Switch color="primary"  name="enableToC" checked={values.enableToC} onChange={toggleChecked}  />}
+                label="Afiseaza cuprins"
+                labelPlacement="start"
+              />
               <Button className="m-2" onClick={saveCategoriesConfig}>
                 Salveaza meniul
               </Button>

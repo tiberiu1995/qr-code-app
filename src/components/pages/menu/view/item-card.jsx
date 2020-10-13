@@ -24,7 +24,10 @@ import { compose } from 'redux';
 
 const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
 
- const getStyle = ({color, font, size}) => ({color, fontSize: value(size), fontFamily: font})
+ const getStyle = ({color, font, size}) => ({
+   color, 
+   fontSize: value(size), 
+   fontFamily: font})
 
 const useStyles = makeStyles({
   name: props => getStyle(props.name),
@@ -44,7 +47,7 @@ const MediaCard = (props) => {
     picture = props.data.pictures;
   } catch (e) {
     picture =
-      "https://eatforum.org/content/uploads/2018/05/table_with_food_top_view_900x700.jpg";
+      "";
   }
 
   return (
@@ -58,12 +61,13 @@ const MediaCard = (props) => {
         style={{ borderRadius: 20, position: "relative", zIndex: 150 }}
       >
         <CardActionArea className="d-flex">
-          <CardMedia
+          {!props.disableImages && <CardMedia
             className="d-block col-4 col-sm-4"
             style={{ height: 100, backgroundSize: "contain" }}
             image={picture}
-            title="Contemplative Reptile"
+            title=""
           />
+          }
           <CardContent className="d-block col-8 col-sm-8">
             <Typography
               className={classes.name}
@@ -91,7 +95,7 @@ const MediaCard = (props) => {
             <Typography className={classes.size} gutterBottom component="p">
               {props.data.size}
             </Typography>
-            { !item_id ? 
+            { !props.disableReviews && !item_id ? 
                 ( !props.isPreview ? 
                   <Link to={{
                     pathname: `${props.location.pathname}reviews/${props.data.id}/`,

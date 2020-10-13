@@ -8,10 +8,11 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { Edit, Delete } from "@material-ui/icons/";
-import { Box } from "@material-ui/core";
+import { Box, Tooltip } from "@material-ui/core";
 
 import { useDrag, useDrop } from "react-dnd";
 import { TableRow, TableCell } from "@material-ui/core/";
+import { HelpOutline } from '@material-ui/icons';
 
 const DND_ITEM_TYPE = "row";
 
@@ -79,7 +80,7 @@ const MediaCard = (props) => {
     picture = props.data.picture;
   } catch (e) {
     picture =
-      "https://eatforum.org/content/uploads/2018/05/table_with_food_top_view_900x700.jpg";
+      "";
   }
 
   return (
@@ -89,7 +90,7 @@ const MediaCard = (props) => {
           className="d-block col-lg-3"
           style={{ height: 112, width: 150 }}
           image={picture}
-          title="Contemplative Reptile"
+          title=""
         />
         <CardContent ref={dropRef} className="d-block col-lg-9">
           <Typography
@@ -109,22 +110,32 @@ const MediaCard = (props) => {
             {props.data.ingredients}
           </Typography>
           <Box className="float-right">
+            <Tooltip title={
+              <>
+               <Typography component="span">
+                Drag and drop {props.data.name} to change its position in the menu
+              </Typography>
+              </>
+            }>
+              <HelpOutline/>
+            </Tooltip>
             {props.edit ? (
-              <Edit
-                className=""
-                size="small"
-                color="primary"
-                onClick={(e) => props.edit(props.data.id)}
-              />
-            ) : (
-              ""
-            )}
+               <Tooltip title="Click here to order the product this category">
+                <Edit
+                  className=""
+                  size="small"
+                  color="primary"
+                  onClick={(e) => props.edit(props.data.id)}
+                />
+               </Tooltip>) : ("")}
+            <Tooltip title="Click here to hide the category from the menu">
             <Delete
               className=""
               size="small"
               color="primary"
               onClick={(e) => props.remove(props.data.id)}
             />
+            </Tooltip>
           </Box>
         </CardContent>
       </CardActionArea>

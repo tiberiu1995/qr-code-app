@@ -9,6 +9,7 @@ import { MenuItem, useMediaQuery } from "@material-ui/core/";
 import Table from "./table.jsx";
 import Select from "../utils/select.jsx";
 import { Image } from "@material-ui/icons";
+import { Tooltip } from '@material-ui/core';
 
 const SelectColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter, id },
@@ -81,35 +82,40 @@ const Datatable = (props) => {
         {/* {<span>
             <i className="fa fa-arrows-v" style={{ width: 35, fontSize: 20, padding: 11,color:'black' }}/>
           </span>} */}
-        <span
-          onClick={() => {
-            if (window.confirm("Are you sure you wish to delete this item?")) {
-              remove(row.row.original);
-            }
-          }}
-        >
-          <i
-            className="fa fa-trash"
-            style={{ width: 35, fontSize: 20, padding: 11, color: "#e4566e" }}
-          />
-        </span>
-        <span
-          onClick={() => {
-            if (window.confirm("Are you sure you wish to edit this item?")) {
-              edit(row.row.original);
-            }
-          }}
-        >
-          <i
-            className="fa fa-pencil"
-            style={{
-              width: 35,
-              fontSize: 20,
-              padding: 11,
-              color: "rgb(40, 167, 69)",
+        <Tooltip title="Remove this row">
+          <span
+            onClick={() => {
+              if (window.confirm("Are you sure you wish to delete this item?")) {
+                remove(row.row.original);
+              }
             }}
-          />
-        </span>
+          >
+            <i
+              className="fa fa-trash"
+              style={{ width: 35, fontSize: 20, padding: 11, color: "#e4566e" }}
+            />
+          </span>
+        </Tooltip>
+        <Tooltip title="Edit this row" placement="bottom">
+          <span
+            onClick={() => {
+              if (window.confirm("Are you sure you wish to edit this item?")) {
+                edit(row.row.original);
+              }
+            }}
+          >
+            <i
+              className="fa fa-pencil"
+              style={{
+                width: 35,
+                fontSize: 20,
+                padding: 11,
+                color: "rgb(40, 167, 69)",
+              }}
+            />
+          </span>
+        </Tooltip>
+        
       </>
     ),
     style: { textAlign: "center" },

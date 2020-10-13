@@ -32,10 +32,10 @@ class HeaderOne extends Component {
   }
 
   componentWillMount() {
-    window.addEventListener("scroll", this.handleScroll);
+    //window.addEventListener("scroll", this.handleScroll);
   }
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
+    //window.removeEventListener("scroll", this.handleScroll);
   }
 
   handleScroll = () => {
@@ -81,12 +81,8 @@ class HeaderOne extends Component {
 
   render() {
     return (
-      <div>
-        <header id="sticky" className="sticky">
-              <NavBar />
-        </header>
-      </div>
-    );
+      <NavBar />
+      );
   }
 }
 

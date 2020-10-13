@@ -12,8 +12,9 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import { fetchMenu, fetchData } from "../utils/fetch";
-import { setToken, setUser } from "../../actions";
+import { setToken, setUser, setLanguage } from "../../actions";
 import { HelpOutline } from "@material-ui/icons";
+import Select from "../utils/select";
 
 const Form = (props) => {
 	const [values, setValues] = React.useState({
@@ -67,7 +68,15 @@ const Form = (props) => {
 								<div className="form-group mb-3 col-lg-12">       
 									<Button variant="primary" onClick={disconnect}>
 											Log out
-									</Button>    
+									</Button>
+                  <Select
+                    name="language"
+                    style={{width: 86}}
+                    label="Language"
+                    value={props.language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    array={["English", "Romanian"]}
+                    />    
 								</div>
 							</div>
 					</div>
@@ -78,7 +87,8 @@ const Form = (props) => {
 
 const mapStateToProps = (state) => ({
   email: state.account.email,
-  token: state.account.token
+  token: state.account.token,
+  language: state.settings.language
 });
 
 export default compose(

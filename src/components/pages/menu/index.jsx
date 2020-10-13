@@ -23,7 +23,6 @@ import { Grid } from "@material-ui/core/";
 import { fetchData, fetchMenu } from "../../utils/fetch";
 import { Add } from '@material-ui/icons';
 
-
 const style = {
   position: "top-right",
   autoClose: 5000,

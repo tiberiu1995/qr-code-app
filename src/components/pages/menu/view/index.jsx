@@ -54,6 +54,11 @@ export class Menu extends Component {
     //const parsed = window.location.href.split('%22').join('"').split('%20').join(' ');
    // console.log(queryString.parse(props.location.search));
     this.state = {
+      settings: {
+        disableToC: false,
+        disableImages: false,
+        disableReviews: false,
+      },
       products: [],
       show_form: false,
       data: [],
@@ -120,9 +125,21 @@ export class Menu extends Component {
     window.addEventListener("scroll", this.handleToolTip);
   }
 
+
+
   fetchData = async (title) => {
     try {
-      let apiData =  await fetchData({title: title}, "menu/view/get.php"); //await fetchMenuView(title);
+      let apiData = await fetchData({ title: title }, "menu/category/get.php");
+      //let categories = apiData.categories;
+      this.setState({settings: { 
+        /*enableAlergens: apiData.enables.enableAlergens == true,
+        enableCalories: apiData.enables.enableCalories == true,*/
+        disableToC: !(apiData.enables.enableToC == true),
+        disableReviews: !(apiData.enables.enableReviews == true)
+      }
+      });
+
+      apiData =  await fetchData({title: title}, "menu/view/get.php"); //await fetchMenuView(title);
       console.log(apiData);
       let data = [];
       apiData.forEach((el, i) => {
@@ -202,6 +219,22 @@ export class Menu extends Component {
     this.setState(refs);
   };
 
+  tableOfContent = (grid, style) => {
+    return (grid.length && style) ?
+      <>
+        Cuprins
+        <br/>
+        <GridImage
+            data={grid}
+            header={true}
+            refs={this.state.refs}
+            style={style}
+          />
+      </> : "";
+  }
+
+
+
   render() {
     const { data, category, item } = this.state;
     const { classes } = this.props;
@@ -216,50 +249,47 @@ export class Menu extends Component {
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
     return (
       <Box className="mx-auto" style={{ maxWidth: 600 }}>
-        Cuprins
-        <br/>
-        <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
+        { !this.state.settings.disableReviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
+        }
         <div className="my-1 display-menu" style={{position: "relative"}}>
-          {grid.length && category_style ? (
-            <GridImage
-              data={grid}
-              header={true}
-              refs={this.state.refs}
-              style={category_style}
-            />
-          ) : (
-            ""
-          )}
+          { !this.state.settings.disableToC && this.tableOfContent(grid, category_style) }
           {
             data.length && item && category_style
               ? data.map((el, i) => (
                   <div
                     ref={this.addRef}
                     key={i}
-                    style={{ backgroundImage: 'url("' + el.background + '")', position: 'relative' }}
+                    style={{ /*backgroundImage: 'url("' + el.background + '")',*/ position: 'relative' }}
                   >
-                    <GridImage data={[el]} style={category_style} />
+                    <GridImage disableImages={this.state.settings.disableImages} data={[el]} style={category_style} />
                     {/* <Typography gutterBottom variant="h4" component="h2" style={{color: category.name.color, fontFamily: category.name.color, fontSize: category.name.size}}>
                     {el.name}
                   </Typography> */}
                     <Box p={2.5}>
                       {el.items.map((_el, _i) => (
-                        <Card isPreview={this.state.isPreview} key={'card'+_i} style={item} id={_i} data={_el} />
+                        <Card 
+                          disableReviews={this.state.settings.disableReviews} 
+                          disableImages={this.state.settings.disableImages}
+                          isPreview={this.state.isPreview} 
+                          key={'card'+_i} 
+                          style={item} 
+                          id={_i} 
+                          data={_el} />
                       ))}
                     </Box>
                   </div>
                 ))
               : ""
           }
-          <Divider/>
-          <br/>
-          Recenzii
-          <br/>
-          { true &&
-            <Reviews menu_title={this.props.match.params.title}
-            />
-
-
+          { !this.state.settings.disableReviews &&
+            <>
+              <Divider/>
+              <br/>
+              Recenzii
+              <br/>
+              <Reviews menu_title={this.props.match.params.title}
+              />
+            </>
           }
           <Fade in={this.state.showToolTip}>
             <Tooltip

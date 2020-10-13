@@ -23,6 +23,7 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { setToken, setUser } from "../../actions";
 import { Box } from '@material-ui/core';
 import { Button } from '@material-ui/core';
+import Cookie from 'js-cookie';
 
 const Form = (props) => {
 	const [values, setValues] = React.useState({
@@ -51,6 +52,7 @@ const Form = (props) => {
         token: values.token,
       }
 			let apiData = await fetchData( obj, "user/get.php");
+			Cookie.set('token_valid_until', apiData.token_end_time);
 			if(apiData.email === values.email) {
 				setUser(values.email);
 				setToken(values.token);

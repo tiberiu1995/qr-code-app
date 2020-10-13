@@ -35,6 +35,14 @@ import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
 import blue from '@material-ui/core/colors/blue';
 
+const mapStateToProps = (state) => ({
+  language: state.settings.language
+})
+
+const Context = connect(
+  mapStateToProps,
+)(ScrollContext);
+
 class Root extends React.Component {
   constructor(props) {
     super(props);
@@ -73,7 +81,7 @@ class Root extends React.Component {
         <IntlProvider locale="ro" messages={messages["ro"]}>
           <ThemeProvider theme={this.theme}>
             <BrowserRouter basename={"/"}>
-              <ScrollContext>
+              <Context>
                 <Switch>
                   <Route
                     path={`${process.env.PUBLIC_URL}/scan-qr/`}
@@ -152,7 +160,7 @@ class Root extends React.Component {
                     />  
                   </Layout>
                 </Switch>
-              </ScrollContext>
+              </Context>
             </BrowserRouter>
           </ThemeProvider>
         </IntlProvider>
@@ -160,6 +168,8 @@ class Root extends React.Component {
     );
   }
 }
+
+
 
 ReactDOM.render(
   //<FirebaseContext.Provider value={new Firebase()}>

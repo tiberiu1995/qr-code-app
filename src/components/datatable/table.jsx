@@ -82,6 +82,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
         }}
         placeholder={`Cauta...`}
         variant="outlined"
+        size="small"
       />
     );
   };

@@ -202,15 +202,52 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                       <Typography align="center" gutterBottom>
                         Stilizare {translate({id: el[1]})} {translate({id: el[0]})}  
                       </Typography>
+
                       <Box m={2}
                         display={media.mobile ? "block" : "flex"}
                         justifyContent="space-evenly" 
                         className="form form-label-center" >
+                        <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
+                          <Typography align="center" gutterBottom  component="h6">
+                            Dimensiune
+                          </Typography>
+                          <Select
+                            name="size"
+                            style={{width: 86}}
+                            label="Dimensiune"
+                            value={this.state[el[0]][el[1]].size}
+                            onChange={(e) => this.setStateFromInput(e, el)}
+                            array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
+                            display={(val) => (val+' px') }
+                            />
+                        </Box>                   
+                         <Box mb={2}>
+                          <Typography align="center" gutterBottom component="h6">
+                            Culoare
+                          </Typography>
+                          <FormControl>
+                            <FormLabel  style={{position: 'absolute', 'background': 'white'}} className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
+                            <input
+                              name="color"
+                              label="Culoare"
+                              type="color"
+                              style={{
+                                width: 86,
+                                height: 40,
+                                borderColor: 'rgba(0, 0, 0, 0.23)'
+
+                              }}
+                              onChange={(e) => this.setStateFromInput(e, el)}
+                              value={this.state[el[0]][el[1]].color}
+                            />
+                          </FormControl>
+                        </Box>
                         <Box mb={2}>
                           <Typography align="center" gutterBottom component="h6">
                             Font
                           </Typography>
                           <Select
+                            style={{width: 185, textAlign: 'left'}}
                             name="font"
                             label="Font"
                             value={this.state[el[0]][el[1]].font}
@@ -226,41 +263,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                               "Verdana",
                             ]}
                           />
-                        </Box>
-                        <Box mb={2}>
-                          <Typography align="center" gutterBottom component="h6">
-                            Culoare
-                          </Typography>
-                          <FormControl>
-                            <FormLabel className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
-                            <input
-                              name="color"
-                              label="Culoare"
-                              type="color"
-                              style={{
-                                width: 50,
-                                height: 50,
-                                marginTop: -18,
-                                marginLeft: 12,
-                              }}
-                              onChange={(e) => this.setStateFromInput(e, el)}
-                              value={this.state[el[0]][el[1]].color}
-                            />
-                          </FormControl>
-                        </Box>
-                        <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
-                          <Typography align="center" gutterBottom component="h6">
-                            Dimensiune
-                          </Typography>
-                          <Select
-                            name="size"
-                            label="Dimensiune"
-                            value={this.state[el[0]][el[1]].size}
-                            onChange={(e) => this.setStateFromInput(e, el)}
-                            array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
-                            display={(val) => (val+' px') }
-                            />
-                        </Box>
+                        </Box>                        
                       </Box>
                     </Box>
                   ))}

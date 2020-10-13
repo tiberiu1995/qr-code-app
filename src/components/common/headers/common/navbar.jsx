@@ -18,6 +18,9 @@ import {
   ListItemIcon,
   Divider,
   AppBar,
+  Toolbar,
+  useScrollTrigger,
+  Slide,
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 import clsx from "clsx";
@@ -25,7 +28,16 @@ import { Mail } from "react-feather";
 import MobileNavBar from "./MobileNavBar";
 import DesktopNavBar from "./DesktopNavBar";
 
+function HideOnScroll(props) {
+  const { children, window } = props;
+  const trigger = useScrollTrigger();
 
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
 
 const NavBar = (props) => {
 
@@ -37,9 +49,13 @@ const NavBar = (props) => {
 
 
   return (
-    desktop ? 
-      <DesktopNavBar/> :
-      <MobileNavBar/>
+    <HideOnScroll {...props}>
+      <AppBar position="sticky">
+        <Toolbar>
+        { desktop ? <DesktopNavBar/> : <MobileNavBar/> }
+        </Toolbar>
+      </AppBar>
+    </HideOnScroll>
   )
 
 };

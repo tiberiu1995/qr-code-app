@@ -10,6 +10,13 @@ export const setMedia = (media) => {
   });
 }
 
+export const setLanguage = (lg) => {
+  store.dispatch({
+    type: "LANGUAGE",
+    payload: lg,
+  }); 
+}
+
 export const setPageIndex = (page) => {
   store.dispatch({
     type: "PAGE_INDEX",

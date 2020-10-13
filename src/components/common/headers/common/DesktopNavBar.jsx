@@ -18,13 +18,15 @@ import {
   ListItemIcon,
   Divider,
   AppBar,
+  Toolbar,
+  Slide,
+  useScrollTrigger,
 } from "@material-ui/core";
 import { useTheme } from "@material-ui/styles";
 import clsx from "clsx";
 import { compose } from 'recompose';
 import { withFirebase } from './../../../firebase/context';
 import { connect } from 'react-redux';
-
 
 const DesktopNavBar = (props) => {
 
@@ -41,22 +43,12 @@ const DesktopNavBar = (props) => {
     link: {
       color: props.theme.palette.common.white
     },
-    overrides: {
-      MuiListItemText: {
-        inset: {
-          color: 'pink',
-          backgroundColor : 'pink'
-        }
+    navbar: {
+      '& .MuiListItemText-root': {
+        flex: '0 auto',
+        margin: [[0 ,16]]
       },
-      '.MuiListItemText-root': {
-          color: 'pink',
-          backgroundColor : 'pink'
-        },
-        '.MuiPaper-root': {
-          height: 200
-        }
-      }
-
+    }
   });
 
   const classes = useStyles();
@@ -64,12 +56,11 @@ const DesktopNavBar = (props) => {
   const theme = props.theme;
 
   return (
-      <AppBar >
-      <List component="nav">
+      <List component="nav" className={clsx(classes.navbar)}>
         { props.email ?
           <ListItem component="div">
           <ListItemText>
-            <Typography variant="h5" align="center">
+            <Typography variant="subtitle1" align="center">
               <Link className={clsx(classes.link)}
                 to={`${process.env.PUBLIC_URL}/dashboard`} 
                 >
@@ -82,7 +73,7 @@ const DesktopNavBar = (props) => {
             </Typography>
           </ListItemText>
           <ListItemText>
-            <Typography variant="h5" align="center"> 
+            <Typography variant="subtitle1" align="center"> 
               <Link className={clsx(classes.link)}
                 to={`${process.env.PUBLIC_URL}/menu`} 
                 >
@@ -92,7 +83,7 @@ const DesktopNavBar = (props) => {
             </Typography>
           </ListItemText>
           <ListItemText>
-            <Typography variant="h5" align="center">
+            <Typography variant="subtitle1" align="center">
               <Link className={clsx(classes.link)}
                 to={`${process.env.PUBLIC_URL}/my-account`}
               >
@@ -105,7 +96,7 @@ const DesktopNavBar = (props) => {
         :
         <ListItem component="div">
         <ListItemText>
-          <Typography variant="h5" align="center">
+          <Typography variant="subtitle1" align="center">
             <Link className={clsx(classes.link)}
               to={`${process.env.PUBLIC_URL}/home`} 
               >
@@ -118,7 +109,7 @@ const DesktopNavBar = (props) => {
           </Typography>
         </ListItemText>
         <ListItemText>
-          <Typography variant="h5" align="center"> 
+          <Typography variant="subtitle1" align="center"> 
             <Link className={clsx(classes.link)}
               to={`${process.env.PUBLIC_URL}/pricing`} 
               >
@@ -128,7 +119,7 @@ const DesktopNavBar = (props) => {
           </Typography>
         </ListItemText>
         <ListItemText>
-          <Typography variant="h5" align="center">
+          <Typography variant="subtitle1" align="center">
             <Link className={clsx(classes.link)}
               to={`${process.env.PUBLIC_URL}/log-in`}
             >
@@ -140,7 +131,6 @@ const DesktopNavBar = (props) => {
       </ListItem>      
       }
       </List>
-      </AppBar>
   )
 };
 

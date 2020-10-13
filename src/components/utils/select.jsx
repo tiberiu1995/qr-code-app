@@ -19,7 +19,7 @@ const CustomSelect = (props) => {
   const display = (el) => (props.display ? props.display(el) : el);
   const valueF = (el) => (props.valueF ? props.valueF(el) : el);
   return (
-    <FormControl className={classes.root} variant="outlined">
+    <FormControl {...props} className={classes.root} variant="outlined" size="small">
       {props.label && <InputLabel id="demo-simple-select-label">{props.label}</InputLabel>}
       <Select name={props.name} value={props.value} onChange={props.onChange}>
         {props.default && (

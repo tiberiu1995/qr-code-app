@@ -28,17 +28,20 @@ import { animateScroll } from "react-scroll";
 // }));
 const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
 
+const getStyle = ({color, fontFamily, fontSize}) => ({
+  color, 
+  fontSize: value(fontSize), 
+  fontFamily: fontFamily,
+  textAlign: "center",
+  whiteSpace: "break-spaces",
+})
+
+
 const scrollToRef = (ref) => animateScroll.scrollTo(ref.offsetTop);
 //window.scrollTo(0, ref.offsetTop);
 
 const useStyles = makeStyles({
-  title: {
-    color: (props) => props.color,
-    fontSize: (props) => value(props.size),
-    fontFamily: (props) => props.font,
-    textAlign: "center",
-    whiteSpace: "break-spaces",
-  },
+  title: props => getStyle(props), 
 });
 
 
@@ -83,7 +86,7 @@ const TitlebarGridList = (props) => {
       <Box>
         <GridList
           cols={cols}
-          cellHeight={180}
+          cellHeight={!props.disableImages ? 180 : 'auto'}
           spacing={0}
           className={classes.gridList}
         >
@@ -91,10 +94,9 @@ const TitlebarGridList = (props) => {
             <Grow key={"ig-g"+i} timeout={1000} in={true}>
             <GridListTile
               key={"tile"+i}
-              style={null}
               onClick={(e) => props.header && executeScroll(refs[i])}
             >
-              <img src={tile.picture} alt={tile.name} />
+             { !props.disableImages && <img src={tile.picture} alt={tile.name} /> }
               <GridListTileBar
                 title={tile.name}
                 classes={{
