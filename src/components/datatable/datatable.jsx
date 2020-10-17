@@ -46,7 +46,7 @@ const Datatable = (props) => {
   };
   const columns = [];
   for (var key in myData[0]) {
-    if (["description", "ingredients", "alergens", "calories", "id"].includes(key))
+    if (["description", "ingredients", "alergens", "calories", "id", "upload_picture", "library_picture", "image_option"].includes(key))
       continue;
    // if(matches && !["name", "category", "picture"].includes(key))
    //   continue;
@@ -67,8 +67,8 @@ const Datatable = (props) => {
       column.Filter = SelectColumnFilter;
       column.filter = "includes";
     }
-    if (key === "picture" || key === "background") {
-      column.Cell = ({ cell: { value } }) => (value.includes('jpeg') ? <img src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
+    if (["picture","background"].includes(key)) {
+      column.Cell = ({ cell: { value } }) => ((value.includes('jpeg') || value.includes('png')) ? <img src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
       column.filterable = false;
     }
     columns.push(column);

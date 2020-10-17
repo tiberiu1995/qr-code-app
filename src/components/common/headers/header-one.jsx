@@ -5,7 +5,7 @@ import Pace from "react-pace-progress";
 
 // Import custom components
 import store from "../../../store";
-import NavBar from "./common/navbar";
+import NavBar from "./common/Navbar1";
 import SideBar from "./common/sidebar";
 import TopBar from "./common/topbar";
 import LogoImage from "./common/logo";

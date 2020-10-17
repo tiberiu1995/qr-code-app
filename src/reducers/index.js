@@ -1,5 +1,4 @@
 import { combineReducers } from "redux";
-import { IntlReducer as Intl, IntlProvider } from "react-redux-multilingual";
 
 // Import custom components
 import accountReducer from "./account";
@@ -12,7 +11,6 @@ const rootReducer = combineReducers({
   settings: settingsReducer,
   media: mediaReducer,
   //filters: filtersReducer,
-  Intl,
 });
 
 export default rootReducer;

@@ -26,22 +26,13 @@ import { animateScroll } from "react-scroll";
 //     color: 'rgba(255, 255, 255, 0.54)',
 //   },
 // }));
-const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
-
-const getStyle = ({color, fontFamily, fontSize}) => ({
-  color, 
-  fontSize: value(fontSize), 
-  fontFamily: fontFamily,
-  textAlign: "center",
-  whiteSpace: "break-spaces",
-})
 
 
 const scrollToRef = (ref) => animateScroll.scrollTo(ref.offsetTop);
 //window.scrollTo(0, ref.offsetTop);
 
 const useStyles = makeStyles({
-  title: props => getStyle(props), 
+  title: props => props.style, 
 });
 
 

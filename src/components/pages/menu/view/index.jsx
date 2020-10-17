@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { withFirebase } from "../../../firebase";
 //import Product from '../menu/product';
-import { Typography, Box, Tooltip, Fab, Fade, Button, Divider } from "@material-ui/core";
+import { Typography, Box, Tooltip, Fab, Fade, Button, Divider, Paper } from "@material-ui/core";
 import { Grid } from "@material-ui/core/";
 import GridImage from "./image-grid.jsx";
 import Card from "./item-card.jsx";
@@ -15,6 +15,7 @@ import { ArrowDropUp, RateReviewSharp } from "@material-ui/icons/";
 import { animateScroll } from "react-scroll";
 import { fetchMenuView, fetchMenu, fetchMenuDesign, fetchData } from '../../../utils/fetch';
 import Reviews from './review';
+import CustomTabs from './tabs.jsx';
 
 const queryString = require('query-string');
 
@@ -28,6 +29,11 @@ const styles = (theme) => ({
     right: theme.spacing(3),
     zIndex: 1500,
   },
+  tabs: {
+    '& .MuiTab-root img': {
+        border: '1px solid rgba(0,0,0,0.5)'
+    }
+  }
 });
 
 const scrollToTop = () => {
@@ -48,6 +54,87 @@ const scrollToBottom = () => {
 //   return () => window.removeEventListener("resize", updateWindowDimensions);
 // },[]);
 
+const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
+
+const getStyle = ({color, font, size}) => ({
+  color, 
+  fontSize: value(size), 
+  fontFamily: font,
+})
+
+  
+const getCategoryHeader = (el, category_style, layout) => {
+  let style = getStyle(category_style);
+  switch (layout) {
+    case 'layout1':
+      return <GridImage /*disableImages={this.state.settings.disableImages}*/ data={[el]} style={style} />
+
+    default:
+      return <Typography style={{...style, textAlign: "center", whiteSpace: "break-spaces",}} align="center">
+          {el.name}
+      </Typography>
+
+  }
+
+}
+
+const getItem = (item, _el,_i, settings, isPreview, layout) => {
+  const style = {
+    name: getStyle(item.name),
+    size: getStyle(item.size),
+    ingredients: getStyle(item.ingredients),
+    alergens: getStyle(item.alergens),
+    calories: getStyle(item.calories),
+  };
+  switch (layout) {
+    case 'layout1':
+      return <Box my={1} display="flex">
+      <Paper style={{height: 75, borderRadius: 25, zIndex: 50, alignSelf: 'center'}} elevation={1}>
+        <img src={_el.pictures} alt={_el.name} height="75" />
+      </Paper >
+      <Paper style={{padding: '8px 16px 8px 32px', left: -20, marginRight: -20, minHeight: 90, position: 'relative', width: '100%' }}>
+        <Typography style={style.name}>
+          {_el.name}
+        </Typography>
+        <Typography style={{...style.ingredients}} >
+          {_el.ingredients} 
+        </Typography>          
+        <Typography style={{...style.size, whiteSpace: "nowrap"}} >
+          {_el.size}
+        </Typography>
+      </Paper>
+
+    </Box>
+      
+      /*<Card 
+        disableReviews={settings.disableReviews} 
+        disableImages={settings.disableImages}
+        isPreview={isPreview} 
+        key={'card'+_i} 
+        style={style} 
+        id={_i} 
+        data={_el} />*/
+      default:
+        return <Box display="flex" mb={1} justifyContent="space-between">
+          <Box>
+            <Typography style={style.name}>
+              {_el.name}
+            </Typography>
+            <Typography style={{...style.ingredients}} >
+              {_el.ingredients} 
+            </Typography>
+          </Box>
+          <Box>
+            <Typography style={{...style.size, whiteSpace: "nowrap"}} >
+            {_el.size}
+            </Typography>
+          </Box>
+        </Box>
+
+  }
+
+}
+
 export class Menu extends Component {
   constructor(props) {
     super(props);
@@ -59,6 +146,7 @@ export class Menu extends Component {
         disableImages: false,
         disableReviews: false,
       },
+      tabIndex: 0,
       products: [],
       show_form: false,
       data: [],
@@ -126,7 +214,6 @@ export class Menu extends Component {
   }
 
 
-
   fetchData = async (title) => {
     try {
       let apiData = await fetchData({ title: title }, "menu/category/get.php");
@@ -148,9 +235,11 @@ export class Menu extends Component {
             category_id: el.category_id,
             name: el.c_name,
             items: [],
-            picture: el.c_picture,
+            picture: el.image_option === "library" ?
+            el.library_picture : el.upload_picture,
             background: el.background,
           };
+
           //data.push();
           category.items = apiData
             .filter((_el, _i) => _el.category_id == el.category_id)
@@ -219,19 +308,33 @@ export class Menu extends Component {
     this.setState(refs);
   };
 
+  handleCategoryChange = (event, value) => {
+    this.setState({tabIndex: value});
+  }
+
   tableOfContent = (grid, style) => {
     return (grid.length && style) ?
       <>
-        Cuprins
-        <br/>
-        <GridImage
+        <CustomTabs
+                //classes={classes.tabs}
+                classes={this.props.classes.tabs}
+                value={this.state.tabIndex}
+                onChange={this.handleCategoryChange}
+                tabLabel={grid.map(el => <img width="50" height="50" style={{borderRadius: 75}} src={el.picture}></img>)}>
+        </CustomTabs>
+        {/* <GridImage
             data={grid}
             header={true}
             refs={this.state.refs}
             style={style}
-          />
+          /> */}
+          {
+
+
+          }
       </> : "";
   }
+
 
 
 
@@ -243,8 +346,8 @@ export class Menu extends Component {
       : [];
     const category_style = category && {
       color: category.name.color,
-      fontFamily: category.name.font,
-      fontSize: category.name.size,
+      font: category.name.font,
+      size: category.name.size,
     };
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
     return (
@@ -256,28 +359,19 @@ export class Menu extends Component {
           {
             data.length && item && category_style
               ? data.map((el, i) => (
-                  <div
+                  <Box
                     ref={this.addRef}
+                    display={i==this.state.tabIndex ? "inherit" : "none"}
                     key={i}
                     style={{ /*backgroundImage: 'url("' + el.background + '")',*/ position: 'relative' }}
                   >
-                    <GridImage disableImages={this.state.settings.disableImages} data={[el]} style={category_style} />
-                    {/* <Typography gutterBottom variant="h4" component="h2" style={{color: category.name.color, fontFamily: category.name.color, fontSize: category.name.size}}>
-                    {el.name}
-                  </Typography> */}
+                    { getCategoryHeader(el,category_style, this.props.layout) }
                     <Box p={2.5}>
                       {el.items.map((_el, _i) => (
-                        <Card 
-                          disableReviews={this.state.settings.disableReviews} 
-                          disableImages={this.state.settings.disableImages}
-                          isPreview={this.state.isPreview} 
-                          key={'card'+_i} 
-                          style={item} 
-                          id={_i} 
-                          data={_el} />
+                          getItem(item,_el,_i, this.state.settings, this.state.isPreview, this.props.layout)
                       ))}
                     </Box>
-                  </div>
+                  </Box>
                 ))
               : ""
           }
@@ -309,12 +403,12 @@ export class Menu extends Component {
   }
 }
 
-/*const mapStateToProps = (state) => ({
-
-})*/
+const mapStateToProps = (state) => ({
+  layout: state.settings.layout
+})
 
 export default compose(
   withFirebase,
   withStyles(styles, { withTheme: true }),
-  connect(null)
+  connect(mapStateToProps)
 )(injectIntl(Menu));

@@ -166,6 +166,9 @@ class FooterOne extends Component {
                       <li>
                         <a href="#">contacts</a>
                       </li>
+                      <li>
+                        <a href="https://icons8.com">icons8</a>
+                      </li>
                     </ul>
                   </div>
                 </div>

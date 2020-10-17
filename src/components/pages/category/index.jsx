@@ -28,7 +28,10 @@ const Categories = (props) => {
 
   const fetchCategories = async () => {
     try {
-      let apiData = await fetchData({title: title}, "category/get.php")
+      let apiData = await fetchData({title: title}, "category/get.php");
+      apiData = apiData.map(el => 
+        ({...el, picture: el.image_option === "library" ?
+        el.library_picture : el.upload_picture}));
       console.log(apiData);
       setData(apiData);
     } catch (error) {

@@ -169,7 +169,7 @@ export class Form extends Component {
     let picture = '';
 
     reader.onloadend = async () => {
-      const canvas = await crop(reader.result, 4 / 3);
+      const canvas = await crop(reader.result, 1);
       picture = canvas.toDataURL();
       //pictures[i].img = reader.result;
       this.setState({

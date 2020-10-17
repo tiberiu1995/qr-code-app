@@ -20,10 +20,13 @@ import { FormLabel } from '@material-ui/core';
 import { FormControl } from '@material-ui/core';
 import { InputLabel, IconButton } from '@material-ui/core/';
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { setToken, setUser } from "../../actions";
+import { setToken, setUser, setName } from "../../actions";
 import { Box } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import Cookie from 'js-cookie';
+import { withFirebase } from '../firebase';
+import Cookies from 'js-cookie';
+import { setUid } from './../../actions/index';
 
 const Form = (props) => {
 	const [values, setValues] = React.useState({
@@ -31,120 +34,147 @@ const Form = (props) => {
 		error: false,
 		token: '',
 		email: '',
-    amount: '',
-    password: '',
-    weight: '',
+		amount: '',
+		password: '',
+		weight: '',
     weightRange: '',
-    showPassword: false,
-  });
+    uid: '',
+		showPassword: false,
+	});
 
+  const {firebase, location, history} = props;
+
+  const fetchUser = async (email, uid) => {
+    try {
+      const obj = {
+        email: email,
+        uid: uid,
+      }
+      let apiData = await fetchData( obj, "user/get.php");
+      console.log(apiData);
+      setName(apiData.name);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const addItem = async (e) => {
-    e.preventDefault();
+	e.preventDefault();
 		if (!values.validator.allValid()) {
 			values.validator.showMessages();
 		setValues({...values, "error": !values.validator.allValid()});
 			return "";
 		}
 		try {
-      const obj = {
-        email: values.email,
-        token: values.token,
-      }
-			let apiData = await fetchData( obj, "user/get.php");
-			Cookie.set('token_valid_until', apiData.token_end_time);
-			if(apiData.email === values.email) {
-				setUser(values.email);
-				setToken(values.token);
-				props.history.push("/menu");
+			await firebase.doSignInWithEmailAndPassword(values.email, values.password);
+			const token = await firebase.getUser().getIdToken();
+			console.log(token);
+			const response = await fetch('https://bathtimestories.com/api/validation.php', {
+			  method: 'POST',
+			  mode: 'cors',
+			  body: JSON.stringify({token: token, action: 'set', csrf: Cookies.get('csrf')}),
+			  headers: {
+				'Content-Type': 'application/json'
+			  },
+			});
+      const data = await response.json();
+			if(data.status === 'success') {
+        await fetchUser(values.email, firebase.getUser().uid);
+			  location.search.includes("ref") ? history.goBack() : history.push('/shop');
+			  console.log('set '+data);
+			  setUser(values.email);
+			  //setMessage(data.message);
+        setToken(token);
+        setUid(firebase.getUser().uid);
 			}
-      console.log(apiData);
-    } catch (error) {
-      console.log(error);
-    }
+		  } catch (error) {
+			console.log(error);
+		//	this.setState({ error })
+		  }
+
    /* try {
-      const obj = {
-        products: this.state.products,
-        title: this.state.title || this.props.match.params.id,
-      }
-      const data = await fetchData(obj, "/menu/" + endpoint + ".php");
-      console.log(data);
-      this.setState({
-        message: data === true ? "transaction done" : "transaction void",
-      });
-      window.scrollTo(0, 0);
-    } catch (error) {
-      this.setState({ message: error.message });
-      window.scrollTo(0, 0);
-    }*/
+	  const obj = {
+		products: this.state.products,
+		title: this.state.title || this.props.match.params.id,
+	  }
+	  const data = await fetchData(obj, "/menu/" + endpoint + ".php");
+	  console.log(data);
+	  this.setState({
+		message: data === true ? "transaction done" : "transaction void",
+	  });
+	  window.scrollTo(0, 0);
+	} catch (error) {
+	  this.setState({ message: error.message });
+	  window.scrollTo(0, 0);
+	}*/
   };
 
 
 	const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+		setValues({ ...values, [prop]: event.target.value });
+	 };
 
 	const setStateFromInput = (event) => {
 		setValues({...values, [event.target.name]: event.target.value});
 	}
 
 	const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
+		setValues({ ...values, showPassword: !values.showPassword });
 	};
 	
 	const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+		event.preventDefault();
+	  };
 
 	return (
-			<div className="container-fluid">
-							<div className="form form-label-center row">
-								<Box my="2.5" mx="auto" display="grid">
-									<TextField 
-										margin="normal"
-										label="Email"
-										name="email"
-										variant="outlined" 
-										value={values.email} 	
-										onChange={setStateFromInput}/>
-									{values.validator.message(
-											"email",
-											values.email,
-											"required|email"
-										)}
-									<FormControl margin="normal" /*className={clsx(classes.margin, classes.textField)}*/ variant="outlined">
-											<InputLabel htmlFor="outlined-adornment-password">Token</InputLabel>
-											<OutlinedInput
-													id="outlined-adornment-password"
-													type={values.showPassword ? 'text' : 'password'}
-													value={values.token}
-													onChange={handleChange('token')}
-													endAdornment={
-													<InputAdornment position="end">
-															<IconButton
-															aria-label="toggle password visibility"
-															onClick={handleClickShowPassword}
-															onMouseDown={handleMouseDownPassword}
-															edge="end"
-															>
-															{values.showPassword ? <Visibility /> : <VisibilityOff />}
-															</IconButton>
-													</InputAdornment>
-													}
-													labelWidth={70}
-											/>
-									</FormControl> 
-									{values.validator.message(
-											"token",
-											values.token,
-											"required"
-										)}                   
-									<Button margin="normal" variant="primary" onClick={addItem}>
-											Log In
-									</Button>    
-								</Box>
-							</div>
-					</div>
+		<div className="container-fluid">
+			<div className="form form-label-center row">
+				<Box my="2.5" mx="auto" display="grid">
+					<TextField 
+						margin="normal"
+						label="Email"
+						name="email"
+						variant="outlined" 
+						value={values.email} 	
+						onChange={setStateFromInput}/>
+					{values.validator.message(
+							"email",
+							values.email,
+							"required|email"
+						)}
+					<FormControl margin="normal" /*className={clsx(classes.margin, classes.textField)}*/ variant="outlined">
+							<InputLabel htmlFor="outlined-adornment-password">Token</InputLabel>
+							<OutlinedInput
+									id="outlined-adornment-password"
+									type={values.showPassword ? 'text' : 'password'}
+									value={values.password}
+									onChange={handleChange('password')}
+									endAdornment={
+									<InputAdornment position="end">
+											<IconButton
+											aria-label="toggle password visibility"
+											onClick={handleClickShowPassword}
+											onMouseDown={handleMouseDownPassword}
+											edge="end"
+											>
+											{values.showPassword ? <Visibility /> : <VisibilityOff />}
+											</IconButton>
+									</InputAdornment>
+									}
+									labelWidth={70}
+							/>
+					</FormControl> 
+					{values.validator.message(
+							"password",
+							values.password,
+							"required"
+						)}                   
+					<Button margin="normal" onClick={addItem}>
+							Log In
+					</Button>    
+				</Box>
+			</div>
+		</div>
 	);
 }
 
@@ -156,6 +186,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default compose(
+	withFirebase,
 	withRouter,
   connect(mapStateToProps)
 )(injectIntl(Form));

@@ -19,19 +19,28 @@ const CustomSelect = (props) => {
   const display = (el) => (props.display ? props.display(el) : el);
   const valueF = (el) => (props.valueF ? props.valueF(el) : el);
   return (
-    <FormControl {...props} className={classes.root} variant="outlined" size="small">
+    <FormControl style={props.style} className={classes.root} variant="outlined" size="small">
       {props.label && <InputLabel id="demo-simple-select-label">{props.label}</InputLabel>}
-      <Select name={props.name} value={props.value} onChange={props.onChange}>
-        {props.default && (
-          <MenuItem value={props.default.value}>{props.default.text}</MenuItem>
-        )}
-        {props.array &&
+      { (props.value && props.value.type === "img") ?
+        <Select name={props.name} value={props.value} renderValue={(v) =><img src={v.props.src}></img>} onChange={props.onChange}>
+        { props.array && 
           props.array.map((el, i) => (
             <MenuItem key={valueF(el)} value={valueF(el)}>
               {display(el)}
             </MenuItem>
           ))}
-      </Select>
+        </Select> :
+        <Select name={props.name} value={props.value} onChange={props.onChange}>
+        { props.default && 
+          <MenuItem value={props.default.value}>{props.default.text}</MenuItem> }
+        { props.array && 
+          props.array.map((el, i) => (
+            <MenuItem key={valueF(el)} value={valueF(el)}>
+              {display(el)}
+            </MenuItem>
+          ))}
+        </Select>
+      }
     </FormControl>
   );
 };

@@ -2,14 +2,14 @@ import app from "firebase/app";
 import "firebase/auth";
 
 const config = {
-  apiKey: "AIzaSyAqebA0e5l-xgcEVvNsPypJ1_dRi2dHqMk",
-  authDomain: "e-commerce-1-b4d7f.firebaseapp.com",
-  databaseURL: "https://e-commerce-1-b4d7f.firebaseio.com",
-  projectId: "e-commerce-1-b4d7f",
-  storageBucket: "e-commerce-1-b4d7f.appspot.com",
-  messagingSenderId: "368342962904",
-  appId: "1:368342962904:web:43a406717179b3253ebdad",
-  measurementId: "G-08WBSCBEDH",
+  apiKey: "AIzaSyBGT79ox9Dh1uksG1nbiORofAYBXOat4_s",
+  authDomain: "qr-code-b0dc9.firebaseapp.com",
+  databaseURL: "https://qr-code-b0dc9.firebaseio.com",
+  projectId: "qr-code-b0dc9",
+  storageBucket: "qr-code-b0dc9.appspot.com",
+  messagingSenderId: "557480970352",
+  appId: "1:557480970352:web:b3e689d8e69ba5592eccb5",
+  measurementId: "G-1SXZMVSBCB"
 };
 
 class Firebase {

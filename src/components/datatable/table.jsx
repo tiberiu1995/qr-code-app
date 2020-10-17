@@ -176,12 +176,13 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
   const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
   const lt600 = useMediaQuery('(max-width:599px)');
   const mobile = useMediaQuery('(max-width:499px)');
+  const {formatMessage} = intl;
 
   const filtering = () => headerGroups.map((headerGroup) => (
     <Box mb={2.5} display={ lt600 ? "grid" : "flex"} justifyContent="left"  {...headerGroup.getHeaderGroupProps()}>
       <Box mx={2.5}>
-        <Typography align="left" variant="subtitle1">
-          Filtreaza dupa...
+        <Typography align="left" variant="subtitle2">
+          {formatMessage({id: "filter_by"})} ...
         </Typography>
       </Box>
       { !lt600 ?
@@ -193,7 +194,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
           )
         ) :
         <Box display="flex">
-        { headerGroup.headers.map((column) => ["name", "category"].includes(column.id) && (
+        { headerGroup.headers.map((column) => ["name", "category", "title"].includes(column.id) && (
             column.canFilter && column.filterable &&
               <Box mx={2.5} {...column.getHeaderProps(column.getSortByToggleProps())} >
                 {column.render("Filter")}
@@ -211,9 +212,9 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
       <TableRow {...headerGroup.getHeaderGroupProps()}>
         {headerGroup.headers.map((column) => (
           arr.includes(column.id) && 
-          <TableCell padding={mobile ? "none" : "default" }
+          <TableCell align="center" padding={mobile ? "none" : "default" }
             {...column.getHeaderProps(column.getSortByToggleProps())} >
-            <Box display="flex" alignItems="center">
+            <Box justifyContent="center" display="flex" alignItems="center">
               {column.render("Header")}
               <Box display="grid" className={clsx(classes.arrows)}>
               { sortingArrows(column) }

@@ -3,7 +3,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import { withFirebase } from "./firebase";
 import { injectIntl } from "react-intl";
-import { setToken } from "../actions";
+import { setToken, setUser, setUid  } from "../actions";
 import { Link, withRouter } from "react-router-dom";
 
 // Custom Components
@@ -18,7 +18,7 @@ import { uuid } from "uuidv4";
 import { Box } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core/';
 import { TabletMac } from "@material-ui/icons";
-import { setMedia } from './../actions/index';
+import { setMedia, } from './../actions/index';
 
 
 /*const LoadScript = props => {
@@ -79,6 +79,17 @@ import { setMedia } from './../actions/index';
     page = page ? page.replace(/\//g,'') : null ;
     if (!email && !token && page && authRedirect.includes(page))
       props.history.replace("/log-in");
+    props.firebase.auth.onAuthStateChanged((user) => {
+        if (user) {
+          user.getIdToken().then(function (idToken) {
+            console.log(idToken);
+            console.log(user.email);
+            console.log(user.metadata.creationTime);
+            setToken(idToken);
+            setUid(user.uid);
+          });
+        } else props.history.push("/login?ref=" + page);
+      });
 
   },[]);
 
@@ -139,7 +150,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default compose(
- // withFirebase,
+  withFirebase,
   withRouter,
   connect(mapStateToProps)
 )(injectIntl(App));

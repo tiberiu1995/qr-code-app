@@ -21,27 +21,28 @@ import Items from "./components/pages/items/";
 import Design from "./components/pages/menu/design/";
 import CustomerMenu from "./components/pages/menu/view/";
 import ItemReviews from "./components/pages/menu/view/review/";
-import LoginForm from "./components/pages/log-in";
-import Account from "./components/pages/my-account";
+import Login from "./components/pages/log-in";
+import Register from "./components/pages/register";
+import Profile from "./components/pages/profile.jsx";
+import ForgetPassword from "./components/pages/forget-password.jsx";
+import ChangePassword from "./components/pages/change-password.jsx";
 
 import messages from "./language.json";
 
-import Products from "./components/products/products.jsx";
+//import Products from "./components/products/products.jsx";
 
 import ScanQR from "./components/pages/scan-qr";
 
-import { Container } from "./components/test/test";
+//import { Container } from "./components/test/test";
 import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
-import blue from '@material-ui/core/colors/blue';
+import {blue, red} from '@material-ui/core/colors';
+import { PlayCircleFilledWhite } from "@material-ui/icons";
+import { colors, rgbToHex } from "@material-ui/core";
+import { FirebaseContext } from "./components/firebase";
+import Firebase from './components/firebase/firebase';
+import ForgetPasswordForm from './components/pages/forget-password';
 
-const mapStateToProps = (state) => ({
-  language: state.settings.language
-})
-
-const Context = connect(
-  mapStateToProps,
-)(ScrollContext);
 
 class Root extends React.Component {
   constructor(props) {
@@ -52,6 +53,12 @@ class Root extends React.Component {
     this.theme = createMuiTheme({
       palette: {
         primary: blue,
+        /*secondary: {
+          main: red[50],
+        }*/
+        text: {
+          //secondary: 'rgb(255,255,255)',
+        },
       },
       breakpoints: {
         values: {
@@ -60,6 +67,13 @@ class Root extends React.Component {
           md: 600,
           lg: 900,
           xl: 1300
+        }
+      },
+      overrides: {
+        MuiCheckbox: {
+          root: {
+            //color: 'black'
+          }
         }
       }
     });
@@ -76,12 +90,14 @@ class Root extends React.Component {
 
   */
   render() {
+    const locale = store.getState().settings.language;
+    console.log(locale);
     return (
       <Provider store={store}>
-        <IntlProvider locale="ro" messages={messages["ro"]}>
+        <IntlProvider locale={locale} messages={messages[locale]}>
           <ThemeProvider theme={this.theme}>
             <BrowserRouter basename={"/"}>
-              <Context>
+              <ScrollContext>
                 <Switch>
                   <Route
                     path={`${process.env.PUBLIC_URL}/scan-qr/`}
@@ -145,22 +161,37 @@ class Root extends React.Component {
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/menu/:title/design/`}
-                      component={Design}
+                      render={props => <Design {...props} />}
                     />
 
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/log-in`}
-                      component={LoginForm}
-                    />                      
+                      component={Login}
+                    />  
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/my-account`}
-                      component={Account}
-                    />  
+                      path={`${process.env.PUBLIC_URL}/register`}
+                      component={Register}
+                    />                          
+                    <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/my-account/profile`}
+                      component={Profile}
+                    /> 
+                    <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/my-account/forget-password`}
+                      component={ForgetPassword}
+                    /> 
+                    <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/my-account/change-password`}
+                      component={ChangePassword}
+                    />                                                  
                   </Layout>
                 </Switch>
-              </Context>
+              </ScrollContext>
             </BrowserRouter>
           </ThemeProvider>
         </IntlProvider>
@@ -172,10 +203,10 @@ class Root extends React.Component {
 
 
 ReactDOM.render(
-  //<FirebaseContext.Provider value={new Firebase()}>
-  <Root />,
-  /* </FirebaseContext.Provider>*/ document.getElementById("root")
-);
+  <FirebaseContext.Provider value={new Firebase()}>
+    <Root />
+  </FirebaseContext.Provider>, 
+  document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

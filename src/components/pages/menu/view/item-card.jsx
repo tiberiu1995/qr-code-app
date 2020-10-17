@@ -22,19 +22,13 @@ import { TableRow, TableCell } from "@material-ui/core/";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from 'redux';
 
-const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
-
- const getStyle = ({color, font, size}) => ({
-   color, 
-   fontSize: value(size), 
-   fontFamily: font})
 
 const useStyles = makeStyles({
-  name: props => getStyle(props.name),
-  size: props => getStyle(props.size),
-  ingredients: props => getStyle(props.ingredients),
-  alergens: props => getStyle(props.alergens),
-  calories: props => getStyle(props.calories),
+  name: props => props.name,
+  size: props => props.size,
+  ingredients: props => props.ingredients,
+  alergens: props => props.alergens,
+  calories: props => props.calories,
 });
 
 const MediaCard = (props) => {

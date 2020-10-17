@@ -80,6 +80,9 @@ import React, {
         let config = apiData.categories; //[0].category_configuration.split(',')
         console.log(apiData);
         apiData = await fetchData({ title: title }, "category/get.php");
+        apiData = apiData.map(el => 
+          ({...el, picture: el.image_option === "library" ?
+          el.library_picture : el.upload_picture}));
         let categories = apiData;
         let _left = [];
         let _right = [];

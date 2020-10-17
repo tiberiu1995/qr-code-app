@@ -28,6 +28,7 @@ const CustomList = (props) => {
               >
                 <ListItemIcon>
                   <Checkbox
+                    color="primary"
                     checked={props.checked}
                     tabIndex={-1}
                     disableRipple

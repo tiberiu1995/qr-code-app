@@ -20,6 +20,10 @@ const accountReducer = (state = initialState, action) => {
       return { ...state, email: action.email };
     case "ADD_TOKEN":
       return { ...state, token: action.token };
+    case "ADD_UID":
+      return { ...state, uid: action.uid };
+    case "ADD_NAME":
+      return { ...state, name: action.name };
     case ADD_MSG:
       return { ...state, message: action.message };
     default:

@@ -16,13 +16,13 @@ const Row = ({ media, row, index, moveRow }) => {
   const data = () => {
    if(!lt600) 
     return row.cells.map((cell) => 
-         <TableCell {...cell.getCellProps()}>
+         <TableCell align="center" {...cell.getCellProps()}>
            {cell.render("Cell")}
          </TableCell>
      );
     else
      return row.cells.map((cell) => ["name", "category", "picture", "move", "title", "cat_no", "item_no"].includes(cell.column.id) &&
-     <TableCell padding={media.mobile ? "none" : "default" } {...cell.getCellProps()}>
+     <TableCell align="center" padding={media.mobile ? "none" : "default" } {...cell.getCellProps()}>
        {cell.render("Cell")}
      </TableCell>);
   }

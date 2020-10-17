@@ -45,6 +45,28 @@ export const setToken = (token) => {
   });
 };
 
+export const setUid = (uid) => {
+  store.dispatch({
+    type: "ADD_UID",
+    uid: uid,
+  });
+}
+
+export const setName = (name) => {
+  store.dispatch({
+    type: "ADD_NAME",
+    name: name,
+  }); 
+}
+
+export const setLayout = (layout) => {
+  store.dispatch({
+    type: "ADD_LAYOUT",
+    layout: layout,
+  }); 
+}
+
+
 export const setMessage = (message) => {
   store.dispatch({
     type: types.ADD_MSG,
