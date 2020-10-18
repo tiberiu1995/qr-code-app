@@ -326,8 +326,8 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                     ["category", "name"],
                     ["item", "name"],
                     ["item", "ingredients"],
-                    ["item", "alergens"],
-                    ["item", "calories"],
+                   // ["item", "alergens"],
+                    //["item", "calories"],
                     ["item", "size"],
                   ].map((el, i) => (
                     <Box key={'db'+i}>
@@ -344,7 +344,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                           <Typography align="center" gutterBottom  component="h6">
                             Dimensiune
                           </Typography>
-                          {/* <Select
+                          <Select
                             name="size"
                             style={{width: 86}}
                             label="Dimensiune"
@@ -352,7 +352,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             onChange={(e) => this.setStateFromInput(e, el)}
                             array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
                             display={(val) => (val+' px') }
-                            /> */}
+                            />
                         </Box>                   
                          <Box mb={2}>
                           <Typography align="center" gutterBottom component="h6">
@@ -379,7 +379,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                           <Typography align="center" gutterBottom component="h6">
                             Font
                           </Typography>
-                          {/* <Select
+                          <Select
                             style={{width: 185, textAlign: 'left'}}
                             name="font"
                             label="Font"
@@ -395,7 +395,8 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                               "Trebuchet MS",
                               "Verdana",
                             ]}
-                          /> */}
+                            display={(val) => (<Typography style={{fontFamily: val}}>{val}</Typography>)}
+                          />
                         </Box>                        
                       </Box>
                     </Box>

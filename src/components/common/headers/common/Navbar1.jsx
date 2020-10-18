@@ -146,6 +146,14 @@ const NavBar = (props) => {
           </Link>
         </Typography>
       </ListItemText>
+      <ListItemText>
+        <Typography variant="subtitle1" align="center"> 
+          <Link className={clsx(classes.link)}
+            to={`${process.env.PUBLIC_URL}/tutorials`}  >
+            {formatMessage({id: 'tutorials'})}
+          </Link>
+        </Typography>
+      </ListItemText>
     </ListItem>
 
 const notLoggedMenu = params => 
@@ -161,8 +169,8 @@ const notLoggedMenu = params =>
     <ListItemText>
       <Typography variant="subtitle1" align="center"> 
         <Link className={clsx(classes.link)}
-          to={`${process.env.PUBLIC_URL}/pricing`}  >
-          {formatMessage({id: 'pricing'})}
+          to={`${process.env.PUBLIC_URL}/tutorials`}  >
+          {formatMessage({id: 'tutorials'})}
         </Link>
       </Typography>
     </ListItemText>
@@ -171,6 +179,14 @@ const notLoggedMenu = params =>
         <Link className={clsx(classes.link)}
           to={`${process.env.PUBLIC_URL}/log-in`} >
           {formatMessage({id: 'log_in'})}
+        </Link>
+      </Typography>
+    </ListItemText>
+    <ListItemText>
+      <Typography variant="subtitle1" align="center">
+        <Link className={clsx(classes.link)}
+          to={`${process.env.PUBLIC_URL}/register`} >
+          {formatMessage({id: 'register'})}
         </Link>
       </Typography>
     </ListItemText>

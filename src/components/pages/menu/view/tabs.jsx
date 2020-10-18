@@ -27,7 +27,7 @@ const CustomTabs = (props) =>{
     let {classes, value, onChange, tabLabel, children} = props;
     return <><Tabs
     className={classes}
-    classes={{ indicator: clsx({background: 'blue'}) }}
+    //classes={classes.x}
     scrollButtons="on"
     value={value}
     onChange={onChange}

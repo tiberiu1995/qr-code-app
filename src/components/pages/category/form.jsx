@@ -116,8 +116,8 @@ export class Form extends Component {
           name: props.data.name,
           description: props.data.description,
           imageOption: props.data.image_option,
-          library_picture: <img src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[16]}/>,
-          upload_picture: this.getBase64Image(props.data.picture)
+          library_picture: <img src={props.data.library_picture}/>,
+          upload_picture: this.getBase64Image(props.data.upload_picture)
         }) : this.state = initState;
   }
 
@@ -267,7 +267,7 @@ export class Form extends Component {
                         onChange={this.setStateFromInput}
                         value={this.state.library_picture} 
                         array={categoryIcons.map((el,i) => 
-                          <img src={"https://menu.bathtimestories.com/assets/images/"+el} key={'_icons'+i} alt={el.replace(/(icons8-|-100.png)/g,'')} height="50"/>
+                          <img src={"https://menu.bathtimestories.com/assets/images/"+el} alt={el.replace(/(icons8-|-100.png)/g,'')} height="50"/>
                           )}/> }
                   </Box>
                   {/* <div className="form-group mb-3 col-lg-12">

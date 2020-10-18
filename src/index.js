@@ -111,6 +111,11 @@ class Root extends React.Component {
                   />
                   <Route
                     exact
+                    path={`${process.env.PUBLIC_URL}/my-menu/:title/:category`}
+                    component={CustomerMenu}
+                  />                  
+                  <Route
+                    exact
                     path={`${process.env.PUBLIC_URL}/my-menu/:title/reviews/:item/`}
                     component={ItemReviews}
                   />

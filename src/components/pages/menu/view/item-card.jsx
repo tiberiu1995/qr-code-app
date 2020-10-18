@@ -38,7 +38,7 @@ const MediaCard = (props) => {
 
   let picture;
   try {
-    picture = props.data.pictures;
+    picture = props.data.picture;
   } catch (e) {
     picture =
       "";

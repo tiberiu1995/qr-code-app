@@ -25,7 +25,7 @@ const CustomSelect = (props) => {
         <Select name={props.name} value={props.value} renderValue={(v) =><img src={v.props.src}></img>} onChange={props.onChange}>
         { props.array && 
           props.array.map((el, i) => (
-            <MenuItem key={valueF(el)} value={valueF(el)}>
+            <MenuItem key={valueF(el)+i} value={valueF(el)}>
               {display(el)}
             </MenuItem>
           ))}
