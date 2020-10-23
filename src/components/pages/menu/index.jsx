@@ -22,6 +22,7 @@ import CustomList from "./../../cardboard/_list";
 import { Grid } from "@material-ui/core/";
 import { fetchData, fetchMenu } from "../../utils/fetch";
 import { Add } from '@material-ui/icons';
+import { connect } from 'react-redux';
 
 const style = {
   position: "top-right",
@@ -41,10 +42,7 @@ const Categories = (props) => {
 
   const fetchMenus = async () => {
     try {
-      let response = await fetch(
-        "https://bathtimestories.com/apim/menu/get.php/"
-      );
-      let apiData = await response.json();
+      let apiData = await fetchData({uid: props.uid}, "menu/get.php");
       console.log(apiData);
       setData(apiData);
     } catch (error) {
@@ -133,4 +131,10 @@ const Categories = (props) => {
   );
 };
 
-export default compose(withRouter)(Categories);
+const mapStateToProps = (state) => ({
+  uid: state.account.uid
+})
+
+export default compose(
+  withRouter,
+  connect(mapStateToProps))(Categories);

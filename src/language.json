@@ -29,7 +29,8 @@
     "ingredients": "Ingredients",
     "name": "Name",
     "category": "Category",
-    "picture": "Picture"
+    "picture": "Picture",
+    "tutorials": "Tutorials"
   },
   "es": {},
   "fr": {},
@@ -64,7 +65,6 @@
     "total": "Valoare totala",
     "total.items": "Total produse",
     "shipping.rate": "Cost de livrare",
-    "title": "Titlu",
     "id": "Id",
     "picture": "imagine",
     "menu_admin": "Meniurile mele",

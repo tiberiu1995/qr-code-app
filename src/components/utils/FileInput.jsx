@@ -5,7 +5,7 @@ const FileInput = ({source, onChange, onClick, deleteImg}) => {
 
     return (
       <>
-        <div className="box-input-file row mx-0 col-lg-12 bg-white">
+        <div className="box-input-file row mx-0 bg-white">
         <input 
             style={{position: 'absolute', width: '100%', height: '100%', opacity: 0.0}}
           className="upload mx-auto"

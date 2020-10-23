@@ -1,10 +1,10 @@
-import React, { Component, useEffect } from "react";
+import React, {  useEffect } from "react";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { withFirebase } from "./firebase";
 import { injectIntl } from "react-intl";
-import { setToken, setUser, setUid  } from "../actions";
-import { Link, withRouter } from "react-router-dom";
+import { setToken, setUid  } from "../actions";
+import { withRouter } from "react-router-dom";
 
 // Custom Components
 import HeaderOne from "./common/headers/header-one";
@@ -12,12 +12,11 @@ import FooterOne from "./common/footers/footer-one";
 
 // ThemeSettings
 import ThemeSettings from "./common/theme-settings";
-import CookieConsent, { Cookies } from "react-cookie-consent";
+import CookieConsent, {  } from "react-cookie-consent";
 import Cookie from "js-cookie";
 import { uuid } from "uuidv4";
 import { Box } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core/';
-import { TabletMac } from "@material-ui/icons";
 import { setMedia, } from './../actions/index';
 
 
@@ -88,7 +87,7 @@ import { setMedia, } from './../actions/index';
             setToken(idToken);
             setUid(user.uid);
           });
-        } else props.history.push("/login?ref=" + page);
+        } //else props.history.push("/login?ref=" + page);
       });
 
   },[]);

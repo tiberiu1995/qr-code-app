@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { compose } from "recompose";
-import { connect, Provider } from "react-redux";
+import { Provider } from "react-redux";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { IntlProvider, addLocaleData } from "react-intl";
 import { ScrollContext } from "react-router-scroll-4";
 import "./index.scss";
 import "./components/common/index.scss";
-import Layout from "./components/App.jsx";
+import AdminLayout from "./components/App.jsx";
+import MenuLayout from "./components/App-menu.jsx";
 import * as serviceWorker from "./serviceWorker";
 
 import store from "./store";
@@ -100,26 +100,22 @@ class Root extends React.Component {
               <ScrollContext>
                 <Switch>
                   <Route
-                    path={`${process.env.PUBLIC_URL}/scan-qr/`}
-                    component={ScanQR}
-                  />
-                  {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/`} component={MenuShow}/> */}
-                  <Route
-                    exact
-                    path={`${process.env.PUBLIC_URL}/my-menu/:title/`}
-                    component={CustomerMenu}
-                  />
-                  <Route
-                    exact
-                    path={`${process.env.PUBLIC_URL}/my-menu/:title/:category`}
-                    component={CustomerMenu}
-                  />                  
-                  <Route
-                    exact
-                    path={`${process.env.PUBLIC_URL}/my-menu/:title/reviews/:item/`}
-                    component={ItemReviews}
-                  />
-                  <Layout>
+                      path={`${process.env.PUBLIC_URL}/scan-qr/`}
+                      component={ScanQR}/>
+                  <MenuLayout path={`${process.env.PUBLIC_URL}/my-menu/`}>
+                    {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/`} component={MenuShow}/> */}
+                    <Route
+                      exact
+                      path={[`/my-menu/:title/:category/reviews/:item/`, `/my-menu/:title/reviews/:item/`]}
+                      component={ItemReviews}
+                    />                                      
+                    <Route 
+                      exact
+                      path={[`/my-menu/:title/:category/`,`/my-menu/:title/`]}
+                      component={CustomerMenu}
+                    />
+                  </MenuLayout>
+                  <AdminLayout>
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/menu/new/`}
@@ -166,7 +162,7 @@ class Root extends React.Component {
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/menu/:title/design/`}
-                      render={props => <Design {...props} />}
+                      component={props => <Design {...props} />}
                     />
 
                     <Route
@@ -194,7 +190,7 @@ class Root extends React.Component {
                       path={`${process.env.PUBLIC_URL}/my-account/change-password`}
                       component={ChangePassword}
                     />                                                  
-                  </Layout>
+                  </AdminLayout>
                 </Switch>
               </ScrollContext>
             </BrowserRouter>

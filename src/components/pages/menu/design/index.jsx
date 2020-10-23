@@ -1,28 +1,18 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import SimpleReactValidator from "simple-react-validator";
-import Modal from "react-bootstrap/Modal";
-import ModalBody from "react-bootstrap/ModalBody";
-import ModalHeader from "react-bootstrap/ModalHeader";
-import ModalFooter from "react-bootstrap/ModalFooter";
-import ModalTitle from "react-bootstrap/ModalTitle";
-import { TextField, FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles, SvgIcon, useMediaQuery, Tabs, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
-import { ChromePicker } from "react-color";
+import { FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles, SvgIcon, useMediaQuery, Tabs, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
 import Select from "../../../utils/select.jsx";
-import { Grid, Button, AppBar, Tab } from "@material-ui/core/";
+import { Grid, Button,m} from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch.js";
 import { injectIntl } from "react-intl";
-import { Save, PhoneAndroid, Smartphone } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/styles";
+import { Save, PhoneAndroid} from "@material-ui/icons";
 import { Prompt } from 'react-router-dom';
 import Header from "../menu-header.jsx";
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import clsx from 'clsx';
-import { setLayout } from './../../../../actions/index';
 import FileInput from './../../../utils/FileInput';
 import CustomTabs from '../view/tabs.jsx';
-
-const queryString = require('query-string'); 
 
 const style = theme => ({
   [theme.breakpoints.down('xs')]: {
@@ -73,6 +63,8 @@ const tabLabel = (text, size) => (
     </>
 )
 
+const layoutArray = ["h0b0", "h0b1", "h1b0", "h1b1", "h2b1", "h3b0", "h3b1", "h3b2", 'h4b4'];
+const fontArray = ["Arial", "Courier New", "Georgia", "Palatino", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
 const categoryIcons = [
   'icons8-banana-split-100.png',   
   'icons8-beer-100.png',
@@ -132,15 +124,15 @@ const iframeStyle = mobile => (
     {top: 0, left: '50%',  transform: 'translate(-50%, 1%) scale(0.85)'},
     {top: 0, left: '50%',  transform: 'translate(-50%, -15%) scale(0.59)'},
     {top: 0, left: '50%',  transform: 'translate(-50%, -23%) scale(0.45)'},
-  ]);
+  ]
+);
 
-  const iframeSize = [
+const iframeSize = [
     {width: "320", height: "520"},
     {width: "420", height: "680"},
     {width: "600", height: "900"},
     {width: "800", height: "1150"},
-  ]
-
+]
 
 class Form extends Component {
   constructor(props) {
@@ -151,74 +143,62 @@ class Form extends Component {
       validator: new SimpleReactValidator(),
       backgroundOption: 'image',
       name: "Nume categorie",
-      layout: <img src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[0]}/>,
+      layout: <img alt="" src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[0]}/>,
       tabIndex: 0,
       description: "Descriere",
+      contentType: 'h0b0',
+      background: '',
       category: {
-        name: {
-          color: "#000",
-          size: 20,
-          font: "Times New Roman",
-        },
+        color: '#ffffff'
       },
-      item: {
-        name: {
-          color: "#000",
-          size: 14,
-          font: "Times New Roman",
-        },
-        ingredients: {
-          color: "#000",
-          size: 12,
-          font: "Times New Roman",
-        },
-        alergens: {
-          color: "#000",
-          size: 12,
-          font: "Times New Roman",
-        },
-        calories: {
-          color: "#000",
-          size: 12,
-          font: "Times New Roman",
-        },
-        size: {
-          color: "#000",
-          size: 12,
-          font: "Times New Roman",
-        },
-      },
-    };
+    }
   }
 
-  setStateFromInput = (event, type) => {
+  setStateFromType = (event, type) => {
     !this.state.isEdited && this.setState({isEdited: true});
     var obj = {};
     //console.log(`/my-menu/${this.props.match.params.title}?category=${JSON.stringify(this.state.category)}&item=${JSON.stringify(this.state.item)}`);
     obj[event.target.name] = event.target.value;
-    this.setState({
-      [type[0]]: {
-        ...this.state[type[0]],
-        [type[1]]: {
-          ...this.state[type[0]][type[1]],
-          [event.target.name]: event.target.value,
+
+    //const {category, item, contentType} = this.state;
+    //sessionStorage.setItem('style', JSON.stringify({category, item, contentType}));
+    Array.isArray(type) ?
+      this.setState({
+        [type[0]]: {
+          ...this.state[type[0]],
+          [type[1]]: {
+            ...this.state[type[0]][type[1]],
+            [event.target.name]: event.target.value,
+          },
         },
-      },
+      }) :
+    this.setState({
+      [type]: { ...this.state[type],
+        [event.target.name]: event.target.value,
+      }
     });
   };
 
-  changeLayout = (event) => {
+  setStateFromInput = (event) => {
      // setLayout(event.target.value);
       this.setState({[event.target.name]: event.target.value});
   }
 
+  //handleBackgroundChange = ()
+
   fetchDesign = async () => {
     try {
-      let apiData = await fetchData({title: this.props.match.params.title}, "menu/design/get.php");
-      console.log(apiData);
+      let {custom, defaults} = await fetchData({title: this.props.match.params.title}, "menu/design/get.php");
+      console.log(custom);
       this.setState({
-        category: JSON.parse(apiData.category_design),
-        item: JSON.parse(apiData.item_design),
+        category: JSON.parse(custom.category_design ? custom.category_design : defaults.category_design),
+        item: JSON.parse(custom.item_design ? custom.item_design : defaults.item_design),
+        defaults: {
+          category: JSON.parse(defaults.category_design),
+          item: JSON.parse(defaults.item_design),
+          backgroundOption: defaults.background_option
+        },
+        backgroundOption: custom.background_option || defaults.background_option
       });
     } catch (error) {
       console.log(error);
@@ -231,6 +211,8 @@ class Form extends Component {
         title: this.props.match.params.title,
         category: JSON.stringify(this.state.category),
         item: JSON.stringify(this.state.item),
+        layout_id: this.state.contentType,
+        background_option: this.state.backgroundOption
       }
       let apiData = await fetchData( obj, "menu/design/edit.php");
       console.log(apiData);
@@ -259,33 +241,24 @@ class Form extends Component {
 
     reader.onloadend = async () => {
       const canvas = reader.result;
-      this.setState({ background: canvas });
+      this.setState({ category: {
+        ...this.state.category,
+        backgroundImage: canvas }
+      });
     };
     reader.readAsDataURL(file);
   }
-
-  getBase64Image = async (picture) => {
-    var obj = this;
-    let canvas = document.createElement("canvas");
-    let ctx = canvas.getContext("2d");
-    let img = document.createElement("img");
-    img.crossOrigin = "Anonymous";
-    img.onload = function () {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      var dataURL = canvas.toDataURL("image/jpeg");
-      obj.setState({ background: dataURL.replace(/^data:image\/(png|jpg);base64,/, "") }) || obj.getBase64Image(obj.props.data.background);
-    };
-    img.src = picture;
-  };
 
   deleteImg(type) {
     this.setState({[type]: "" });
   }
 
+  restorePresets = () => {
+    this.setState({...this.state.defaults});
+  }
+
   render() {
-    const { show, onCancel, data, intl, media, classes} = this.props;
+    const { intl, media, classes} = this.props;
     let iframe = {
         background: 'white', 
         position: 'absolute', 
@@ -294,16 +267,21 @@ class Form extends Component {
     iframe = {...iframe, ...iframeStyle(this.props.media.mobile)[this.state.tabIndex]};
     
     const translate = intl.formatMessage;
+    const backgroundImage = this.state.category.backgroundImage || "";
+    const {category, item, contentType, backgroundOption} = this.state;
+    if (item && category && contentType)
+      sessionStorage.setItem('style', JSON.stringify({category, item, contentType, backgroundOption}));
 
-    const {category, item} = this.state;
-    const previewQuery = 
+   /* const previewQuery = 
     `cnc=${category.name.color.replace("#",'')}&cns=${category.name.size}&cnf=${category.name.font.replace(/\s/g, "_")}&
 inc=${item.name.color.replace("#",'')}&ins=${item.name.size}&inf=${item.name.font.replace(/\s/g, "_")}&
 iic=${item.ingredients.color.replace("#",'')}&iis=${item.ingredients.size}&iif=${item.ingredients.font.replace(/\s/g, "_")}&
 iac=${item.alergens.color.replace("#",'')}&ias=${item.alergens.size}&iaf=${item.alergens.font.replace(/\s/g, "_")}&
 icc=${item.calories.color.replace("#",'')}&ics=${item.calories.size}&icf=${item.calories.font.replace(/\s/g, "_")}&
-isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.font.replace(/\s/g, "_")}`;
+isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.font.replace(/\s/g, "_")}`;*/
+    
 
+    //document.querySelector('iframe').contentWindow.postMessage(1233, '*');
     return (
       <Box m={{'sm': 2}}>
         <Prompt
@@ -321,14 +299,16 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
             spacing={2} >
             <Grid align="center" item xs={12} lg={6}>
               <Paper elevation={1}>
+                <Button onClick={this.restorePresets}>Restore preset styles</Button>
                 <form className={"needs-validation add-product-form " + clsx(classes.form)}>
-                {[
+                {this.state.item && [
                     ["category", "name"],
                     ["item", "name"],
                     ["item", "ingredients"],
                    // ["item", "alergens"],
                     //["item", "calories"],
                     ["item", "size"],
+                    ["item", "reviews"],
                   ].map((el, i) => (
                     <Box key={'db'+i}>
                       <Divider/>
@@ -345,11 +325,11 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             Dimensiune
                           </Typography>
                           <Select
-                            name="size"
+                            name="fontSize"
                             style={{width: 86}}
                             label="Dimensiune"
-                            value={this.state[el[0]][el[1]].size}
-                            onChange={(e) => this.setStateFromInput(e, el)}
+                            value={this.state[el[0]][el[1]].fontSize}
+                            onChange={(e) => this.setStateFromType(e, el)}
                             array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
                             display={(val) => (val+' px') }
                             />
@@ -370,7 +350,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                                 borderColor: 'rgba(0, 0, 0, 0.23)'
 
                               }}
-                              onChange={(e) => this.setStateFromInput(e, el)}
+                              onChange={(e) => this.setStateFromType(e, el)}
                               value={this.state[el[0]][el[1]].color}
                             />
                           </FormControl>
@@ -381,20 +361,11 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                           </Typography>
                           <Select
                             style={{width: 185, textAlign: 'left'}}
-                            name="font"
+                            name="fontFamily"
                             label="Font"
-                            value={this.state[el[0]][el[1]].font}
-                            onChange={(e) => this.setStateFromInput(e, el)}
-                            array={[
-                              "Arial",
-                              "Courier New",
-                              "Georgia",
-                              "Palatino",
-                              "Tahoma",
-                              "Times New Roman",
-                              "Trebuchet MS",
-                              "Verdana",
-                            ]}
+                            value={this.state[el[0]][el[1]].fontFamily}
+                            onChange={(e) => this.setStateFromType(e, el)}
+                            array={fontArray}
                             display={(val) => (<Typography style={{fontFamily: val}}>{val}</Typography>)}
                           />
                         </Box>                        
@@ -411,44 +382,53 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                     className="form form-label-center" >
                     <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
                       <Typography align="center" gutterBottom  component="h6"> </Typography>
-                      
+                      <Select
+                            //style={{width: 185, textAlign: 'left'}}
+                            name="contentType"
+                            label="Layout"
+                            value={this.state.contentType}
+                            onChange={this.setStateFromInput}
+                            array={layoutArray}
+                            display={(val) => "Layout "+(layoutArray.indexOf(val)+1)}
+                          />
                     </Box> 
                   </Box>
                   <Divider/>
-                  <Typography align="center" gutterBottom>
-                    Background 
-                  </Typography>
                   <Box m={2}
                     display={"flex"}
                     justifyContent="space-evenly" 
                     className="form form-label-center" >
-                    <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
+                    <Box mb={2} display="flex" flexDirection="column">
                       <FormControl component="fieldset">
                         <FormLabel component="legend">Background</FormLabel>
-                        <RadioGroup aria-label="background" name="backgroundOption" value={this.state.backgroundOption} onChange={this.handleBackgroundChange}>
+                        <RadioGroup row aria-label="background" name="backgroundOption" value={this.state.backgroundOption} onChange={this.setStateFromInput}>
                          <FormControlLabel value="image" control={<Radio />} label="Image" />
                           <FormControlLabel value="color" control={<Radio />} label="Color" />
                        </RadioGroup>
                      </FormControl>
                       <Typography align="center" gutterBottom  component="h6"> </Typography>
-                      {this.state.backgroundOption == "image" ? 
+                      {this.state.backgroundOption === "image" ? 
                         <FileInput 
-                          source={this.state.background} 
+                          source={
+                            backgroundImage &&
+                            backgroundImage.indexOf("base64") >=0 ? 
+                            backgroundImage : 'https://bathtimestories.com/'+backgroundImage}
+
                           onChange={(event) => this._handleImgChange(event,"picture")} 
                           deleteImg={(event) => this.deleteImg("picture")}
                           onClick={(event) => this._handleSubmit(event)}/> :
                         <FormControl>
                           <FormLabel  style={{position: 'absolute', 'background': 'white'}} className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
                           <input
-                            name="color"
+                            name="background"
                             label="Culoare"
                             type="color"
                             style={{
-                              width: 86,
-                              height: 40,
+                              width: 133,
+                              height: 100,
                               borderColor: 'rgba(0, 0, 0, 0.23)'}}
-                            //onChange={(e) => this.setStateFromInput(e)}
-                            value={"#ffffff"}/>
+                            onChange={(e) => this.setStateFromType(e, "category")}
+                            value={this.state.category.background}/>
                         </FormControl>}
                     </Box> 
                   </Box>                  
@@ -476,9 +456,8 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                 children={<Box mt={2} style={{position: 'relative'}}>
                   {images(this.props.media.mobile)[this.state.tabIndex]}
                   <iframe
-
                       title="preview"
-                      src={`/my-menu/${this.props.match.params.title}?${previewQuery}/`}
+                      src={`/my-menu/${this.props.match.params.title}/?preview=true/`}
                       {...iframeSize[this.state.tabIndex]}
                       style={iframe}
                     />

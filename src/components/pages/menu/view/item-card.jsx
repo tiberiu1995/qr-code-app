@@ -51,8 +51,7 @@ const MediaCard = (props) => {
       exit: 0,
      }} in={props.data.name !== ''}>
       <Card
-        className="my-4 p-0"
-        style={{ borderRadius: 20, position: "relative", zIndex: 150 }}
+        style={{ margin: '0 1rem 1rem 1rem', borderRadius: 20, position: "relative", zIndex: 150 }}
       >
         <CardActionArea className="d-flex">
           {!props.disableImages && <CardMedia

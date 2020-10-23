@@ -1,22 +1,21 @@
-import React, { Component, Fragment } from "react";
-import SimpleReactValidator from "simple-react-validator";
+import React, { Component} from "react";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { withFirebase } from "../../../firebase";
 //import Product from '../menu/product';
-import { Typography, Box, Tooltip, Fab, Fade, Button, Divider, Paper } from "@material-ui/core";
-import { Grid } from "@material-ui/core/";
+import { Typography, Box, Tooltip, Fab, Fade, Button, Divider, } from "@material-ui/core";
 import GridImage from "./image-grid.jsx";
 import Card from "./item-card.jsx";
-import { makeStyles } from "@material-ui/core/styles";
 import { withStyles } from "@material-ui/styles";
-import { ArrowDropUp, RateReviewSharp } from "@material-ui/icons/";
+import { ArrowDropUp,  } from "@material-ui/icons/";
 import { animateScroll } from "react-scroll";
-import { fetchMenuView, fetchMenu, fetchMenuDesign, fetchData } from '../../../utils/fetch';
+import { fetchData } from '../../../utils/fetch';
 import Reviews from './review';
 import CustomTabs from './tabs.jsx';
 import Hx from './hx.jsx';
+import { Link } from 'react-router-dom';
+import { Tab } from '@material-ui/core/';
 
 const queryString = require('query-string');
 
@@ -61,15 +60,6 @@ const styles = (theme) => ({
     }
   }
 });
-/*      h1: cercuri
-				h2: patrate
-				h3: liniar
-				h4: grid
-				
-				b1: overlapped rectangles v1
-				b2: overlapped rectangles v2
-				b3: liniar rectangles */
-
 
 const scrollToTop = () => {
   animateScroll.scrollToTop();
@@ -80,22 +70,6 @@ const scrollToBottom = () => {
   animateScroll.scrollToBottom();
   //window.scrollTo(0, 0);
 };
-
-// let [mobileView, setMobileView] = useState(window.innerWidth<600);
-// useEffect(() => {
-//   //(window.innerWidth>600 && mobileView || window.innerWidth<600 && !mobileView) && setMobileView(!mobileView)
-//   window.addEventListener("resize", updateWindowDimensions);
-
-//   return () => window.removeEventListener("resize", updateWindowDimensions);
-// },[]);
-
-const value = (size) => ( window.innerWidth<600 ? ((100 * parseInt(size)) / 400 + "vw") : parseInt(size));
-
-const getStyle = ({color, font, size}) => ({
-  color, 
-  fontSize: value(size), 
-  fontFamily: font,
-})
 
 export class Menu extends Component {
   constructor(props) {
@@ -122,61 +96,40 @@ export class Menu extends Component {
       category: "",
       mobileView: window.innerWidth<600,
     };
-    const params = queryString.parse(props.location.search);
-    if (Object.keys(params).length){
-    this.state.isPreview = true;
-    this.state.category = {
-      name: {
-        color: "#"+params.cnc,
-        size: params.cns,
-        font: params.cnf.replace(/_/g, " "),
-      },
-    };
-    this.state.item = {
-        name: {
-          color: "#"+params.inc,
-          size: params.ins,
-          font: params.inf.replace(/_/g, " "),
-        },
-        ingredients: {
-          color: "#"+params.iic,
-          size: params.iis,
-          font: params.iif.replace(/_/g, " "),
-        },
-        alergens: {
-          color: "#"+params.iac,
-          size: params.ias,
-          font: params.iaf.replace(/_/g, " "),
-        },
-        calories: {
-          color: "#"+params.icc,
-          size: params.ics,
-          font: params.icf.replace(/_/g, " "),
-        },
-        size: {
-          color: "#"+params.isc,
-          size: params.iss,
-          font: params.isf.replace(/_/g, " "),
-        },
-    };
-  }
     this.edit = false;
   }
 
-  updateWindowDimensions = () => {
+  value = (size) => {
+    if (this.props.media.mobile)
+     return (100 * parseInt(size)) / 400 + "vw";
+    if (this.props.media.tablet)
+     return (100 * parseInt(size)) / 500 + "vw";    
+    return parseInt(size);
+  }
+
+  /*updateWindowDimensions = () => {
     if(window.innerWidth>600 && this.state.mobileView || window.innerWidth<600 && !this.state.mobileView){
       this.setState({mobileView: !this.state.mobileView});
       console.log("updating height")
     };
-  };
+  };*/
+
+  updatePreviewStyle = () => {
+    if(sessionStorage.getItem('style')){
+      const {item, category, contentType, backgroundOption} = JSON.parse(sessionStorage.getItem('style'));
+      this.setContentType(contentType);
+      this.setState({item, category, backgroundOption});
+      sessionStorage.setItem('style', '');
+    }
+  }
 
   componentDidMount() {
-    this.setContentType('h3b0');
+    //this.setContentType('h3b0');
+    const params = queryString.parse(this.props.location.search);
+    params.preview && setInterval(this.updatePreviewStyle, 1000);
     window.addEventListener("resize", this.updateWindowDimensions);
     const title = this.props.match.params.title;
     this.fetchData(title);
-    if(!this.state.item)
-      this.fetchDesign(title);
     window.addEventListener("scroll", this.handleToolTip);
   }
 
@@ -184,19 +137,13 @@ export class Menu extends Component {
   fetchData = async (title) => {
     try {
       let settings = await fetchData({ title: title }, "menu/category/get.php");
-      //let categories = apiData.categories;
-      this.setState({settings: { 
-        /*enableAlergens: apiData.enables.enableAlergens == true,
-        enableCalories: apiData.enables.enableCalories == true,*/
-        disableToC: !(settings.enables.enableToC == true),
-        disableReviews: !(settings.enables.enableReviews == true)
-      }
-      });
       let {data, layout} =  await fetchData({title: title}, "menu/view/get.php");
+      let design = await fetchData({title: title}, "menu/design/get.php")
+
       console.log(data);
       let newData = [];
       data.forEach((el, i) => {
-        if (i == 0 || data[i - 1].category_id !== el.category_id) {
+        if (i === 0 || data[i - 1].category_id !== el.category_id) {
           let category = {
             category_id: el.category_id,
             name: el.c_name,
@@ -222,41 +169,26 @@ export class Menu extends Component {
         }
       });
       this.setState({
+        category: JSON.parse(design.custom.category_design ? design.custom.category_design : design.defaults.category_design),
+        item: JSON.parse(design.custom.item_design ? design.custom.item_design : design.defaults.item_design),
         data: newData,
         headerType: Number(layout.header_type),
         bodyType: Number(layout.body_type),
-        samePage: layout.same_page==true
+        samePage: layout.same_page==true,
+        settings: { 
+          disableToC: !(settings.enables.enableToC == true),
+          disableReviews: !(settings.enables.enableReviews == true)
+        },
+        backgroundOption: design.custom.background_option || design.defaults.background_option
+
       });
+      this.setContentType(layout.id);
+
     } catch (error) {
       console.log(error);
     }
   };
 
-  fetchMenu = async (title) => {
-    try {
-      let data = await fetchMenu(title);
-      console.log(data);
-      this.setState({
-        products: data.products,
-        categories: data.categories.map((i) => i.category),
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  fetchDesign = async (title) => {
-    try {
-      let apiData = await fetchData({title: title}, "menu/design/get.php")
-      console.log(apiData);
-      this.setState({
-        category: JSON.parse(apiData.category_design),
-        item: JSON.parse(apiData.item_design),
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   handleToolTip = (event) => {
     if (!this.state.showToolTip && window.scrollY > window.innerHeight / 2)
@@ -300,27 +232,33 @@ export class Menu extends Component {
         case 'h3b1':
           this.setState({headerType: 3, bodyType: 1, samePage: false});
           break;
-        case 'h3':
-          this.setState({headerType: 3});
+        case 'h3b2':
+          this.setState({headerType: 3, bodyType: 2, samePage: true});
+          break;
+        case 'h4b4':
+          this.setState({headerType: 4, bodyType: 4, samePage: false, tabIndex: -1});
           break;
         default:
           this.setState({headerType: 1});   
     }
   }
 
-  tableOfContent = (grid, style) => {
+  tableOfContent = (grid, category_style) => {
     const {classes} = this.props;
+    let style =  JSON.parse(JSON.stringify(category_style));
+    style.name.fontSize = this.value(style.name.fontSize);
     switch (this.state.headerType){
       case 0:
         return <CustomTabs
                 //classes={classes.tabs}
-                classes={[classes.tabs, classes.h1]}
+                classes={[classes.tabs, classes.h1].join(' ')}
+                //style={style.background}
                 value={this.state.tabIndex}
                 onChange={this.handleCategoryChange}
                 tabLabel={grid.map(el =>
                   <>
-                    <img width="50" height="50" style={{background: 'white'}} src={el.picture}/>
-                    <Typography style={{...getStyle(style), textTransform: 'none', width: 'min-content'}}>
+                    <img alt="" width="50" height="50" style={{background: 'white'}} src={el.picture}/>
+                    <Typography style={{...style.name, textTransform: 'none', width: 'min-content'}}>
                       {el.name}
                     </Typography>
                   </>
@@ -334,8 +272,8 @@ export class Menu extends Component {
                 onChange={this.handleCategoryChange}
                 tabLabel={grid.map(el =>                   
                   <>
-                    <img width="50" height="50" src={el.picture}/>
-                    <Typography style={{...getStyle(style), fontSize: 'inherit', textTransform: 'none', width: 'min-content'}}>
+                    <img alt="" width="50" height="50" style={{background: 'white'}} src={el.picture}/>
+                    <Typography style={{...style.name, fontSize: 'inherit', textTransform: 'none', width: 'min-content'}}>
                       {el.name}
                     </Typography>
                   </>
@@ -353,9 +291,9 @@ export class Menu extends Component {
         <Hx
           el={el}
           style
-          onClick={()=>{this.props.history.push(''+grid[i].id)}}
+          onClick={()=>{this.props.history.push(grid[i].id+'/')}}
           key={'_hx3'+i}
-          children={<Typography style={getStyle(style)}>
+          children={<Typography style={style.name}>
             {el.name}
           </Typography>}
         />)
@@ -365,11 +303,36 @@ export class Menu extends Component {
     }
   }
 
-  getCategoryHeader = (el, category_style) => {
-    let style = getStyle(category_style);
+  getCategoryHeader = (el, category_style, index) => {
+    //let style = {...category_style};
+    //style.fontSize = this.value(style.fontSize);
+    switch (this.state.headerType){
+      case 4: 
+        return <Box 
+          style={{
+            height: 100, 
+            background: 'url(' + el.picture + ')', 
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'}}
+          key={'_c4'+el.id} onClick={()=>{console.log(this.state.tabIndex);this.setState({
+              tabIndex: this.state.tabIndex !== index ? index : -1
+            }) }} >
+          <Box 
+            display="flex"
+            style={{height: '100%', background: 'rgba(0,0,0,0.5)'}}
+            justifyContent="center"
+            alignItems="center">
+            <Typography style={category_style.name}>
+              {el.name}
+            </Typography>
+          </Box>
+        </Box>
+      default: 
+        return ''
+    }
     switch (this.props.layout) {
-      case 'layout1':
-        return <GridImage /*disableImages={this.state.settings.disableImages}*/ data={[el]} style={style} />
+     // case 'layout1':
+      //  return <GridImage /*disableImages={this.state.settings.disableImages}*/ data={[el]} style={style} />
 
       default:
         return ''/*<Typography style={{...style, textAlign: "center", whiteSpace: "break-spaces",}} align="center">
@@ -380,14 +343,11 @@ export class Menu extends Component {
   }
 
   getItem = (el,i) => {
-    const {item, isPreview, settings, bodyType} = this.state;
-    const style = {
-      name: getStyle(item.name),
-      size: getStyle(item.size),
-      ingredients: getStyle(item.ingredients),
-      alergens: getStyle(item.alergens),
-      calories: getStyle(item.calories),
-    };
+    const {item, isPreview, settings: {disableReviews, disableImages}, bodyType} = this.state;
+    let style = JSON.parse(JSON.stringify(item)); //{...item};
+    for (const [key, value] of Object.entries(style)) {
+      style[key].fontSize = this.value(value.fontSize)
+    }
     switch (bodyType) {
       case 0:
         return <Hx
@@ -408,13 +368,28 @@ export class Menu extends Component {
               <Typography style={{...style.size, lineHeight: '2.5em', textAlign: 'right'/*whiteSpace: "nowrap"*/}} >
                   {el.size}
                 </Typography>
+                { !disableReviews ? 
+                    ( !isPreview ? 
+                      <Link to={{
+                        pathname: `reviews/${el.id}/`,
+                        state: ({
+                          item: el,
+                          style: style
+                        })
+                        }}>
+                      <Typography style={{...style.reviews}} >
+                        Vezi recenzii
+                      </Typography>
+                      </Link> :
+                      'Vezi recenzii'
+                    ) : ''
+                }
             </>}
-          style={getStyle(style)}
         />
       case 1:
         return <Card 
-            disableReviews={ settings.disableReviews} 
-            disableImages={ settings.disableImages}
+            disableReviews={ disableReviews} 
+            disableImages={ disableImages}
             isPreview={ isPreview} 
             key={'_ca1'+i} 
             style={style} 
@@ -433,10 +408,45 @@ export class Menu extends Component {
               <Typography style={{...style.ingredients, textAlign: 'right'}} >
                 {el.ingredients} 
               </Typography>
+              { !disableReviews && isPreview ? 
+                ( !isPreview ? 
+                  <Link to={{
+                    pathname: `${this.props.history.pathname}reviews/${el.id}/`,
+                    state: ({
+                      item: el,
+                      style: style
+                    })
+                    }}>
+                    Vezi recenzii
+                  </Link> :
+                  'Vezi recenzii'
+                ) : ''
+              }
             </Box>
             <Box>
               <Typography style={{...style.size, whiteSpace: "nowrap"}} >
               {el.size}
+              </Typography>
+            </Box>
+          </Box>
+      case 4:
+        return <Box 
+          style={{
+            height: 100, 
+            background: 'url(' + el.picture + ')', 
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'}}
+          key={'_b4'+el.id}>
+            <Box 
+              display="flex"
+              style={{height: '100%', background: 'rgba(0,0,0,0.5)'}}
+              justifyContent="center"
+              alignItems="center">
+              <Typography style={style.name}>
+                {el.name}
+              </Typography>
+              <Typography style={{...style.ingredients, textAlign: 'right'}} >
+                {el.ingredients} 
               </Typography>
             </Box>
           </Box>
@@ -453,11 +463,7 @@ export class Menu extends Component {
 
   getBody = (category_id) => {
     const { data, category, item } = this.state;
-    const category_style = category && {
-      color: category.name.color,
-      font: category.name.font,
-      size: category.name.size,
-    };
+    const category_style = category;
 
     if (data.length && item && category_style){
       if(category_id){
@@ -467,12 +473,11 @@ export class Menu extends Component {
             ref={this.addRef}
             key={'_jk'+0}
             style={{ /*backgroundImage: 'url("' + el.background + '")',*/ position: 'relative' }}
-            p={2}
           >
           <Button onClick={this.goBack}>Go back</Button>
           
-            { this.getCategoryHeader(el,category_style) }
-            <Box p={2}>
+            { el && this.getCategoryHeader(el,category_style, '') }
+            <Box >
               {el.items.map((_el, _i) => (
                   this.getItem(_el,_i)
               ))}
@@ -482,16 +487,14 @@ export class Menu extends Component {
       else 
         return data.map((el, i) => (
           <Box
-            p={2}
             ref={this.addRef}
-            display={ (this.state.samePage && i==this.state.tabIndex) ? "inherit" : "none"}
             key={'_jk'+i}
             style={{ /*backgroundImage: 'url("' + el.background + '")',*/
               //background: '#333333',
               position: 'relative' }}
           >
-            { this.getCategoryHeader(el,category_style) }
-            <Box>
+            { this.getCategoryHeader(el,category_style, i) }
+            <Box display={ ((this.state.headerType == 4 && this.state.tabIndex ==i) || (this.state.samePage && i==this.state.tabIndex)) ? "inherit" : "none"}>
               {el.items.map((_el, _i) => (
                   this.getItem(_el,_i)
               ))}
@@ -507,11 +510,7 @@ export class Menu extends Component {
     const grid = data
       ? data.map((el, i) => ({ id: el.category_id, name: el.name, picture: el.picture }))
       : [];
-    const category_style = category && {
-      color: category.name.color,
-      font: category.name.font,
-      size: category.name.size,
-    };
+    const category_style = category;
 
 
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
@@ -519,8 +518,18 @@ export class Menu extends Component {
       <Box className="mx-auto" style={{ maxWidth: 600 }}>
         { !this.state.settings.disableReviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
         }
-        <Box py={2} className="display-menu" style={{position: "relative", background: '#e2e2e2'}}>
-          { grid && !category_id && !this.state.settings.disableToC && this.tableOfContent(grid, category_style) }
+        <Box 
+          py={2} 
+          className="display-menu" 
+          style={{
+            position: "relative", 
+            background: (this.state.backgroundOption==="image" && category.backgroundImage) ? 
+              ( category.backgroundImage.indexOf("base64") >=0 ? 
+                'url('+ category.backgroundImage +')' :
+                'url(https://bathtimestories.com/'+category.backgroundImage+')') :
+              category.background
+              }}>
+          { !this.state.settings.disableToC && grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
           { this.getBody(category_id)
           }
         </Box>
@@ -552,11 +561,10 @@ export class Menu extends Component {
     );
   }
 }
-
 const mapStateToProps = (state) => ({
-  layout: state.settings.layout
+  layout: state.settings.layout,
+  media: state.media
 })
-
 export default compose(
   withFirebase,
   withStyles(styles, { withTheme: true }),

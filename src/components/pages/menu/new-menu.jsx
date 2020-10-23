@@ -147,6 +147,7 @@ export class Menu extends Component {
     }
     const data = {
       title: this.state.title,
+      uid: this.props.uid
     };
     this.setState({
       title: "",
@@ -210,7 +211,7 @@ export class Menu extends Component {
 
 const mapStateToProps = (state) => ({
   //symbol: state.data.symbol,
-  //email: state.account.email,
+  uid: state.account.uid,
   //token: state.account.token
 });
 

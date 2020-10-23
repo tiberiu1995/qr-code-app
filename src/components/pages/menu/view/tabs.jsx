@@ -33,7 +33,7 @@ const CustomTabs = (props) =>{
     onChange={onChange}
     aria-label="simple tabs example">
     { tabLabel.map((el,i) => 
-        <Tab label={el} />
+        <Tab key={'ct_tb'+i} label={el} />
     )}
     </Tabs>
     {children}
