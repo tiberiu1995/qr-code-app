@@ -7,15 +7,21 @@ import { makeStyles } from '@material-ui/core/styles';
 import { injectIntl } from 'react-intl';
 import { Paper } from '@material-ui/core';
 import { BlurOn, Create, Dashboard, Fastfood} from '@material-ui/icons';
+import { Divider } from '@material-ui/core';
 const useStyles = makeStyles(theme => ({
   container: {
     top: '50%',
     transform: 'translateY(-50%)',
-    borderRadius: [[0, 25, 25, 0]],
+    borderRadius: [[0, 12, 12, 0]],
     border: '1px solid rgba(0, 0, 0, 0.23)',
     background: 'rgb(241,241,241)',
     left: 0,
-    zIndex: 1000
+    zIndex: 1000,
+    '& .MuiButton-root': {
+      margin: 8,
+      padding: 0,
+      minWidth: 24,
+    }
   }
 
 }));
@@ -54,15 +60,19 @@ const Header = (props) => {
     <Button onClick={goHome}>
       <Dashboard/>
     </Button>
+    <Divider/>
     <Button onClick={showCategories}>
       <Fastfood/>
     </Button>
+    <Divider/>
     <Button onClick={showItems}>
       <Fastfood/>
     </Button>
+    <Divider/>
     <Button onClick={showDesign}>
       <Create/>
     </Button>
+    <Divider/>
     <Button onClick={showQr}>
       <BlurOn/>
     </Button>    

@@ -95,21 +95,21 @@ const Datatable = (props) => {
           size="small"
           color="primary"
           onClick={() => {
-            if (window.confirm("Are you sure you wish to delete this item?")) {
-              remove(row.row.original);
-            }
-          }}
-        />
-        <Delete
-          className={classes.delete}
-          size="small"
-          color="primary"
-          onClick={() => {
             if (window.confirm("Are you sure you wish to edit this item?")) {
               edit(row.row.original);
             }
           }}
           />
+        <Delete
+          className={classes.delete}
+          size="small"
+          color="primary"
+          onClick={() => {
+            if (window.confirm("Are you sure you wish to delete this item?")) {
+              remove(row.row.original);
+            }
+          }}
+        />
          {/* <Tooltip title="Edit this row" placement="bottom">
         </Tooltip> */}
       </>

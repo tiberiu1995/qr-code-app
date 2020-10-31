@@ -22,6 +22,11 @@ import { Rating } from '@material-ui/lab/';
 const queryString = require('query-string');
 
 const styles = (theme) => ({
+  container: {
+    '& p, & span': {
+      lineHeight: 1.2
+    }
+  },
   fab: {
     margin: theme.spacing(2),
   },
@@ -130,7 +135,7 @@ export class Menu extends Component {
               precision={0.5} 
               readOnly
               style={style.reviewStars}
-              value={this.state.reviews.find(r => r.id === el.id).rating}/> : ''
+              value={parseFloat(this.state.reviews.find(r => r.id === el.id).rating)}/> : ''
             }
             { this.state.toggles.item_reviewText ? 
               <Typography 
@@ -165,7 +170,7 @@ export class Menu extends Component {
       this.setContentType(contentType);
       this.setState({item, category, backgroundOption, toggles});
       let preview = queryString.parse(this.props.location.search).preview;
-      if(preview){
+      if(preview && this.state.originalData){
         let data = JSON.parse(JSON.stringify(this.state.originalData));
         data.forEach(el => {
           if (!toggles.category_description)
@@ -577,7 +582,7 @@ export class Menu extends Component {
 
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
     return (
-      <Box className="mx-auto" style={{ maxWidth: 600 }}>
+      <Box className={"mx-auto "+ classes.container} style={{ maxWidth: 600 }}>
         {/* this.state.toggles.item_reviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
          */}
         {modalItem ? 

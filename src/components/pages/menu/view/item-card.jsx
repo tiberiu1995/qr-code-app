@@ -18,6 +18,13 @@ const useStyles = makeStyles({
   ingredients: props => props.ingredients,
   alergens: props => props.alergens,
   calories: props => props.calories,
+  cardMedia: { height: 100, backgroundSize: "contain" },
+  card: {
+    margin: [[0, '1rem', '1rem', '1rem']], 
+    borderRadius: 20, 
+    position: "relative", 
+    zIndex: 150 
+  }
 });
 
 const MediaCard = (props) => {
@@ -39,14 +46,11 @@ const MediaCard = (props) => {
       enter: 1000+props.id*2500,
       exit: 0,
      }} in={props.data.name !== ''}>
-      <Card
-        style={{ margin: '0 1rem 1rem 1rem', borderRadius: 20, position: "relative", zIndex: 150 }}
-      >
+      <Card className={classes.card} >
         <CardActionArea className="d-flex">
           {!props.disableImages && 
           <CardMedia
-            className="d-block col-4 col-sm-4"
-            style={{ height: 100, backgroundSize: "contain" }}
+            className={"d-block col-4 col-sm-4 "+classes.cardMedia}
             image={picture}
             title=""
           />

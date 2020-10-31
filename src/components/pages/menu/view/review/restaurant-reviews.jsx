@@ -125,7 +125,7 @@ const Reviews = (props) => {
                           {el.name}
                         </Typography>
                         <Box display="flex">
-                          <Rating size="small" name="read-only" value={parseInt(el.rating)} readOnly />  
+                          <Rating size="small" name="read-only" value={parseFloat(el.rating)} readOnly />  
                           <Typography style={{fontSize: 12, marginLeft: 4}}>
                           {moment(parseInt(el.date)*1000).format("DD/MM/YYYY")}
                           </Typography>

@@ -22,6 +22,9 @@ const useStyles = makeStyles(theme => ({
   },
   delete: {
     color: '#f44336',
+  },
+  cardContent: {
+    flex: '1 1 auto'
   }
 }));
 
@@ -96,14 +99,14 @@ const MediaCard = (props) => {
 
   return (
     <Card ref={dragRef} className="mb-2 p-0">
-      <CardActionArea className="d-flex">
+      <CardActionArea className="d-flex justify-content-between">
         <CardMedia
-          className="d-block col-lg-3"
-          style={{ height: 112, width: 150 }}
+          className="d-block"
+          style={{ height: 100, width: 100 }}
           image={picture}
           title=""
         />
-        <CardContent ref={dropRef} className="d-block col-lg-9">
+        <CardContent ref={dropRef} className={"d-block "+classes.cardContent}>
           <Typography
             className="text-center"
             gutterBottom
@@ -111,14 +114,6 @@ const MediaCard = (props) => {
             component="h5"
           >
             {props.data.name}
-          </Typography>
-          <Typography
-            className="float-left"
-            gutterBottom
-            variant="subtitle1"
-            component="p"
-          >
-            {props.data.ingredients}
           </Typography>
           <Box className="float-right">
             <Tooltip title={

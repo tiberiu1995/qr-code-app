@@ -19,8 +19,10 @@ import { Box } from "@material-ui/core";
 import { Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch";
 import Header from "../menu-header.jsx";
+import { injectIntl } from 'react-intl';
 
 const Categories = (props) => {
+  const { formatMessage } = props.intl;
   const [data, setData] = useState([]);
   const title = props.match.params.title;
   const category = props.match.params.category;
@@ -78,21 +80,6 @@ const Categories = (props) => {
       fetchItemsConfiguration(title);
     }, []);
 
-  const saveItem = async (item, endpoint) => {
-    try {
-      const apiData = await fetchData({ data: item }, "menu/" + endpoint + ".php");
-      console.log(apiData);
-      endpoint === "edit"
-        ? toast.success("Meniul a fost editat!")
-        : toast.success("Meniul a fost salvat!");
-      //await fetchMenus();
-      // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
-      //window.scrollTo(0, 0);
-    } catch (error) {
-      //this.setState({ message: error.message });
-      //window.scrollTo(0, 0);
-    }
-  };
 
   const saveItemsConfig = async () => {
     try{
@@ -104,20 +91,20 @@ const Categories = (props) => {
       const apiData = await fetchData( obj , "menu/item/" + endpoint + ".php");
       console.log(apiData);
       endpoint === "edit"
-        ? toast.success("Categoria a fost editata!")
-        : toast.success("Categoria a fost salvata!");
+        ? toast.success(formatMessage({id: "edited_menu"}))
+        : toast.success(formatMessage({id: "menu_saved"}));
+      setEdited(false);
       //await fetchMenus();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       //window.scrollTo(0, 0);
     } catch (error) {
+      toast.error(formatMessage({id: "error_menu"}));
       //this.setState({ message: error.message });
       //window.scrollTo(0, 0);
     }
   };
 
   const removeItem = (value) => {
-    let l = left;
-    let r = right;
     let index = right.findIndex((el) => el.id == value);
     setEdited(true);
     setLeft(
@@ -135,7 +122,6 @@ const Categories = (props) => {
   const addItem = (value) => {
     //alert(value);
     let l = left;
-    let r = right;
     let index = l.findIndex((el) => el.id == value);
     setEdited(true);
     setRight(
@@ -148,10 +134,6 @@ const Categories = (props) => {
         $splice: [[index, 1]],
       })
     );
-  };
-
-  const handleToggle = (value) => {
-    alert(value);
   };
 
   return (
@@ -186,7 +168,7 @@ const Categories = (props) => {
           </Grid>
         </Grid>
         <Button className="m-2" onClick={saveItemsConfig}>
-          Salveaza meniul
+          {formatMessage({id: 'save_menu'}) }
         </Button>
 
         {data.length ? (
@@ -212,4 +194,4 @@ const Categories = (props) => {
   );
 };
 
-export default compose(withRouter)(Categories);
+export default compose(withRouter)(injectIntl(Categories));

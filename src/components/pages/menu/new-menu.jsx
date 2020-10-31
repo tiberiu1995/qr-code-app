@@ -1,27 +1,35 @@
 import React, { Component, Fragment, useState, useCallback } from "react";
-import { Editor } from "@tinymce/tinymce-react";
-import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { withFirebase } from "../../firebase";
 //import Breadcrumb from "../breadcrumb";
 import SimpleReactValidator from "simple-react-validator";
-import Product from "../../menu/product";
-import Button from "react-bootstrap/Button";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import update from "immutability-helper";
-import { Card } from "../../menu/card.jsx";
-import QRCode from "qrcode.react";
-import Datatable from "../../datatable/datatable.jsx";
 import { fetchMenu, fetchData } from "../../utils/fetch";
 import Modal from "react-bootstrap/Modal";
 import ModalBody from "react-bootstrap/ModalBody";
 
 //import data from './../../../../all_in_one_multikart_react/front-end/src/admin/assets/data/digital-category';
-import { TextField } from '@material-ui/core';
-import { FormLabel } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
+
+import { withStyles } from '@material-ui/styles';
+
+const useStyles = theme => ({
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+  delete: {
+    backgroundColor: '#f44336',
+    color: 'white',
+  },
+  [theme.breakpoints.up('md')]: {
+    modal: {
+      '& .modal-dialog': { minWidth: 600,
+      }
+    },
+  },
+});
 
 export class Menu extends Component {
   constructor(props) {
@@ -156,11 +164,11 @@ export class Menu extends Component {
   };
 
   render() {
-    const { show, onCancel, data } = this.props;
+    const { classes, show, onCancel, intl: {formatMessage} } = this.props;
     return (
         <Modal
         backdrop="static"
-        className="row d-flex justify-content-center"
+        className={"row d-flex justify-content-center "+classes.modal}
         show={show}
         onHide={onCancel}
         size="lg"
@@ -195,11 +203,11 @@ export class Menu extends Component {
           </div>
         </ModalBody>
         <Modal.Footer>
-          <Button variant="primary" onClick={this.addItem}>
-            Salveaza
+          <Button className={classes.delete} variant="contained" onClick={onCancel}>
+            {formatMessage({id: 'back'})}
           </Button>
-          <Button variant="primary" onClick={onCancel}>
-            Inapoi
+          <Button className={classes.edit} variant="contained" onClick={this.addItem}>
+            {formatMessage({id: 'add'})}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -217,5 +225,6 @@ const mapStateToProps = (state) => ({
 
 export default compose(
   withFirebase,
-  connect(mapStateToProps)
+  connect(mapStateToProps),
+  withStyles(useStyles)
 )(injectIntl(Menu));

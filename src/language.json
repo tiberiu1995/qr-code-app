@@ -46,12 +46,15 @@
     "no_item": "No products found",
     "edited_category": "Category edited",
     "edited_item": "Product edited",
+    "edited_menu": "Menu edited",
     "saved_category": "Category saved",
     "saved_item": "Product saved",
+    "saved_menu": "Menu saved",
     "deleted_category": "Category deleted",
     "deleted_item": "Product deleted",
     "error_category": "Failed operation",
     "error_item": "Failed operation",
+    "error_menu": "Failed operation",
     "page": "Page",
     "write_review": "Write a review",
     "comment": "Comment",
@@ -60,7 +63,10 @@
     "size/price": "Price/size",
     "choose_category": "Choose",
     "background": "Background",
-    "layout": "Layout"
+    "layout": "Layout",
+    "color": "Color",
+    "reviewStars": "Review - stars",
+    "reviewText": "Review - total"
 
   },
   "es": {},

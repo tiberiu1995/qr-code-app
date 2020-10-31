@@ -1,16 +1,13 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import SimpleReactValidator from "simple-react-validator";
 import Modal from "react-bootstrap/Modal";
 import ModalBody from "react-bootstrap/ModalBody";
-import ModalHeader from "react-bootstrap/ModalHeader";
-import ModalFooter from "react-bootstrap/ModalFooter";
-import ModalTitle from "react-bootstrap/ModalTitle";
-import Button from "react-bootstrap/Button";
-import { Box, TextField, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio } from "@material-ui/core";
+import { Box, Button, TextField, FormLabel, FormControl, FormControlLabel, RadioGroup, Radio } from "@material-ui/core";
 import FileInput from './../../utils/FileInput';
-import { TransferWithinAStationSharp } from "@material-ui/icons";
 import Select from "../../utils/select.jsx";
 import { injectIntl } from 'react-intl';
+import { compose } from 'redux';
+import { withStyles } from '@material-ui/styles';
 
 const categoryIcons = [
   'icons8-banana-split-100.png',   
@@ -42,6 +39,23 @@ const categoryIcons = [
   'icons8-spaghetti-100.png',       
   'icons8-sushi-100.png'
 ];
+
+const useStyles = theme => ({
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+  delete: {
+    backgroundColor: '#f44336',
+    color: 'white',
+  },
+  [theme.breakpoints.up('md')]: {
+    modal: {
+      '& .modal-dialog': { minWidth: 600,
+      }
+    },
+  },
+});
 
 const initState = { 
   validator: new SimpleReactValidator(),
@@ -204,10 +218,11 @@ export class Form extends Component {
 
   render() {
     const { show, onCancel, data, intl: {formatMessage} } = this.props;
+    const classes = this.props.classes;
     return (
       <Modal
         backdrop="static"
-        className="row d-flex justify-content-center"
+        className={"row d-flex justify-content-center "+classes.modal}
         show={show}
         onHide={onCancel}
         size="lg"
@@ -287,11 +302,11 @@ export class Form extends Component {
           </div>
         </ModalBody>
         <Modal.Footer>
-          <Button variant="contained" onClick={this.addItem}>
-            {formatMessage({id: 'add'})}
-          </Button>
-          <Button variant="contained" onClick={onCancel}>
+          <Button className={classes.delete} variant="contained" onClick={onCancel}>
             {formatMessage({id: 'back'})}
+          </Button>
+          <Button className={classes.edit} variant="contained" onClick={this.addItem}>
+            {formatMessage({id: 'add'})}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -299,4 +314,4 @@ export class Form extends Component {
   }
 }
 
-export default injectIntl(Form);
+export default compose(withStyles(useStyles))(injectIntl(Form));

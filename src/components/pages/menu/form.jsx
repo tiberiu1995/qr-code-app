@@ -97,12 +97,14 @@ import { injectIntl } from 'react-intl';
         const apiData = await fetchData( obj, "menu/category/" + endpoint + ".php");
         console.log(apiData);
         endpoint === "edit"
-          ? toast.success("Meniul a fost editat!")
-          : toast.success("Meniul a fost salvat!");
+          ? toast.success(formatMessage({id: "edited_menu"}))
+          : toast.success(formatMessage({id: "menu_saved"}));
+        setEdited(false);
         // await fetchMenus();
         // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
         //window.scrollTo(0, 0);
       } catch (error) {
+        toast.error(formatMessage({id: "error_menu"}));
         //this.setState({ message: error.message });
         //window.scrollTo(0, 0);
       }

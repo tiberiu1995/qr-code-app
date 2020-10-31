@@ -10,6 +10,8 @@ import {
 } from "@material-ui/core/";
 import FileInput from "../../utils/FileInput.jsx";
 import { injectIntl } from 'react-intl';
+import { compose } from 'redux';
+import { withStyles } from '@material-ui/styles';
 
 const initState = {
   validator: new SimpleReactValidator(),
@@ -24,6 +26,25 @@ const initState = {
   size: "",
   picture: '',
 }
+
+const useStyles = theme => ({
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+  delete: {
+    backgroundColor: '#f44336',
+    color: 'white',
+  },
+  [theme.breakpoints.up('md')]: {
+    modal: {
+      '& .modal-dialog': { minWidth: 600,
+      }
+    },
+  },
+});
+
+
 
 const crop = (url, aspectRatio) => {
   // we return a Promise that gets resolved with our canvas element
@@ -175,11 +196,11 @@ export class Form extends Component {
   }
 
   render() {
-    const { show, onCancel, data, intl: {formatMessage} } = this.props;
+    const { classes, show, onCancel, data, intl: {formatMessage} } = this.props;
     return (
       <Modal
         backdrop="static"
-        className="row d-flex col-lg-12 justify-content-center"
+        className={"row d-flex justify-content-center "+classes.modal}
         show={show}
         onHide={onCancel}
         size="lg"
@@ -320,10 +341,10 @@ export class Form extends Component {
           </div>
         </ModalBody>
         <Modal.Footer>
-          <Button variant="contained" color="error" onClick={onCancel}>
+          <Button className={classes.delete} variant="contained" onClick={onCancel}>
             {formatMessage({id: 'back'})} 
           </Button>
-          <Button variant="contained" color="success" onClick={this.addItem}>
+          <Button className={classes.edit} variant="contained" onClick={this.addItem}>
             {formatMessage({id: 'add'})}
           </Button>
         </Modal.Footer>
@@ -332,4 +353,4 @@ export class Form extends Component {
   }
 }
 
-export default injectIntl(Form);
+export default compose(withStyles(useStyles))(injectIntl(Form));

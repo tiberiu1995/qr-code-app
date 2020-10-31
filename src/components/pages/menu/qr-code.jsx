@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
         transform: 'translate(14px, -6px) scale(0.75)'
     },
     '& .MuiButton-root': {
-      marginTop: 16
+      marginTop: 8
     },
     '& .MuiFormControl-root': { 
         '& .MuiFormLabel-root': {

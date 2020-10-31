@@ -15,6 +15,7 @@ import FileInput from './../../../utils/FileInput';
 import CustomTabs from '../view/tabs.jsx';
 import Layout from './radio-layout.jsx';
 import { thunkMiddleware } from 'redux-thunk';
+import { toast } from 'react-toastify';
 
 const style = theme => ({
   toggle: {
@@ -231,7 +232,6 @@ class Form extends Component {
   }
 
   setStateFromType = (event, type) => {
-    !this.state.isEdited && this.setState({isEdited: true});
     var obj = {};
     //console.log(`/my-menu/${this.props.match.params.title}?category=${JSON.stringify(this.state.category)}&item=${JSON.stringify(this.state.item)}`);
     obj[event.target.name] = event.target.value;
@@ -247,25 +247,28 @@ class Form extends Component {
             [event.target.name]: event.target.value,
           },
         },
+        isEdited: true
       }) :
     this.setState({
       [type]: { ...this.state[type],
         [event.target.name]: event.target.value,
-      }
+      },
+      isEdited: true
     });
   };
 
   setStateFromInput = (event) => {
      // setLayout(event.target.value);
-      this.setState({[event.target.name]: event.target.value});
+      this.setState({[event.target.name]: event.target.value, isEdited: true});
   }
 
   handleToggle = (event) => {
     this.setState({ 
       toggles: {
         ...this.state.toggles,
-        [event.target.name]: event.target.checked
-      }
+        [event.target.name]: event.target.checked,
+      },
+      isEdited: true
     });
   }
 
@@ -297,7 +300,7 @@ class Form extends Component {
         contentType: defaults.id,
         category: JSON.parse(custom.category_design ? custom.category_design : defaults.category_design),
         item: JSON.parse(custom.item_design ? custom.item_design : defaults.item_design),
-        toggles: JSON.parse(custom.toggles),
+        toggles: custom.toggles ? JSON.parse(custom.toggles) : "",
         defaults: {
           category: JSON.parse(defaults.category_design),
           item: JSON.parse(defaults.item_design),
@@ -311,6 +314,7 @@ class Form extends Component {
   };
 
   saveDesign = async () => {
+    const {formatMessage} = this.props.intl;
     try {
       const obj = {
         title: this.props.match.params.title,
@@ -322,8 +326,10 @@ class Form extends Component {
       }
       let apiData = await fetchData( obj, "menu/design/edit.php");
       console.log(apiData);
+      toast.success(formatMessage({id: 'edited_menu'}));
+      this.setState({isEdited: false});
     } catch (error) {
-      console.log(error);
+      toast.error(formatMessage({id: "error_menu"}));
     }
   };
 
@@ -352,11 +358,11 @@ class Form extends Component {
       default:
         contentType = "h0b0" 
     }
-    this.setState({layout: newValue, contentType: contentType});
+    this.setState({layout: newValue, contentType: contentType, isEdited: true, });
   };
 
   handleVariantChange = (event, newValue) => {
-    this.setState({contentType: newValue});
+    this.setState({contentType: newValue, isEdited: true, });
   };
 
   componentDidMount() {
@@ -377,6 +383,7 @@ class Form extends Component {
       const canvas = reader.result;
       this.setState({ category: {
         ...this.state.category,
+        isEdited: true, 
         backgroundImage: canvas }
       });
     };
@@ -385,13 +392,14 @@ class Form extends Component {
 
   deleteImg() {
     this.setState({ category: {
-      ...this.state.category, 
+      ...this.state.category,
+      isEdited: true, 
       backgroundImage: "" }
     });
   }
 
   restorePresets = () => {
-    this.setState({...this.state.defaults});
+    this.setState({...this.state.defaults, isEdited: true,});
   }
 
   render() {
