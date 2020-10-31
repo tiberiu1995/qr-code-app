@@ -33,7 +33,7 @@ import matchSorter from "match-sorter";
 import Row from "./row.jsx";
 import Select from "../utils/select.jsx";
 
-const CustomTable = ({ columns, data, hideFilters }) => {
+const CustomTable = ({ columns, data }) => {
   const [records, setRecords] = useState(data);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const CustomTable = ({ columns, data, hideFilters }) => {
                         : null}
                     </div>
                     <div>
-                      {!hideFilters && column.canFilter && column.filterable
+                      { column.canFilter && column.filterable
                         ? column.render("Filter")
                         : null}
                     </div>

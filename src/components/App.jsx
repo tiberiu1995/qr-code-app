@@ -14,7 +14,7 @@ import FooterOne from "./common/footers/footer-one";
 import ThemeSettings from "./common/theme-settings";
 import CookieConsent, {  } from "react-cookie-consent";
 import Cookie from "js-cookie";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 import { Box } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core/';
 import { setMedia, } from './../actions/index';

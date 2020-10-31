@@ -22,7 +22,12 @@ const CustomSelect = (props) => {
     <FormControl style={props.style} className={classes.root} variant="outlined" size="small">
       {props.label && <InputLabel id="demo-simple-select-label">{props.label}</InputLabel>}
       { (props.value && props.value.type === "img") ?
-        <Select name={props.name} value={props.value} renderValue={(v) =><img src={v.props.src}></img>} onChange={props.onChange}>
+        <Select 
+          disabled={props.disabled} 
+          name={props.name} 
+          value={props.value} 
+          renderValue={(v) =><img src={v.props.src}></img>} 
+          onChange={props.onChange}>
         { props.array && 
           props.array.map((el, i) => (
             <MenuItem key={valueF(el)+i} value={valueF(el)}>
@@ -30,7 +35,11 @@ const CustomSelect = (props) => {
             </MenuItem>
           ))}
         </Select> :
-        <Select name={props.name} value={props.value} onChange={props.onChange}>
+        <Select 
+          disabled={props.disabled} 
+          name={props.name} 
+          value={props.value} 
+          onChange={props.onChange}>
         { props.default && 
           <MenuItem value={props.default.value}>{props.default.text}</MenuItem> }
         { props.array && 

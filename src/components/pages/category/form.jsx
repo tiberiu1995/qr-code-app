@@ -10,6 +10,7 @@ import { Box, TextField, FormLabel, FormControl, FormControlLabel, RadioGroup, R
 import FileInput from './../../utils/FileInput';
 import { TransferWithinAStationSharp } from "@material-ui/icons";
 import Select from "../../utils/select.jsx";
+import { injectIntl } from 'react-intl';
 
 const categoryIcons = [
   'icons8-banana-split-100.png',   
@@ -165,9 +166,10 @@ export class Form extends Component {
     reader.onloadend = async () => {
       const canvas = await crop(reader.result, 1);
       //pictures[i].img = reader.result;
+      let data = await canvas.toDataURL() 
       type === "upload_picture"
-        ? this.setState({ upload_picture: canvas })
-        : this.setState({ background: canvas });
+        ? this.setState({ upload_picture: data})
+        : this.setState({ background: data});
     };
     reader.readAsDataURL(file);
   }
@@ -201,7 +203,7 @@ export class Form extends Component {
   }
 
   render() {
-    const { show, onCancel, data } = this.props;
+    const { show, onCancel, data, intl: {formatMessage} } = this.props;
     return (
       <Modal
         backdrop="static"
@@ -222,7 +224,7 @@ export class Form extends Component {
                   <div className="form-group mb-3">
                     <TextField
                       name="name"
-                      label="Nume"
+                      label={formatMessage({id: 'name'})}
                       value={this.state.name}
                       onChange={this.setStateFromInput}
                     />
@@ -237,7 +239,7 @@ export class Form extends Component {
                     </FormLabel>
                       <TextField
                         name="description"
-                        label="Descriere"
+                        label={formatMessage({id: 'description'})}
                         multiline
                         value={this.state.description}
                         onChange={this.setStateFromInput}
@@ -250,7 +252,7 @@ export class Form extends Component {
                   </div>
                   <Box display="flex" flexDirection="column">
                     <FormControl component="fieldset">
-                        <FormLabel>Imagine categorie</FormLabel>
+                        <FormLabel>{formatMessage({id: 'picture'})}</FormLabel>
                         <RadioGroup row aria-label="image-source" name="imageOption" value={this.state.imageOption} onChange={this.setStateFromInput}>
                          <FormControlLabel value="library" control={<Radio />} label="Library" />
                           <FormControlLabel value="upload" control={<Radio />} label="Upload" />
@@ -285,11 +287,11 @@ export class Form extends Component {
           </div>
         </ModalBody>
         <Modal.Footer>
-          <Button variant="primary" onClick={this.addItem}>
-            Salveaza
+          <Button variant="contained" onClick={this.addItem}>
+            {formatMessage({id: 'add'})}
           </Button>
-          <Button variant="primary" onClick={onCancel}>
-            Inapoi
+          <Button variant="contained" onClick={onCancel}>
+            {formatMessage({id: 'back'})}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -297,4 +299,4 @@ export class Form extends Component {
   }
 }
 
-export default Form;
+export default injectIntl(Form);

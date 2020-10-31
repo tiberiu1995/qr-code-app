@@ -18,6 +18,7 @@ import CustomList from "../../../cardboard/_list";
 import { Box } from "@material-ui/core";
 import { Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch";
+import Header from "../menu-header.jsx";
 
 const Categories = (props) => {
   const [data, setData] = useState([]);
@@ -159,6 +160,7 @@ const Categories = (props) => {
         when={isEdited}
         message={`Are you sure you want to exit without saving?`}
       />
+      <Header/>
       <Box m={5}>
         <Grid container spacing={4} justify={"center"}>
           <Grid item xs={12} sm={6} style={{ maxWidth: 600 }}>

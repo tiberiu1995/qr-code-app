@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import SimpleReactValidator from "simple-react-validator";
-import { FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles, SvgIcon, useMediaQuery, Tabs, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
+import { FormLabel, Box, FormControl, Divider, Typography, Paper, withStyles, Switch, RadioGroup, FormControlLabel, Radio } from "@material-ui/core";
 import Select from "../../../utils/select.jsx";
-import { Grid, Button,m} from "@material-ui/core/";
+import { Grid, Button} from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch.js";
 import { injectIntl } from "react-intl";
 import { Save, PhoneAndroid} from "@material-ui/icons";
@@ -13,8 +13,26 @@ import { compose } from 'redux';
 import clsx from 'clsx';
 import FileInput from './../../../utils/FileInput';
 import CustomTabs from '../view/tabs.jsx';
+import Layout from './radio-layout.jsx';
+import { thunkMiddleware } from 'redux-thunk';
 
 const style = theme => ({
+  toggle: {
+    '& .MuiSwitch-thumb': {
+      color: '#f44336',
+    },
+    '& .MuiSwitch-track': {
+      backgroundColor: '#f44336',
+    },
+    '& .Mui-checked': {
+      '& + .MuiSwitch-track':{
+        backgroundColor: '#4caf50',
+      },
+      '& .MuiSwitch-thumb':{
+        color: '#4caf50',
+      },
+    } 
+  },
   [theme.breakpoints.down('xs')]: {
     form: {
       '& .MuiFormLabel-root': {
@@ -134,6 +152,18 @@ const iframeSize = [
     {width: "800", height: "1150"},
 ]
 
+const styleElements = [
+                    ["category", "name"],
+                    ["category", "description"],
+                    ["item", "name"],
+                    ["item", "ingredients"],
+                    ["item", "alergens"],
+                    ["item", "calories"],
+                    ["item", "size"],
+                    ["item", "reviewText"],
+                    ["item", "reviewStars"],
+                  ];
+
 class Form extends Component {
   constructor(props) {
     super(props);
@@ -143,14 +173,60 @@ class Form extends Component {
       validator: new SimpleReactValidator(),
       backgroundOption: 'image',
       name: "Nume categorie",
-      layout: <img alt="" src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[0]}/>,
+      layout: "0",
+      //layout: <img alt="" src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[0]}/>,
       tabIndex: 0,
+
       description: "Descriere",
       contentType: 'h0b0',
       background: '',
       category: {
-        color: '#ffffff'
+        color: '#ffffff',
+        name:{
+          color:"#000000",
+          fontSize:20,
+          fontFamily:"Verdana"
+        },
+        description:{
+          color:"#000000",
+          fontSize:12,
+          fontFamily:"Verdana"
+        },
+        background:"#ffffff",
+        backgroundImage:""
       },
+      item: {
+        name:{
+          color:"#000000",
+          fontSize:14,
+          fontFamily:"Arial"},
+        ingredients:{
+          "color":"#000000",
+          "fontSize":12,
+          "fontFamily":"Tahoma"},
+        alergens:{
+          color:"#000",
+          fontSize:12,
+          fontFamily:"Times New Roman"},
+        calories:{
+          color:"#000",
+          fontSize:12,
+          fontFamily:"Times New Roman"},
+        size:{
+          color:"#000",
+          fontSize:10,
+          fontFamily:"Verdana"},
+        reviewText:{
+          color:"#8b3232",
+          fontSize:32,
+          fontFamily:"Verdana"},
+        reviewStars:{
+          color:"#8b3232",
+          fontSize:32}           
+      },
+      toggles: {
+        ...styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {})
+      }
     }
   }
 
@@ -184,15 +260,44 @@ class Form extends Component {
       this.setState({[event.target.name]: event.target.value});
   }
 
+  handleToggle = (event) => {
+    this.setState({ 
+      toggles: {
+        ...this.state.toggles,
+        [event.target.name]: event.target.checked
+      }
+    });
+  }
+
   //handleBackgroundChange = ()
 
   fetchDesign = async () => {
     try {
       let {custom, defaults} = await fetchData({title: this.props.match.params.title}, "menu/design/get.php");
+      let layout = "";
+      switch (defaults.id.substring(0,2)) {
+        case 'h0':
+          layout = "0";
+          break;
+       case 'h1':
+          layout = "1";
+          break;
+        case 'h3':
+          layout = "2";
+          break;
+        case 'h4':
+          layout = "3";
+          break;
+        default:
+          layout = "0"
+      }
       console.log(custom);
       this.setState({
+        layout: layout,
+        contentType: defaults.id,
         category: JSON.parse(custom.category_design ? custom.category_design : defaults.category_design),
         item: JSON.parse(custom.item_design ? custom.item_design : defaults.item_design),
+        toggles: JSON.parse(custom.toggles),
         defaults: {
           category: JSON.parse(defaults.category_design),
           item: JSON.parse(defaults.item_design),
@@ -212,7 +317,8 @@ class Form extends Component {
         category: JSON.stringify(this.state.category),
         item: JSON.stringify(this.state.item),
         layout_id: this.state.contentType,
-        background_option: this.state.backgroundOption
+        background_option: this.state.backgroundOption,
+        toggles: JSON.stringify(this.state.toggles)
       }
       let apiData = await fetchData( obj, "menu/design/edit.php");
       console.log(apiData);
@@ -225,6 +331,34 @@ class Form extends Component {
     this.setState({tabIndex: newValue});
   };
 
+  handleLayoutChange = (event, newValue) => {
+    let contentType = "";
+    switch (newValue){
+      case "0":
+        contentType = "h0b0";
+        break;
+      case "1":
+        contentType = "h1b0";
+        break;
+      case "2":
+        contentType = "h3b0";
+        break;
+      case "3":
+        contentType = "h4b4";
+        break
+      case "4":
+        contentType = "h5b2";
+        break
+      default:
+        contentType = "h0b0" 
+    }
+    this.setState({layout: newValue, contentType: contentType});
+  };
+
+  handleVariantChange = (event, newValue) => {
+    this.setState({contentType: newValue});
+  };
+
   componentDidMount() {
     this.fetchDesign();
   }
@@ -233,7 +367,7 @@ class Form extends Component {
     e.preventDefault();
   }
 
-  _handleImgChange(e, type) {
+  _handleImgChange(e) {
     e.preventDefault();
 
     let reader = new FileReader();
@@ -249,8 +383,11 @@ class Form extends Component {
     reader.readAsDataURL(file);
   }
 
-  deleteImg(type) {
-    this.setState({[type]: "" });
+  deleteImg() {
+    this.setState({ category: {
+      ...this.state.category, 
+      backgroundImage: "" }
+    });
   }
 
   restorePresets = () => {
@@ -266,11 +403,11 @@ class Form extends Component {
     
     iframe = {...iframe, ...iframeStyle(this.props.media.mobile)[this.state.tabIndex]};
     
-    const translate = intl.formatMessage;
+    const {formatMessage} = intl;
     const backgroundImage = this.state.category.backgroundImage || "";
-    const {category, item, contentType, backgroundOption} = this.state;
+    const {category, item, contentType, backgroundOption, toggles} = this.state;
     if (item && category && contentType)
-      sessionStorage.setItem('style', JSON.stringify({category, item, contentType, backgroundOption}));
+      sessionStorage.setItem('style', JSON.stringify({category, item, contentType, backgroundOption, toggles}));
 
    /* const previewQuery = 
     `cnc=${category.name.color.replace("#",'')}&cns=${category.name.size}&cnf=${category.name.font.replace(/\s/g, "_")}&
@@ -301,33 +438,40 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
               <Paper elevation={1}>
                 <Button onClick={this.restorePresets}>Restore preset styles</Button>
                 <form className={"needs-validation add-product-form " + clsx(classes.form)}>
-                {this.state.item && [
-                    ["category", "name"],
-                    ["item", "name"],
-                    ["item", "ingredients"],
-                   // ["item", "alergens"],
-                    //["item", "calories"],
-                    ["item", "size"],
-                    ["item", "reviews"],
-                  ].map((el, i) => (
+                {this.state.item && styleElements.map((el, i) => (
                     <Box key={'db'+i}>
                       <Divider/>
-                      <Typography align="center" gutterBottom>
-                        Stilizare {translate({id: el[1]})} {translate({id: el[0]})}  
-                      </Typography>
-
+                      <Box display="flex" alignItems="center" >
+                        <Typography align="center" gutterBottom style={{flex: '0 1 50%'}}>
+                          {formatMessage({id: el[0]})} {formatMessage({id: el[1]})} 
+                        </Typography>
+                        { ["alergens", "ingredients", "calories", "description", "reviewStars", "reviewText"].includes(el[1]) ?
+                            <FormControlLabel
+                              style={{flex: '0 1 50%', marginRight: 0}}
+                              value={this.state.toggles[el[0]+'_'+el[1]]!==false}
+                              control={
+                                <Switch 
+                                  className={classes.toggle} 
+                                  name={el[0]+'_'+el[1]}
+                                  checked={this.state.toggles[el[0]+'_'+el[1]]!==false} 
+                                  onChange={this.handleToggle}  />}
+                              label={"Show "}
+                              labelPlacement="start"
+                            /> : ''}
+                      </Box>
                       <Box m={2}
                         display={media.mobile ? "block" : "flex"}
                         justifyContent="space-evenly" 
                         className="form form-label-center" >
                         <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
                           <Typography align="center" gutterBottom  component="h6">
-                            Dimensiune
+                            {formatMessage({id: 'size'})}
                           </Typography>
                           <Select
+                            disabled={this.state.toggles[el[0]+'_'+el[1]]===false}
                             name="fontSize"
                             style={{width: 86}}
-                            label="Dimensiune"
+                            label={formatMessage({id: 'size'})}
                             value={this.state[el[0]][el[1]].fontSize}
                             onChange={(e) => this.setStateFromType(e, el)}
                             array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
@@ -336,13 +480,18 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                         </Box>                   
                          <Box mb={2}>
                           <Typography align="center" gutterBottom component="h6">
-                            Culoare
+                          {formatMessage({id: 'color'})}
                           </Typography>
                           <FormControl>
-                            <FormLabel  style={{position: 'absolute', 'background': 'white'}} className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
-                            <input
+                            <FormLabel  
+                              style={{position: 'absolute', 'background': 'white'}} 
+                              className="MuiInputLabel-outlined MuiInputLabel-shrink">
+                              {formatMessage({id: 'color'})}
+                            </FormLabel>
+                            <input                            
                               name="color"
-                              label="Culoare"
+                              disabled={ this.state.toggles[el[0]+'_'+el[1]]===false }
+                              label={formatMessage({id: 'color'})}
                               type="color"
                               style={{
                                 width: 86,
@@ -355,11 +504,12 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             />
                           </FormControl>
                         </Box>
-                        <Box mb={2}>
+                        <Box mb={2} visibility={el[1]=="reviewStars" && "hidden"}>
                           <Typography align="center" gutterBottom component="h6">
                             Font
                           </Typography>
                           <Select
+                            disabled={this.state.toggles[el[0]+'_'+el[1]]===false}
                             style={{width: 185, textAlign: 'left'}}
                             name="fontFamily"
                             label="Font"
@@ -372,26 +522,20 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                       </Box>
                     </Box>
                   ))}
-                  <Divider/>
+                  <Divider/>              
                   <Typography align="center" gutterBottom>
-                    Layout 
+                   {formatMessage({id: 'layout'})}
                   </Typography>
                   <Box m={2}
                     display={"flex"}
                     justifyContent="space-evenly" 
                     className="form form-label-center" >
-                    <Box mb={2}/*display={{ xs: "block", sm: "none", md: "block" }}*/ >
-                      <Typography align="center" gutterBottom  component="h6"> </Typography>
-                      <Select
-                            //style={{width: 185, textAlign: 'left'}}
-                            name="contentType"
-                            label="Layout"
-                            value={this.state.contentType}
-                            onChange={this.setStateFromInput}
-                            array={layoutArray}
-                            display={(val) => "Layout "+(layoutArray.indexOf(val)+1)}
-                          />
-                    </Box> 
+                  <Layout 
+                    layout={this.state.layout}
+                    handleLayoutChange={this.handleLayoutChange}
+                    contentType={this.state.contentType}
+                    handleVariantChange={this.handleVariantChange}
+                    />
                   </Box>
                   <Divider/>
                   <Box m={2}
@@ -400,7 +544,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                     className="form form-label-center" >
                     <Box mb={2} display="flex" flexDirection="column">
                       <FormControl component="fieldset">
-                        <FormLabel component="legend">Background</FormLabel>
+                        <FormLabel component="legend">{formatMessage({id: 'background'})}</FormLabel>
                         <RadioGroup row aria-label="background" name="backgroundOption" value={this.state.backgroundOption} onChange={this.setStateFromInput}>
                          <FormControlLabel value="image" control={<Radio />} label="Image" />
                           <FormControlLabel value="color" control={<Radio />} label="Color" />
@@ -414,18 +558,24 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             backgroundImage.indexOf("base64") >=0 ? 
                             backgroundImage : 'https://bathtimestories.com/'+backgroundImage}
 
-                          onChange={(event) => this._handleImgChange(event,"picture")} 
-                          deleteImg={(event) => this.deleteImg("picture")}
+                          onChange={(event) => this._handleImgChange(event)} 
+                          deleteImg={(event) => this.deleteImg()}
                           onClick={(event) => this._handleSubmit(event)}/> :
                         <FormControl>
-                          <FormLabel  style={{position: 'absolute', 'background': 'white'}} className="MuiInputLabel-outlined MuiInputLabel-shrink">Culoare</FormLabel>
+                          <FormLabel  
+                            style={{
+                              position: 'absolute', 
+                              background: 'white',
+                              transform: 'translate(55px, -6px) scale(0.75)'}} 
+                            className="MuiInputLabel-outlined">{formatMessage({id: 'color'})}</FormLabel>
                           <input
                             name="background"
-                            label="Culoare"
+                            label={formatMessage({id: 'color'})}
                             type="color"
                             style={{
-                              width: 133,
+                              width: 100,
                               height: 100,
+                              margin: 'auto',
                               borderColor: 'rgba(0, 0, 0, 0.23)'}}
                             onChange={(e) => this.setStateFromType(e, "category")}
                             value={this.state.category.background}/>
@@ -441,13 +591,13 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                       startIcon={<Save />}
                       onClick={this.saveDesign}
                     >
-                      Save
+                      {formatMessage({id: 'save'})}
                     </Button>
                   </Box>
                 </form>
               </Paper>
             </Grid>
-            <Grid align="center" item xs={12} lg={6} style={{position: 'relative'}}>
+            <Grid align="center" item xs={12} lg={6} style={{position: 'sticky', top: 0, alignSelf:'baseline'}}>
               <CustomTabs
                 classes={classes.tabs}
                 value={this.state.tabIndex}

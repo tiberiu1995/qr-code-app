@@ -14,7 +14,9 @@ import {
   TextField,
   Button,
   Box,
+  Paper,
   Table,
+  TableContainer,
   TableBody,
   TableCell,
   TableHead,
@@ -64,7 +66,7 @@ const fuzzyTextFilterFn = (rows, id, filterValue) => {
 // Let the table remove the filter if the string is empty
 fuzzyTextFilterFn.autoRemove = (val) => !val;
 
-const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
+const CustomTable = ({ columns, data, settings, intl}) => {
   const [records, setRecords] = useState(data);
   const classes = useStyles();
   // Define a default UI for filtering
@@ -80,7 +82,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
         onChange={(e) => {
           setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
         }}
-        placeholder={`Cauta...`}
+        placeholder={`Search...`}
         variant="outlined"
         size="small"
       />
@@ -207,21 +209,22 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
   ));
 
   const header = () => {
-    let arr =  lt600 ? ["name", "category", "title", "cat_no", "item_no"] : ["name", "category", "size", "title", "cat_no", "item_no"];
+    let arr =  lt600 ? ["name", "category", "title", "cat_no", "item_no", "move", "picture"] : 
+    ["name", "category", "size", "title", "cat_no", "item_no", "move", "picture"];
     return headerGroups.map((headerGroup) => (
       <TableRow {...headerGroup.getHeaderGroupProps()}>
         {headerGroup.headers.map((column) => (
-          arr.includes(column.id) && 
+          arr.includes(column.id) ?
           <TableCell align="center" padding={mobile ? "none" : "default" }
             {...column.getHeaderProps(column.getSortByToggleProps())} >
             <Box justifyContent="center" display="flex" alignItems="center">
               {column.render("Header")}
               <Box display="grid" className={clsx(classes.arrows)}>
               { sortingArrows(column) }
-              </Box>
-             
+              </Box>         
             </Box>
-          </TableCell>
+          </TableCell> :
+          <TableCell></TableCell>
         ))}
       </TableRow>
     ))
@@ -242,7 +245,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
     return '';
   };
 
-  const pagionation = () => (
+  const pagination = () => (
     lt600 ? 
       <>
         <Select
@@ -252,7 +255,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
         }}
         array={Array.from({length: pageOptions.length}, (_, i) => i + 1)}
         display={(e) => {
-          return `Pagina ${e}`;
+          return `Page ${e}`;
         }} />
         <Select
           value={pageSize}
@@ -262,7 +265,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
           }}
           array={[5, 10, 20, 50]}
           display={(e) => {
-            return `Afiseaza ${e}`;
+            return `Show ${e}`;
           }} />
       </> :
       <>
@@ -286,7 +289,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
           <NavigateBefore />
         </Button> 
         <span className="mx-2">
-          Pagina {pageIndex + 1} din {pageOptions.length}
+          {formatMessage({id: 'page'})} {pageIndex + 1}/{pageOptions.length}
         </span>           
         <Button
           onClick={() => {
@@ -314,7 +317,7 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
           }}
           array={[5, 10, 20, 50]}
           display={(e) => {
-            return `Afiseaza ${e}`;
+            return `Show ${e}`;
           }}/>
     </>
     )
@@ -322,38 +325,36 @@ const CustomTable = ({ columns, data, hideFilters, settings, intl}) => {
   return (
 
     <DndProvider backend={HTML5Backend}>
-      {!hideFilters || <Box {...getTableProps()}>
+      <Box {...getTableProps()}>
         { filtering() }
       </Box>
-      }
-
-      <Table {...getTableProps()}>
-        <TableHead>
-          { header() }
-        </TableHead>
-        <TableBody {...getTableBodyProps()}>
-          {page.map(
-            (row, index) =>
-              prepareRow(row) || (
-                <Row
-                  index={index}
-                  key={"row_" + index}
-                  row={row}
-                  moveRow={moveRow}
-                  {...row.getRowProps()}
-                />
-              )
-          )}
-        </TableBody>
-      </Table>
-      {!hideFilters || (
-        <Box>
-          <Box m={2} display="flex" alignItems="center" justifyContent="center" className={clsx(classes.pagination)} >
-            { pagionation()
-              }
-          </Box>
+      <TableContainer component={Paper}>
+        <Table {...getTableProps()}>
+          <TableHead>
+            { header() }
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {page.map(
+              (row, index) =>
+                prepareRow(row) || (
+                  <Row
+                    style={{ background: (index%2 ? 'white' : '#f9f9f9') }}
+                    index={index}
+                    key={"row_" + index}
+                    row={row}
+                    moveRow={moveRow}
+                    {...row.getRowProps()}
+                  />
+                )
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box>
+        <Box m={2} display="flex" alignItems="center" justifyContent="center" className={clsx(classes.pagination)} >
+          { pagination() }
         </Box>
-      )}
+      </Box>
     </DndProvider>
   );
 };

@@ -17,6 +17,17 @@ import { fetchData } from "../../utils/fetch";
 import { Button, Box } from "@material-ui/core";
 import { Save, Add } from "@material-ui/icons";
 import Header from "../menu/menu-header.jsx";
+import { injectIntl } from 'react-intl';
+
+const style = {
+  position: "top-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+};
 
 const Categories = (props) => {
   const [data, setData] = useState([]);
@@ -49,12 +60,13 @@ const Categories = (props) => {
       const apiData = await fetchData({ title: title, data: item }, "category/" + endpoint + ".php");
       console.log(apiData);
       endpoint === "edit"
-        ? toast.success("Categoria a fost editata!")
-        : toast.success("Categoria a fost salvata!");
+        ? toast.success(formatMessage({id: 'edited_category'}), style)
+        : toast.success(formatMessage({id: 'saved_category'}), style);
       await fetchCategories();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       window.scrollTo(0, 0);
     } catch (error) {
+      toast.error(formatMessage({id: 'error_category'}), style);
       //this.setState({ message: error.message });
       window.scrollTo(0, 0);
     }
@@ -64,7 +76,7 @@ const Categories = (props) => {
     try {
       const apiData = await fetchData({ data: item }, "category/delete.php");
       console.log(apiData);
-      toast.success("Categoria a fost stearsa!");
+      toast.success(formatMessage({id: 'deleted_category'}), style);
       await fetchCategories();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       //window.scrollTo(0, 0);
@@ -92,36 +104,38 @@ const Categories = (props) => {
 
   const showModal = () => showForm(true);
   const closeModal = () => showForm(false);
-
+  const {intl: {formatMessage}} = props;
   return (
     <div className="my-1 mx-auto col-lg-10">
       <div className="form-group mb-3">
         <Header/>
-        {
-          <Form
-            key={new Date().valueOf()}
-            addItem={addItem}
-            data={category}
-            show={isVisible}
-            onCancel={closeModal}
-          />
-        }
-        {data.length ? (
-          <Datatable edit={edit} remove={removeItem} myData={[...data]} />
-        ) : (
-          <h4>Nu ai adaugat nicio categorie</h4>
-        )}
-        <Box m={2} display="flex" justifyContent="center" >
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            style={{justifyContent: 'center'}}
-            startIcon={<Add />}
-            onClick={showModal}
-          >
-            Adauga categorie
-          </Button>
+        <Box m={2} display="flex" justifyContent="center" flexDirection="column" >
+          {
+            <Form
+              key={new Date().valueOf()}
+              addItem={addItem}
+              data={category}
+              show={isVisible}
+              onCancel={closeModal}
+            />
+          }
+          {data.length ? (
+            <Datatable edit={edit} remove={removeItem} myData={[...data]} />
+          ) : (
+            <h4>{ formatMessage({id: 'no_category'}) }</h4>
+          )}
+          <Box m={2} display="flex" justifyContent="center" >
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              style={{justifyContent: 'center'}}
+              startIcon={<Add />}
+              onClick={showModal}
+            >
+              { formatMessage({id: 'add_category'}) }
+            </Button>
+          </Box>
         </Box>
       </div>
       {/* <Button className="m-2" onClick={saveData}>Salveaza <i className="fa fa-check" aria-hidden="true"/></Button> */}
@@ -129,4 +143,4 @@ const Categories = (props) => {
   );
 };
 
-export default compose(withRouter)(Categories);
+export default compose(withRouter)(injectIntl(Categories));

@@ -1,28 +1,20 @@
 import React, {
-  Component,
-  Fragment,
   useState,
   useEffect,
-  useCallback,
 } from "react";
 import Datatable from "../../datatable/datatable";
-import Card from "../../cardboard/datatable";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 //import Form from "./form0";
 import Form from "./new-menu";
 import update from "immutability-helper";
 import { Button, Box } from "@material-ui/core";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
-import MediaCard from "./../../cardboard/_card";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import CustomList from "./../../cardboard/_list";
-import { Grid } from "@material-ui/core/";
 import { fetchData, fetchMenu } from "../../utils/fetch";
 import { Add } from '@material-ui/icons';
 import { connect } from 'react-redux';
+import { injectIntl } from 'react-intl';
 
 const style = {
   position: "top-right",
@@ -35,6 +27,7 @@ const style = {
 };
 
 const Categories = (props) => {
+  const {formatMessage} = props.intl;
   const [data, setData] = useState([]);
   const [isVisible, showForm] = useState(false);
   //const id = props.match.params.id;
@@ -60,7 +53,7 @@ const Categories = (props) => {
     try {
       const apiData = await fetchData( { title: item.title }, "menu/delete.php");
       console.log(apiData);
-      toast.success("Meniul a fost sters!");
+      toast.success(formatMessage({id: "deleted_menu"}));
       await fetchMenus();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       //window.scrollTo(0, 0);
@@ -88,9 +81,10 @@ const Categories = (props) => {
       const apiData = await fetchData(item, "menu/new.php");
       console.log(apiData);
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
-      apiData.error ? toast.error("Titlul meniului exista deja!", style) : (toast.success("Meniul a fost creat!", style) && await fetchMenus());
+      apiData.error ? toast.error(formatMessage({id: 'menu_exists'}), style) : (toast.success(formatMessage({id: 'menu_created'}), style) && await fetchMenus());
       window.scrollTo(0, 0);
     } catch (error) {
+      toast.error(formatMessage({id: 'error_menu'}), style)
       //this.setState({ message: error.message });
       window.scrollTo(0, 0);
     }
@@ -105,8 +99,8 @@ const Categories = (props) => {
     <div className="my-1 mx-auto text-center">
       <Box m={5}>
         {data.length ? 
-          <Datatable hideFilters edit={edit} remove={remove} myData={[...data]} /> : 
-          <h4>Nu ai adaugat niciun meniu</h4>
+          <Datatable edit={edit} remove={remove} myData={[...data]} /> : 
+          <h4>{ formatMessage({id: 'no_menu'})}</h4>
         }
       </Box>
       <Box m={2} display="flex" justifyContent="center" >
@@ -118,7 +112,7 @@ const Categories = (props) => {
             startIcon={<Add />}
             onClick={showModal}
           >
-            Adauga meniu
+            {formatMessage({id: 'add_menu'}) }
           </Button>
           <Form
             key={new Date().valueOf()}
@@ -137,4 +131,4 @@ const mapStateToProps = (state) => ({
 
 export default compose(
   withRouter,
-  connect(mapStateToProps))(Categories);
+  connect(mapStateToProps))(injectIntl(Categories));

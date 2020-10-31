@@ -1,11 +1,7 @@
-import React, { Component, Fragment } from "react";
-import { Editor } from "@tinymce/tinymce-react";
+import React, { Component,  } from "react";
 import SimpleReactValidator from "simple-react-validator";
 import Modal from "react-bootstrap/Modal";
 import ModalBody from "react-bootstrap/ModalBody";
-import ModalHeader from "react-bootstrap/ModalHeader";
-import ModalFooter from "react-bootstrap/ModalFooter";
-import ModalTitle from "react-bootstrap/ModalTitle";
 import Select from "./../../utils/select.jsx";
 import {
   TextField,
@@ -13,6 +9,22 @@ import {
   Box,
 } from "@material-ui/core/";
 import FileInput from "../../utils/FileInput.jsx";
+import { injectIntl } from 'react-intl';
+
+const initState = {
+  validator: new SimpleReactValidator(),
+  created: new Date().valueOf(),
+  name: "",
+  description:
+    "",
+  ingredients:
+    "",
+  alergens: "",
+  calories: "",
+  size: "",
+  picture: '',
+}
+
 const crop = (url, aspectRatio) => {
   // we return a Promise that gets resolved with our canvas element
   return new Promise((resolve) => {
@@ -85,18 +97,7 @@ export class Form extends Component {
             (el) => el.name === props.data.category
           ).id,
         })
-      : (this.state = {
-          validator: new SimpleReactValidator(),
-          name: "Nume produs",
-          description:
-            "Descriere exemplu. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          ingredients:
-            "Lorem, ipsum, dolor, sit, amet, consectetur, adipiscing, elit",
-          alergens: "",
-          calories: "",
-          size: "Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei",
-          picture: '',
-        });
+      : (this.state = initState);
   }
 
   componentDidMount() {
@@ -133,18 +134,7 @@ export class Form extends Component {
       category: this.state.category || this.props.categories[0],
       id: this.props.data ? this.props.data.id : "",
     };
-    this.setState({
-      created: new Date().valueOf(),
-      name: "Nume produs",
-      description:
-        "Descriere exemplu. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      ingredients:
-        "Lorem, ipsum, dolor, sit, amet, consectetur, adipiscing, elit",
-      alergens: "",
-      calories: "",
-      size: "Mica 5.00 lei | Medie 8.00 lei | Mare 12.00 lei",
-      picture: '',
-    });
+    this.setState(initState);
     this.props.addItem(data);
   };
 
@@ -185,11 +175,11 @@ export class Form extends Component {
   }
 
   render() {
-    const { show, onCancel, data } = this.props;
+    const { show, onCancel, data, intl: {formatMessage} } = this.props;
     return (
       <Modal
         backdrop="static"
-        className="row d-flex justify-content-center"
+        className="row d-flex col-lg-12 justify-content-center"
         show={show}
         onHide={onCancel}
         size="lg"
@@ -210,34 +200,28 @@ export class Form extends Component {
               <div className="container-fluid">
                 <div className="col-xl-12">
                   <form className="needs-validation add-product-form">
-                      <FileInput 
-                          source={this.state.picture} 
-                          onChange={(event) => this._handleImgChange(event)} 
-                          deleteImg={(event) => this.deleteImg()}
-                          onClick={(event) => this._handleSubmit(event)}/>
-                    <div className="form form-label-center row">
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="">
-                          <TextField
-                            className="col-12"
-                            name="name"
-                            label="Nume"
-                            value={this.state.name}
-                            onChange={this.setStateFromInput}
-                          />
-                          {this.state.validator.message(
-                            "name",
-                            this.state.name,
-                            "required|string"
-                          )}
-                        </div>
+                    <div className="form-group mb-3 col-lg-12">
+                      <div className="">
+                        <TextField
+                          className="col-12"
+                          name="name"
+                          label={formatMessage({id: 'name' })}
+                          value={this.state.name}
+                          onChange={this.setStateFromInput}
+                        />
+                        {this.state.validator.message(
+                          "name",
+                          this.state.name,
+                          "required|string"
+                        )}
                       </div>
-                      <div className="form-group mb-3 col-lg-12">
+                    </div>
+                    <div className="form-group mb-3 col-lg-12">
                         <div className="description-sm">
                           {this.props.categories && (
                             <Select
-                              label="Categorie"
-                              default={{ value: 0, text: "Alege o categorie" }}
+                              label={formatMessage({id: 'category'})}
+                              default={{ value: 0, text: formatMessage({id: 'choose_category'}) }}
                               value={this.state.category || 0}
                               onChange={this.setStateFromInput}
                               display={(el) => {
@@ -258,60 +242,9 @@ export class Form extends Component {
                       <div className="form-group mb-3 col-lg-12">
                         <div className="description-sm">
                           <TextField
-                            className="col-12"
-                            name="ingredients"
-                            multiline
-                            label="Ingrediente"
-                            value={this.state.ingredients}
-                            onChange={this.setStateFromInput}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          <TextField
-                            label="Alergeni"
-                            multiline
-                            className="col-12"
-                            name="alergens"
-                            value={this.state.alergens}
-                            onChange={this.setStateFromInput}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          <TextField
-                            className="col-12"
-                            name="calories"
-                            label="Calorii"
-                            value={this.state.calories}
-                            onChange={this.setStateFromInput}
-                          />
-                        </div>
-                      </div>
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          <TextField
-                            name="description"
-                            label="Descriere"
-                            multiline
-                            className="col-12"
-                            value={this.state.description}
-                            onChange={this.setStateFromInput}
-                          />
-                          {this.state.validator.message(
-                            "description",
-                            this.state.description,
-                            "required|string"
-                          )}
-                        </div>
-                      </div>
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          <TextField
                             name="size"
-                            label="Portie/preturi"
+                            placeholder="Small €12/ Medium €15/ Large €18"
+                            label={formatMessage({id: 'size/price'})}
                             className="col-12"
                             value={this.state.size}
                             onChange={this.setStateFromInput}
@@ -323,6 +256,62 @@ export class Form extends Component {
                           )}
                         </div>
                       </div>
+                    <FileInput 
+                        source={this.state.picture} 
+                        onChange={(event) => this._handleImgChange(event)} 
+                        deleteImg={(event) => this.deleteImg()}
+                        onClick={(event) => this._handleSubmit(event)}/>
+                        {this.state.validator.message(
+                          "picture",
+                          this.state.picture,
+                          "required"
+                        )}
+                    <div className="form-group mb-3 col-lg-12">
+                      <div className="description-sm">
+                        <TextField
+                          className="col-12"
+                          name="ingredients"
+                          multiline
+                          label={formatMessage({id: 'ingredients'})}
+                          value={this.state.ingredients}
+                          onChange={this.setStateFromInput}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group mb-3 col-lg-12">
+                      <div className="description-sm">
+                        <TextField
+                          label={formatMessage({id: 'alergens'})}
+                          multiline
+                          className="col-12"
+                          name="alergens"
+                          value={this.state.alergens}
+                          onChange={this.setStateFromInput}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group mb-3 col-lg-12">
+                      <div className="description-sm">
+                        <TextField
+                          className="col-12"
+                          name="calories"
+                          label={formatMessage({id: 'calories'})}
+                          value={this.state.calories}
+                          onChange={this.setStateFromInput}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group mb-3 col-lg-12">
+                      <div className="description-sm">
+                        <TextField
+                          name="description"
+                          label={formatMessage({id: 'description'})}
+                          multiline
+                          className="col-12"
+                          value={this.state.description}
+                          onChange={this.setStateFromInput}
+                        />
+                      </div>
                     </div>
                   </form>
                 </div>
@@ -331,11 +320,11 @@ export class Form extends Component {
           </div>
         </ModalBody>
         <Modal.Footer>
-          <Button variant="primary" onClick={this.addItem}>
-            Salveaza
+          <Button variant="contained" color="error" onClick={onCancel}>
+            {formatMessage({id: 'back'})} 
           </Button>
-          <Button variant="primary" onClick={onCancel}>
-            Inapoi
+          <Button variant="contained" color="success" onClick={this.addItem}>
+            {formatMessage({id: 'add'})}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -343,4 +332,4 @@ export class Form extends Component {
   }
 }
 
-export default Form;
+export default injectIntl(Form);

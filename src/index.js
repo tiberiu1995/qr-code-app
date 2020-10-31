@@ -20,7 +20,8 @@ import Categories from "./components/pages/category/";
 import Items from "./components/pages/items/";
 import Design from "./components/pages/menu/design/";
 import CustomerMenu from "./components/pages/menu/view/";
-import ItemReviews from "./components/pages/menu/view/review/";
+import ItemReviews from "./components/pages/menu/view/review/product-reviews.jsx";
+import RestaurantReviews from "./components/pages/menu/view/review/restaurant-reviews.jsx";
 import Login from "./components/pages/log-in";
 import Register from "./components/pages/register";
 import Profile from "./components/pages/profile.jsx";
@@ -42,6 +43,7 @@ import { colors, rgbToHex } from "@material-ui/core";
 import { FirebaseContext } from "./components/firebase";
 import Firebase from './components/firebase/firebase';
 import ForgetPasswordForm from './components/pages/forget-password';
+import QrCode from './components/pages/menu/qr-code';
 
 
 class Root extends React.Component {
@@ -52,7 +54,9 @@ class Root extends React.Component {
     };
     this.theme = createMuiTheme({
       palette: {
-        primary: blue,
+        primary: {
+          main: 'rgb(241,241,241)'
+        },
         /*secondary: {
           main: red[50],
         }*/
@@ -103,12 +107,7 @@ class Root extends React.Component {
                       path={`${process.env.PUBLIC_URL}/scan-qr/`}
                       component={ScanQR}/>
                   <MenuLayout path={`${process.env.PUBLIC_URL}/my-menu/`}>
-                    {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/`} component={MenuShow}/> */}
-                    <Route
-                      exact
-                      path={[`/my-menu/:title/:category/reviews/:item/`, `/my-menu/:title/reviews/:item/`]}
-                      component={ItemReviews}
-                    />                                      
+                    {/* <Route exact path={`${process.env.PUBLIC_URL}/menu/`} component={MenuShow}/> */}                                      
                     <Route 
                       exact
                       path={[`/my-menu/:title/:category/`,`/my-menu/:title/`]}
@@ -163,6 +162,12 @@ class Root extends React.Component {
                       exact
                       path={`${process.env.PUBLIC_URL}/menu/:title/design/`}
                       component={props => <Design {...props} />}
+                    />
+
+                    <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/menu/:title/qr-code/`}
+                      component={QrCode}
                     />
 
                     <Route

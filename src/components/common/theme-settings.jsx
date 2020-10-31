@@ -18,7 +18,7 @@ class ThemeSettings extends Component {
   /*=====================
      Tap on Top
      ==========================*/
-  componentWillMount() {
+  /*componentWillMount() {
     window.addEventListener("scroll", this.handleScroll);
   }
   componentWillUnmount() {
@@ -33,7 +33,7 @@ class ThemeSettings extends Component {
   };
   clickToTop() {
     window.scroll({ top: 0, left: 0, behavior: "smooth" });
-  }
+  }*/
 
   componentDidMount() {
     SlideUpDown("setting-title");
@@ -533,11 +533,11 @@ class ThemeSettings extends Component {
                         >{this.state.themeLayout?'Light':'Dark'}</div>
                     </div>
                 </div> */}
-        <div className="tap-top" onClick={this.clickToTop} style={tap_to_top}>
+        {/* <div className="tap-top" onClick={this.clickToTop} style={tap_to_top}>
           <div>
             <i className="fa fa-angle-double-up"></i>
           </div>
-        </div>
+        </div> */}
 
         <ToastContainer />
       </div>

@@ -11,12 +11,14 @@ import { withStyles } from "@material-ui/styles";
 import { ArrowDropUp,  } from "@material-ui/icons/";
 import { animateScroll } from "react-scroll";
 import { fetchData } from '../../../utils/fetch';
-import Reviews from './review';
+import RestaurantReviews from './review/restaurant-reviews.jsx';
+import ProductReviews from './review/product-reviews.jsx';
 import CustomTabs from './tabs.jsx';
 import Hx from './hx.jsx';
 import { Link } from 'react-router-dom';
-import { Tab } from '@material-ui/core/';
-
+import Cx from './cx';
+import {MoreVert} from '@material-ui/icons/';
+import { Rating } from '@material-ui/lab/';
 const queryString = require('query-string');
 
 const styles = (theme) => ({
@@ -40,6 +42,10 @@ const styles = (theme) => ({
     }
   },
   tabs: {
+    '& .MuiTabs-scroller': {
+      overflow:'overlay !important',
+    },
+
     '& .MuiTab-root': {
       minWidth: 'auto',
       '& .MuiTab-wrapper': {
@@ -47,7 +53,8 @@ const styles = (theme) => ({
       }
     },
     '& .MuiTabs-flexContainer': {
-      justifyContent: 'center'
+      justifyContent: 'center',
+      width: 'max-content'
     },
     '& .MuiTabs-indicator': {
       display: 'none'
@@ -71,6 +78,7 @@ const scrollToBottom = () => {
   //window.scrollTo(0, 0);
 };
 
+
 export class Menu extends Component {
   constructor(props) {
     super(props);
@@ -81,12 +89,8 @@ export class Menu extends Component {
       bodyType: '',
       samePage: '',
       default_style: '',
-      settings: {
-        disableToC: false,
-        disableImages: false,
-        disableReviews: false,
-      },
       tabIndex: 0,
+      catIndex: -1,
       products: [],
       show_form: false,
       data: [],
@@ -95,9 +99,50 @@ export class Menu extends Component {
       item: "",
       category: "",
       mobileView: window.innerWidth<600,
+      isVisible: false,
+      modalIndex: -1,
+      toggles: {
+
+      }
     };
     this.edit = false;
   }
+
+  showModal = (el) => {
+    this.setState({modalIndex: el.id, modalItem: el});
+  }
+
+  hideModal = (e) => {
+    this.setState({modalIndex: -1, modalItem: ''});
+  }
+
+   review = (isPreview, el, style, align="right") => {
+    let count = this.state.reviews.find(r => r.id === el.id);
+    count = count.rating ? count.count : 0;
+    let reviewType = 'stars';
+    return (this.state.reviews ?
+          <Box 
+            onClick={(e) => this.showModal(el)}> 
+            { this.state.toggles.item_reviewStars ?
+              <Rating 
+              size="small" 
+              name="read-only" 
+              precision={0.5} 
+              readOnly
+              style={style.reviewStars}
+              value={this.state.reviews.find(r => r.id === el.id).rating}/> : ''
+            }
+            { this.state.toggles.item_reviewText ? 
+              <Typography 
+                align={align}
+                style={style.reviewText}
+                variant="body2">
+              {count} reviews
+              </Typography> : ''
+            }         
+          </Box>
+        : ''
+    )}
 
   value = (size) => {
     if (this.props.media.mobile)
@@ -116,9 +161,26 @@ export class Menu extends Component {
 
   updatePreviewStyle = () => {
     if(sessionStorage.getItem('style')){
-      const {item, category, contentType, backgroundOption} = JSON.parse(sessionStorage.getItem('style'));
+      const {item, category, contentType, backgroundOption, toggles} = JSON.parse(sessionStorage.getItem('style'));
       this.setContentType(contentType);
-      this.setState({item, category, backgroundOption});
+      this.setState({item, category, backgroundOption, toggles});
+      let preview = queryString.parse(this.props.location.search).preview;
+      if(preview){
+        let data = JSON.parse(JSON.stringify(this.state.originalData));
+        data.forEach(el => {
+          if (!toggles.category_description)
+            el.description = "";
+          el.items.forEach(_el => {
+            if (!toggles.item_ingredients)
+                _el.ingredients = "";
+            if (!toggles.item_alergens)
+                _el.alergens = "";
+            if (!toggles.item_calories)
+                _el.calories = "";
+          })    
+        })
+        this.setState({data: data});
+      }
       sessionStorage.setItem('style', '');
     }
   }
@@ -136,10 +198,11 @@ export class Menu extends Component {
 
   fetchData = async (title) => {
     try {
-      let settings = await fetchData({ title: title }, "menu/category/get.php");
-      let {data, layout} =  await fetchData({title: title}, "menu/view/get.php");
+      //let settings = await fetchData({ title: title }, "menu/category/get.php");
+      let {data, layout, reviews} =  await fetchData({title: title}, "menu/view/get.php");
       let design = await fetchData({title: title}, "menu/design/get.php")
-
+      let toggles = JSON.parse(design.custom.toggles);
+      let preview = queryString.parse(this.props.location.search).preview;
       console.log(data);
       let newData = [];
       data.forEach((el, i) => {
@@ -152,43 +215,47 @@ export class Menu extends Component {
             el.library_picture : el.upload_picture,
             background: el.background,
           };
-
+          if (toggles.category_description || preview)
+            category = {...category, description: el.description};
           //data.push();
           category.items = data
             .filter((_el, _i) => _el.category_id == el.category_id)
-            .map((_el, _i) => ({
-              id: _el.item_id,
-              name: _el.i_name,
-              ingredients: _el.ingredients,
-              alergens: _el.alergens,
-              calories: _el.calories,
-              picture: _el.i_pictures,
-              size: _el.size,
-            }));
+            .map((_el, _i) => {
+              let item = {
+                id: _el.item_id,
+                name: _el.i_name,
+                picture: _el.i_pictures,
+                size: _el.size,
+              }
+              if (toggles.item_ingredients || preview)
+                item = {...item, ingredients: _el.ingredients}
+              if (toggles.item_alergens || preview)
+                item = {...item, alergens: _el.alergens}
+              if (toggles.item_calories || preview)
+                item = {...item, calories: _el.calories}
+              return item
+            });
           newData.push(category);
         }
       });
+      preview && this.setState({originalData: JSON.parse(JSON.stringify(newData))});
       this.setState({
+        reviews: reviews,
         category: JSON.parse(design.custom.category_design ? design.custom.category_design : design.defaults.category_design),
         item: JSON.parse(design.custom.item_design ? design.custom.item_design : design.defaults.item_design),
         data: newData,
         headerType: Number(layout.header_type),
         bodyType: Number(layout.body_type),
         samePage: layout.same_page==true,
-        settings: { 
-          disableToC: !(settings.enables.enableToC == true),
-          disableReviews: !(settings.enables.enableReviews == true)
-        },
+        toggles: toggles,
         backgroundOption: design.custom.background_option || design.defaults.background_option
 
       });
       this.setContentType(layout.id);
-
     } catch (error) {
       console.log(error);
     }
   };
-
 
   handleToolTip = (event) => {
     if (!this.state.showToolTip && window.scrollY > window.innerHeight / 2)
@@ -232,11 +299,11 @@ export class Menu extends Component {
         case 'h3b1':
           this.setState({headerType: 3, bodyType: 1, samePage: false});
           break;
-        case 'h3b2':
-          this.setState({headerType: 3, bodyType: 2, samePage: true});
+        case 'h5b2':
+          this.setState({headerType: 5, bodyType: 2, samePage: true});
           break;
         case 'h4b4':
-          this.setState({headerType: 4, bodyType: 4, samePage: false, tabIndex: -1});
+          this.setState({headerType: 4, bodyType: 4, samePage: false, catIndex: -1});
           break;
         default:
           this.setState({headerType: 1});   
@@ -247,6 +314,7 @@ export class Menu extends Component {
     const {classes} = this.props;
     let style =  JSON.parse(JSON.stringify(category_style));
     style.name.fontSize = this.value(style.name.fontSize);
+    style.description.fontSize = this.value(style.description.fontSize);
     switch (this.state.headerType){
       case 0:
         return <CustomTabs
@@ -266,6 +334,7 @@ export class Menu extends Component {
         </CustomTabs>
       case 1:
         return <CustomTabs
+                style={{overflow: 'scroll'}}
                 //classes={classes.tabs}
                 classes={this.props.classes.tabs}
                 value={this.state.tabIndex}
@@ -308,20 +377,30 @@ export class Menu extends Component {
     //style.fontSize = this.value(style.fontSize);
     switch (this.state.headerType){
       case 4: 
+        return <Cx 
+          key={'chs4'+index}
+          index = {index}
+          fade 
+          onClick={()=>{this.setState({
+              catIndex: this.state.catIndex !== index ? index : -1
+          }) }}
+
+          style={{backgroundSize: 'cover'}}
+          el={el} >
+            <Typography style={category_style.name}>
+              {el.name}
+            </Typography>
+            <Typography style={category_style.description}>
+              {el.description}
+            </Typography>
+            </Cx>
+      case 5:
         return <Box 
-          style={{
-            height: 100, 
-            background: 'url(' + el.picture + ')', 
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'}}
-          key={'_c4'+el.id} onClick={()=>{console.log(this.state.tabIndex);this.setState({
-              tabIndex: this.state.tabIndex !== index ? index : -1
-            }) }} >
-          <Box 
-            display="flex"
-            style={{height: '100%', background: 'rgba(0,0,0,0.5)'}}
-            justifyContent="center"
-            alignItems="center">
+          display="flex" 
+          key={'_bjd'+index}
+          mb={1} 
+          justifyContent="space-between">
+          <Box>
             <Typography style={category_style.name}>
               {el.name}
             </Typography>
@@ -342,8 +421,8 @@ export class Menu extends Component {
     }
   }
 
-  getItem = (el,i) => {
-    const {item, isPreview, settings: {disableReviews, disableImages}, bodyType} = this.state;
+  getItem = (el,i, index) => {
+    const {item, isPreview, bodyType, toggles} = this.state;
     let style = JSON.parse(JSON.stringify(item)); //{...item};
     for (const [key, value] of Object.entries(style)) {
       style[key].fontSize = this.value(value.fontSize)
@@ -359,41 +438,30 @@ export class Menu extends Component {
                 <Typography style={{...style.name, lineHeight: '2.5em'}}>
                   {el.name}
                 </Typography>
+                { this.state.reviews.length ? this.review(isPreview, el, style) : ''}
               </Box>                
               <Box>          
                 <Typography style={{...style.ingredients}} >
                   {el.ingredients} 
                 </Typography>
+                <Typography style={{...style.alergens}} >
+                {el.alergens}
+              </Typography>
+              <Typography style={{...style.calories}} >
+                {el.calories} 
+              </Typography> 
               </Box>
               <Typography style={{...style.size, lineHeight: '2.5em', textAlign: 'right'/*whiteSpace: "nowrap"*/}} >
                   {el.size}
-                </Typography>
-                { !disableReviews ? 
-                    ( !isPreview ? 
-                      <Link to={{
-                        pathname: `reviews/${el.id}/`,
-                        state: ({
-                          item: el,
-                          style: style
-                        })
-                        }}>
-                      <Typography style={{...style.reviews}} >
-                        Vezi recenzii
-                      </Typography>
-                      </Link> :
-                      'Vezi recenzii'
-                    ) : ''
-                }
+              </Typography>
             </>}
         />
       case 1:
         return <Card 
-            disableReviews={ disableReviews} 
-            disableImages={ disableImages}
-            isPreview={ isPreview} 
             key={'_ca1'+i} 
             style={style} 
             id={i} 
+            review={this.state.reviews.length ? this.review(isPreview,el,style) : ''}
             data={el} />
       case 2:
         return <Box 
@@ -405,51 +473,45 @@ export class Menu extends Component {
               <Typography style={style.name}>
                 {el.name}
               </Typography>
-              <Typography style={{...style.ingredients, textAlign: 'right'}} >
+              { this.state.reviews.length ? this.review(isPreview, el, style, 'left') : ''}
+              <Typography style={{...style.ingredients}} >
                 {el.ingredients} 
               </Typography>
-              { !disableReviews && isPreview ? 
-                ( !isPreview ? 
-                  <Link to={{
-                    pathname: `${this.props.history.pathname}reviews/${el.id}/`,
-                    state: ({
-                      item: el,
-                      style: style
-                    })
-                    }}>
-                    Vezi recenzii
-                  </Link> :
-                  'Vezi recenzii'
-                ) : ''
-              }
-            </Box>
-            <Box>
+              <Typography style={{...style.alergens}} >
+                {el.alergens}
+              </Typography>
+              <Typography style={{...style.calories}} >
+                {el.calories} 
+              </Typography> 
               <Typography style={{...style.size, whiteSpace: "nowrap"}} >
               {el.size}
               </Typography>
             </Box>
           </Box>
       case 4:
-        return <Box 
-          style={{
-            height: 100, 
-            background: 'url(' + el.picture + ')', 
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'}}
-          key={'_b4'+el.id}>
-            <Box 
-              display="flex"
-              style={{height: '100%', background: 'rgba(0,0,0,0.5)'}}
-              justifyContent="center"
-              alignItems="center">
-              <Typography style={style.name}>
+        return <Cx 
+          index={i}
+          key={'cxs4'+i}
+          el={el} 
+          fade={this.state.catIndex == index}
+          style={{backgroundSize: 'contain', backgroundRepeat: 'no-repeat', position: 'relative'}}>
+            <Typography style={style.name}>
                 {el.name}
               </Typography>
-              <Typography style={{...style.ingredients, textAlign: 'right'}} >
+              <Typography style={{...style.ingredients}} >
                 {el.ingredients} 
               </Typography>
-            </Box>
-          </Box>
+              <Typography style={{...style.alergens}} >
+                {el.alergens}
+              </Typography>
+              <Typography style={{...style.calories}} >
+                {el.calories} 
+              </Typography>              
+              <Typography style={{...style.size}} >
+                {el.size} 
+              </Typography>
+              { this.state.reviews.length ? this.review(isPreview, el, style) : '' }
+          </Cx>
       default: 
         return 'error'
 
@@ -477,9 +539,9 @@ export class Menu extends Component {
           <Button onClick={this.goBack}>Go back</Button>
           
             { el && this.getCategoryHeader(el,category_style, '') }
-            <Box >
+            <Box>
               {el.items.map((_el, _i) => (
-                  this.getItem(_el,_i)
+                  this.getItem(_el,_i,'')
               ))}
             </Box>
           </Box>
@@ -494,9 +556,9 @@ export class Menu extends Component {
               position: 'relative' }}
           >
             { this.getCategoryHeader(el,category_style, i) }
-            <Box display={ ((this.state.headerType == 4 && this.state.tabIndex ==i) || (this.state.samePage && i==this.state.tabIndex)) ? "inherit" : "none"}>
+            <Box display={ (([4,5].includes(this.state.headerType)) || (this.state.samePage && i==this.state.tabIndex)) ? "inherit" : "none"}>
               {el.items.map((_el, _i) => (
-                  this.getItem(_el,_i)
+                  this.getItem(_el,_i,i)
               ))}
             </Box>
           </Box>))
@@ -505,7 +567,7 @@ export class Menu extends Component {
 
   render() {
     const category_id = this.props.match.params.category;
-    const { data, category } = this.state;
+    const { data, category, item, modalItem, modalIndex } = this.state;
     const { classes } = this.props;
     const grid = data
       ? data.map((el, i) => ({ id: el.category_id, name: el.name, picture: el.picture }))
@@ -516,10 +578,17 @@ export class Menu extends Component {
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
     return (
       <Box className="mx-auto" style={{ maxWidth: 600 }}>
-        { !this.state.settings.disableReviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
+        {/* this.state.toggles.item_reviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
+         */}
+        {modalItem ? 
+          <ProductReviews
+          item={modalItem}
+          key="pr23"
+          style={JSON.parse(JSON.stringify(item))}
+          show={modalIndex>=0}
+          onCancel={this.hideModal} /> : ''
         }
         <Box 
-          py={2} 
           className="display-menu" 
           style={{
             position: "relative", 
@@ -529,19 +598,16 @@ export class Menu extends Component {
                 'url(https://bathtimestories.com/'+category.backgroundImage+')') :
               category.background
               }}>
-          { !this.state.settings.disableToC && grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
+          { grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
           { this.getBody(category_id)
           }
         </Box>
-        <Box>
-          { !this.state.settings.disableReviews &&
+        <Box m={2}>
+          { this.state.toggles.item_reviews &&
             <>
               <Divider/>
               <br/>
-              Recenzii
-              <br/>
-              <Reviews menu_title={this.props.match.params.title}
-              />
+              <RestaurantReviews menu_title={this.props.match.params.title}/>
             </>
           }
           <Fade in={this.state.showToolTip}>

@@ -3,7 +3,6 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { compose } from 'redux';
@@ -15,6 +14,7 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { useState } from 'react';
 import { Box } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   link: {
-    color: '#ffffff',
+    color: '#000000',
   },
   drawer: {
    '& .MuiListItemText-root a': {
@@ -76,6 +76,7 @@ const useStyles = makeStyles((theme) => ({
   },
   sectionMobile: {
     display: 'flex',
+    flexDirection: 'column',
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
@@ -120,94 +121,39 @@ const NavBar = (props) => {
     setOpen(!open);
   };
 
-  const menu = style => (props.email ? loggedMenu(style) : notLoggedMenu(style))
-
-  const loggedMenu = params => 
-    <ListItem component="div" className={classes.menu+" "+params.className} >
-      <ListItemText>
-        <Typography variant="subtitle1" align="center"> 
-          <Link className={clsx(classes.link)}
-            to={`${process.env.PUBLIC_URL}/menu`} 
-            >
-            {/* <i className={"fa fa-tasks mx-1 "+clsx(classes.link)}  aria-hidden="true" /> */}
-            {formatMessage({id: 'menu_admin'})}
-          </Link>
-        </Typography>
-      </ListItemText>
-      <ListItemText>
-        <Typography variant="subtitle1" align="center"> 
-          <Link className={clsx(classes.link)}
-            to={`${process.env.PUBLIC_URL}/tutorials`}  >
-            {formatMessage({id: 'tutorials'})}
-          </Link>
-        </Typography>
-      </ListItemText>
+  const generateMenu = (array, style) => (
+    <ListItem component="div" className={classes.menu+" "+style.className} > 
+    { array.map((el,i) => (
+        <ListItemText key={'nb'+i}>
+          <Typography variant="subtitle1" align="center">
+            <Link className={clsx(classes.link)} to={`${process.env.PUBLIC_URL}/${el.url}`} >
+              {formatMessage({id: el.id || el.url})}
+            </Link>
+          </Typography>
+        </ListItemText>
+    ))
+    }
     </ListItem>
+  )
 
-const notLoggedMenu = params => 
-<ListItem component="div" className={classes.menu+" "+params.className} >
-<ListItemText>
-      <Typography variant="subtitle1" align="center">
-        <Link className={clsx(classes.link)}
-          to={`${process.env.PUBLIC_URL}/home`} >
-          {formatMessage({id: 'home'})}
-        </Link>
-      </Typography>
-    </ListItemText>
-    <ListItemText>
-      <Typography variant="subtitle1" align="center"> 
-        <Link className={clsx(classes.link)}
-          to={`${process.env.PUBLIC_URL}/tutorials`}  >
-          {formatMessage({id: 'tutorials'})}
-        </Link>
-      </Typography>
-    </ListItemText>
-    <ListItemText>
-      <Typography variant="subtitle1" align="center">
-        <Link className={clsx(classes.link)}
-          to={`${process.env.PUBLIC_URL}/log-in`} >
-          {formatMessage({id: 'log_in'})}
-        </Link>
-      </Typography>
-    </ListItemText>
-    <ListItemText>
-      <Typography variant="subtitle1" align="center">
-        <Link className={clsx(classes.link)}
-          to={`${process.env.PUBLIC_URL}/register`} >
-          {formatMessage({id: 'register'})}
-        </Link>
-      </Typography>
-    </ListItemText>
-</ListItem>
-
-const accountMenu = params => (
-  <ListItem component="div" className={classes.menu+" "+params.className} >
-    <ListItemText>
-          <Typography variant="subtitle1" align="center">
-            <Link className={clsx(classes.link)}
-              to={`/my-account/profile`} >
-              {formatMessage({id: 'profile'})}
-            </Link>
-          </Typography>
-        </ListItemText>
-        <ListItemText>
-          <Typography variant="subtitle1" align="center"> 
-            <Link className={clsx(classes.link)}
-              to={`/my-account/plan`}  >
-              {formatMessage({id: 'plan'})}
-            </Link>
-          </Typography>
-        </ListItemText>
-        <ListItemText>
-          <Typography variant="subtitle1" align="center">
-            <Link className={clsx(classes.link)}
-              to={`/my-account/settings`} >
-              {formatMessage({id: 'settings'})}
-            </Link>
-          </Typography>
-        </ListItemText>
-    </ListItem>)
-
+  const arr1 = [
+    {id: 'menu_admin', url: 'menu'}, 
+    {url: 'tutorials'}, 
+    {id: 'profile', url: 'account/profile'}, 
+    {id: 'plan', url: 'account/plan'}, 
+    {id: 'settings', url: 'account/settings'}];
+  const arr2 = [
+     {id: 'menu_admin', url: 'menu'}, 
+    {url: 'tutorials'}];
+  const arr3 = [
+    {url: 'home'}, 
+    {url: 'tutorials'}];
+  const arr6 = [
+     {id: 'menu_admin', url: 'menu'}, 
+    {url: 'tutorials'}, 
+    {url: 'log-in'}, 
+    {url: 'register'}];
+  
   return (
     <div className={classes.grow}>
       <HideOnScroll {...props}>
@@ -224,23 +170,36 @@ const accountMenu = params => (
                 <MenuIcon />
               </IconButton>
               <img src="https://bathtimestories.com/wp-content/uploads/2020/07/smartphone.png" height="50"/>
+              { props.email ? 
+                ( props.history.location.pathname.indexOf("account")>=0 ?
+                    generateMenu(arr1, {className: classes.sectionDesktop}) :
+                    generateMenu(arr2, {className: classes.sectionDesktop})
+                ) : 
+                generateMenu(arr3, {className: classes.sectionDesktop})
+              }
             </Box>
-            { menu({className: classes.sectionDesktop}) }
-            { props.email ?
+            { 
               <Box display="flex">  
-              { props.history.location.pathname.indexOf("account")>=0 && accountMenu({className: classes.sectionDesktop}) }
-              <Typography style={{alignSelf: 'center'}}  className={classes.link} variant="subtitle2" align="center">  
-                { formatMessage({id: 'greeting'}) }, {props.name}
-              </Typography> 
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit">
-                <AccountCircle />
-              </IconButton>
-            </Box> : ''}
+              { props.email ?
+                <>
+                  <Typography style={{alignSelf: 'center'}}  className={classes.link} variant="subtitle2" align="center">  
+                    { formatMessage({id: 'greeting'}) }, {props.name}
+                  </Typography> 
+                  <IconButton
+                    edge="end"
+                    aria-label="account of current user"
+                    aria-haspopup="true"
+                    onClick={handleProfileMenuOpen}
+                    color="inherit">
+                    <AccountCircle />
+                  </IconButton>
+                </> :
+                generateMenu([{url: 'log-in'}, {url: 'register'}], {className: classes.sectionDesktop})
+              }
+              {/* { props.history.location.pathname.indexOf("account")>=0 } */}
+              
+            </Box>
+            }
           </Box>
         </Toolbar>
         <Drawer open={open} onClose={toggleDrawer} className={classes.drawer}>
@@ -250,8 +209,15 @@ const accountMenu = params => (
              onClick={toggleDrawer}
              onKeyDown={toggleDrawer}
            >
-             { menu({className: classes.sectionMobile})  }
-             { props.email && props.history.location.pathname.indexOf("account")>=0 && accountMenu({className: classes.sectionMobile}) }
+            { props.email ? 
+              ( props.history.location.pathname.indexOf("account")>=0 ?
+                generateMenu(arr1, {className: classes.sectionMobile}) :
+                generateMenu(arr2, {className: classes.sectionMobile})
+              ) : 
+              generateMenu(arr6, {className: classes.sectionMobile})
+            }
+             {/* { props.history.location.pathname.indexOf("account")>=0 || 
+              menu({className: classes.sectionMobile},'right',props.email) } */}
            </div>
          </Drawer>
       </AppBar>

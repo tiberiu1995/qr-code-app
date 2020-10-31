@@ -80,7 +80,7 @@ const Form = (props) => {
       const data = await response.json();
 			if(data.status === 'success') {
         await fetchUser(values.email, firebase.getUser().uid);
-			  location.search.includes("ref") ? history.goBack() : history.push('/shop');
+			  location.search.includes("ref") ? history.goBack() : history.push('/menu');
 			  console.log('set '+data);
 			  setUser(values.email);
 			  //setMessage(data.message);

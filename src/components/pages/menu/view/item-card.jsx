@@ -7,18 +7,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import {
-  Edit,
-  Delete,
-  RateReview,
-  RateReviewTwoTone,
-  Close,
-  Star,
-} from "@material-ui/icons/";
 import { Box, Fade } from "@material-ui/core";
-
-import { useDrag, useDrop } from "react-dnd";
-import { TableRow, TableCell } from "@material-ui/core/";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from 'redux';
 
@@ -54,7 +43,8 @@ const MediaCard = (props) => {
         style={{ margin: '0 1rem 1rem 1rem', borderRadius: 20, position: "relative", zIndex: 150 }}
       >
         <CardActionArea className="d-flex">
-          {!props.disableImages && <CardMedia
+          {!props.disableImages && 
+          <CardMedia
             className="d-block col-4 col-sm-4"
             style={{ height: 100, backgroundSize: "contain" }}
             image={picture}
@@ -62,46 +52,31 @@ const MediaCard = (props) => {
           />
           }
           <CardContent className="d-block col-8 col-sm-8">
-            <Typography
-              className={classes.name}
-              gutterBottom
-              variant="h5"
-              component="h2"
-            >
-              {props.data.name}
-            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="baseline">
+              <Typography
+                className={classes.name}
+                gutterBottom
+                variant="h5"
+                component="h2">
+                {props.data.name}
+              </Typography>
+              { props.review }
+            </Box>
             <Typography
               className={classes.ingredients}
               gutterBottom
-              component="p"
-            >
-              {props.data.ingredients
-                ? "Ingrediente: " + props.data.ingredients
-                : ""}
+              component="p">
+              {props.data.ingredients}
             </Typography>
             <Typography className={classes.alergens} gutterBottom component="p">
-              {props.data.alergens ? "Alergeni: " + props.data.alergens : ""}
+              {props.data.alergens}
             </Typography>
             <Typography className={classes.calories} gutterBottom component="p">
-              {props.data.calories ? "Calorii: " + props.data.calories : ""}
+              {props.data.calories}
             </Typography>
             <Typography className={classes.size} gutterBottom component="p">
               {props.data.size}
             </Typography>
-            { !props.disableReviews && !item_id ? 
-                ( !props.isPreview ? 
-                  <Link to={{
-                    pathname: `${props.location.pathname}reviews/${props.data.id}/`,
-                    state: ({
-                      item: props.data,
-                      style: props.style
-                    })
-                    }}>
-                    Vezi recenzii
-                  </Link> :
-                  'Vezi recenzii'
-                ) : ''
-            }
           </CardContent>
         </CardActionArea>
       </Card>

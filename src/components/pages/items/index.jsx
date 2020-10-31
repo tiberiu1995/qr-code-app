@@ -17,6 +17,7 @@ import { fetchData } from "../../utils/fetch";
 import { Button, Box } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import Header from "../menu/menu-header.jsx";
+import { injectIntl } from 'react-intl';
 
 const style = {
   position: "top-right",
@@ -69,13 +70,13 @@ const Items = (props) => {
       const apiData = await fetchData({ title: title, data: item, }, "item/" + endpoint + ".php");
       console.log(apiData);
       endpoint === "edit"
-        ? toast.success("Produsul a fost editat!", style)
-        : toast.success("Produsul a fost salvat!", style);
+        ? toast.success(formatMessage({id: 'edited_item'}), style)
+        : toast.success(formatMessage({id: 'saved_item'}), style);
       await fetchItems();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       //window.scrollTo(0, 0);
     } catch (error) {
-      toast.error("Produsul nu a putut fi adaugat!", style);
+      toast.error(formatMessage({id: 'error_item'}), style);
       //this.setState({ message: error.message });
       //window.scrollTo(0, 0);
     }
@@ -85,7 +86,7 @@ const Items = (props) => {
     try {
       const apiData = await fetchData({ data: item, }, "item/delete.php");
       console.log(apiData);
-      toast.success("Produsul a fost sters!", style);
+      toast.success(formatMessage({id: 'deleted_category'}), style);
       await fetchItems();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       //window.scrollTo(0, 0);
@@ -119,38 +120,38 @@ const Items = (props) => {
 
   const showModal = () => showForm(true);
   const closeModal = () => showForm(false);
-
+  const {intl: {formatMessage}} = props;
   return (
     <div className="my-1 mx-auto col-lg-10">
       <div className="form-group mb-3">
         <Header/>
-        {/* <ToastContainer /> */}
-        {categories.length && (
-          <Form
-            key={new Date().valueOf()}
-            addItem={addItem}
-            data={item}
-            show={isVisible}
-            categories={categories}
-            onCancel={closeModal}
-          />
-        )}
-        {data.length ? (
-          <Datatable edit={edit} remove={removeItem} myData={[...data]} />
-        ) : (
-          <h4>Nu ai adaugat niciun produs</h4>
-        )}
-        <Box m={2} display="flex" justifyContent="center" >
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            style={{justifyContent: 'center'}}
-            startIcon={<Add />}
-            onClick={_new}
-          >
-            Adauga produs
-          </Button>
+        <Box m={2} display="flex" justifyContent="center" flexDirection="column" >
+          {categories.length && (
+            <Form
+              key={new Date().valueOf()}
+              addItem={addItem}
+              data={item}
+              show={isVisible}
+              categories={categories}
+              onCancel={closeModal}
+            />
+          )}
+          {data.length ? (
+            <Datatable edit={edit} remove={removeItem} myData={[...data]} />
+          ) : (
+            <h4>{ formatMessage({id: 'no_item'}) }</h4>
+          )}
+          <Box m={2} display="flex" justifyContent="center" >
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              style={{justifyContent: 'center'}}
+              startIcon={<Add />}
+              onClick={_new} >
+              { formatMessage({id: 'add_item'}) } 
+            </Button>
+          </Box>
         </Box>
       </div>
       {/* <Button className="m-2" onClick={saveData}>Salveaza <i className="fa fa-check" aria-hidden="true"/></Button> */}
@@ -158,4 +159,4 @@ const Items = (props) => {
   );
 };
 
-export default compose(withRouter)(Items);
+export default compose(withRouter)(injectIntl(Items));

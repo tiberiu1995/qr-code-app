@@ -16,7 +16,18 @@ import { HelpOutline } from '@material-ui/icons';
 
 const DND_ITEM_TYPE = "row";
 
+const useStyles = makeStyles(theme => ({
+  edit: {
+      color: '#4caf50',
+  },
+  delete: {
+    color: '#f44336',
+  }
+}));
+
+
 const MediaCard = (props) => {
+  const classes = useStyles();
   const moveRow = props.moveRow;
   const dropRef = React.useRef(null);
   const dragRef = React.useRef(null);
@@ -122,7 +133,7 @@ const MediaCard = (props) => {
             {props.edit ? (
                <Tooltip title="Click here to order the product this category">
                 <Edit
-                  className=""
+                  className={classes.edit}
                   size="small"
                   color="primary"
                   onClick={(e) => props.edit(props.data.id)}
@@ -130,7 +141,7 @@ const MediaCard = (props) => {
                </Tooltip>) : ("")}
             <Tooltip title="Click here to hide the category from the menu">
             <Delete
-              className=""
+              className={classes.delete}
               size="small"
               color="primary"
               onClick={(e) => props.remove(props.data.id)}

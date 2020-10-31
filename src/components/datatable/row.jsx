@@ -9,7 +9,7 @@ import { injectIntl } from 'react-intl';
 
 const DND_ITEM_TYPE = "row";
 
-const Row = ({ media, row, index, moveRow }) => {
+const Row = ({ media, row, index, moveRow, style }) => {
   const lt600 = useMediaQuery('(max-width:599px)');
 
   
@@ -21,14 +21,14 @@ const Row = ({ media, row, index, moveRow }) => {
          </TableCell>
      );
     else
-     return row.cells.map((cell) => ["name", "category", "picture", "move", "title", "cat_no", "item_no"].includes(cell.column.id) &&
-     <TableCell align="center" padding={media.mobile ? "none" : "default" } {...cell.getCellProps()}>
+     return row.cells.map((cell) => ["name", "category", "title", "cat_no", "item_no", "move"].includes(cell.column.id) &&
+     <TableCell align="center" padding={media.mobile ? "none" : "none" } {...cell.getCellProps()}>
        {cell.render("Cell")}
      </TableCell>);
   }
 
   return (
-    <TableRow>
+    <TableRow style={{...style}}>
       { data() }
     </TableRow>
   );

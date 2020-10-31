@@ -128,18 +128,20 @@ const Form = (props) => {
               <TextField label="Phone" name="phone" value={values.phone} onChange={setStateFromInput} variant="outlined" size="small" margin="normal"/>
               <TextField disabled label="Email" value={values.email} variant="outlined" size="small" margin="normal"/>
               <TextField label="Company Name" name="companyName" value={values.companyName} onChange={setStateFromInput} variant="outlined" size="small" margin="normal"/>
+            </Box>  
+            <Box align="center">
+              <Button variant="outlined" onClick={editUser} mt={2} mb={1}>
+                {formatMessage({id: 'save'})}
+              </Button>
             </Box>
-
-            {formatMessage({id: 'greeting'})+props.email}     
-            <Button variant="primary" onClick={disconnect} mt={2} mb={1}>
+            <Box align="center">
+              <Button variant="outlined" onClick={disconnect} mt={2} mb={1}>
                 {formatMessage({id: 'log_out'})}
-            </Button>
-            <Button variant="primary" onClick={editUser} mt={2} mb={1}>
-              {formatMessage({id: 'save'})}
-            </Button>
-            <Link to={"change-password"}>
-              Change password
-            </Link>
+              </Button>
+              <Link to={"change-password"}>
+                Change password
+              </Link>
+            </Box>
             <Select 
               style={{
                 marginTop: 16,

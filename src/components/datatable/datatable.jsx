@@ -1,15 +1,24 @@
-import React, { Component, Fragment, useState } from "react";
+import React from "react";
 //import {ReactTable} from 'react-table';
 //import { ToastContainer, toast } from 'react-toastify';
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { Link, withRouter } from "react-router-dom";
-import { MenuItem, useMediaQuery } from "@material-ui/core/";
+import { MenuItem, useMediaQuery, Tooltip } from "@material-ui/core/";
 import Table from "./table.jsx";
 import Select from "../utils/select.jsx";
-import { Image } from "@material-ui/icons";
-import { Tooltip } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { Delete, Edit, Image } from '@material-ui/icons/';
+
+const useStyles = makeStyles(theme => ({
+  edit: {
+      color: '#4caf50',
+  },
+  delete: {
+    color: '#f44336',
+  }
+}));
 
 const SelectColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter, id },
@@ -24,8 +33,8 @@ const SelectColumnFilter = ({
   return (
     <Select
       label={id}//{formatMessage({id: id})}
-      default={{ value: "Toate", text: "Toate" }}
-      value={filterValue || "Toate"}
+      default={{ value: "All", text: "All" }}
+      value={filterValue || "All"}
       onChange={(e) => {
         setFilter(e.target.value || undefined);
       }}
@@ -35,7 +44,8 @@ const SelectColumnFilter = ({
 };
 
 const Datatable = (props) => {
-  const { edit, myData, remove, hideFilters, intl: { formatMessage} } = props;
+  const classes = useStyles();
+  const { edit, myData, remove, intl: { formatMessage} } = props;
   const translate = formatMessage;
   const desktop = useMediaQuery('(min-width:900px)');
   const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
@@ -67,9 +77,10 @@ const Datatable = (props) => {
       column.Filter = SelectColumnFilter;
       column.filter = "includes";
     }
-    if (["picture","background"].includes(key)) {
+    if (["picture", "background", "pictures"].includes(key)) {
       column.Cell = ({ cell: { value } }) => ((value.includes('jpeg') || value.includes('png')) ? <img src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
       column.filterable = false;
+      column.sortable = false;
     }
     columns.push(column);
 
@@ -79,49 +90,36 @@ const Datatable = (props) => {
     accessor: (str) => "Move",
     Cell: (row) => (
       <>
-        {/* {<span>
-            <i className="fa fa-arrows-v" style={{ width: 35, fontSize: 20, padding: 11,color:'black' }}/>
-          </span>} */}
-        <Tooltip title="Remove this row">
-          <span
-            onClick={() => {
-              if (window.confirm("Are you sure you wish to delete this item?")) {
-                remove(row.row.original);
-              }
-            }}
-          >
-            <i
-              className="fa fa-trash"
-              style={{ width: 35, fontSize: 20, padding: 11, color: "#e4566e" }}
-            />
-          </span>
-        </Tooltip>
-        <Tooltip title="Edit this row" placement="bottom">
-          <span
-            onClick={() => {
-              if (window.confirm("Are you sure you wish to edit this item?")) {
-                edit(row.row.original);
-              }
-            }}
-          >
-            <i
-              className="fa fa-pencil"
-              style={{
-                width: 35,
-                fontSize: 20,
-                padding: 11,
-                color: "rgb(40, 167, 69)",
-              }}
-            />
-          </span>
-        </Tooltip>
-        
+        <Edit
+          className={classes.edit}
+          size="small"
+          color="primary"
+          onClick={() => {
+            if (window.confirm("Are you sure you wish to delete this item?")) {
+              remove(row.row.original);
+            }
+          }}
+        />
+        <Delete
+          className={classes.delete}
+          size="small"
+          color="primary"
+          onClick={() => {
+            if (window.confirm("Are you sure you wish to edit this item?")) {
+              edit(row.row.original);
+            }
+          }}
+          />
+         {/* <Tooltip title="Edit this row" placement="bottom">
+        </Tooltip> */}
       </>
+
+
     ),
     style: { textAlign: "center" },
     disableSortBy: true,
   });
-  return <Table data={myData} hideFilters={hideFilters} columns={columns} />;
+  return <Table data={myData} columns={columns} />;
 };
 
 export default compose(withRouter, connect(null))(injectIntl(Datatable));

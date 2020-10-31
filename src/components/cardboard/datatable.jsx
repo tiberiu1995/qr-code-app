@@ -1,15 +1,27 @@
-import React, { Component, Fragment, useState } from "react";
+import React from "react";
 //import {ReactTable} from 'react-table';
 //import { ToastContainer, toast } from 'react-toastify';
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import { Link, withRouter } from "react-router-dom";
-import { MenuItem } from "@material-ui/core/";
 import Table from "./table.jsx";
 //import Select from '../../select.jsx';
+import { Edit, Delete } from '@material-ui/icons/';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+  edit: {
+      color: '#4caf50',
+  },
+  delete: {
+    color: '#f44336',
+  }
+}));
+
 
 export const Datatable = (props) => {
+  const classes = useStyles();
   const { edit, myData, remove } = props;
 
   const capitalize = (str) => {
@@ -24,7 +36,7 @@ export const Datatable = (props) => {
     };
     if (key === "pictures") {
       column.Cell = ({ cell: { value } }) => (
-        <img src={value[0].img} width="100px" />
+        <img alt="" src={value[0].img} width="100px" />
       );
     }
     key !== "id" && columns.push(column);
@@ -34,43 +46,26 @@ export const Datatable = (props) => {
     accessor: (str) => "Move",
     Cell: (row) => (
       <>
-        {
-          <span>
-            <i
-              className="fa fa-arrows-v"
-              style={{ width: 35, fontSize: 20, padding: 11, color: "black" }}
-            />
-          </span>
-        }
-        <span
+        <Edit
+          className={classes.edit}
+          size="small"
+          color="primary"
           onClick={() => {
             if (window.confirm("Are you sure you wish to delete this item?")) {
               remove(row.row.original);
             }
           }}
-        >
-          <i
-            className="fa fa-trash"
-            style={{ width: 35, fontSize: 20, padding: 11, color: "#e4566e" }}
-          />
-        </span>
-        <span
+        />
+        <Delete
+          className={classes.delete}
+          size="small"
+          color="primary"
           onClick={() => {
             if (window.confirm("Are you sure you wish to edit this item?")) {
               edit(row.row.original);
             }
           }}
-        >
-          <i
-            className="fa fa-pencil"
-            style={{
-              width: 35,
-              fontSize: 20,
-              padding: 11,
-              color: "rgb(40, 167, 69)",
-            }}
           />
-        </span>
       </>
     ),
     style: { textAlign: "center" },
