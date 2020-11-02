@@ -95,9 +95,7 @@ const Datatable = (props) => {
           size="small"
           color="primary"
           onClick={() => {
-            if (window.confirm("Are you sure you wish to edit this item?")) {
               edit(row.row.original);
-            }
           }}
           />
         <Delete

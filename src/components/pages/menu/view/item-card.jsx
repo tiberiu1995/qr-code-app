@@ -12,20 +12,40 @@ import { Link, withRouter } from "react-router-dom";
 import { compose } from 'redux';
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   name: props => props.name,
   size: props => props.size,
   ingredients: props => props.ingredients,
   alergens: props => props.alergens,
   calories: props => props.calories,
-  cardMedia: { height: 100, backgroundSize: "contain" },
+  cardMedia: { 
+    flex: '0 0 auto', 
+    height: 110, 
+    width: 110, 
+    backgroundSize: "contain",
+    [theme.breakpoints.up('450')]:{
+          width: 125, 
+          height: 125, 
+    },
+    [theme.breakpoints.up('500')]:{
+          width: 140, 
+          height: 140, 
+    },
+    [theme.breakpoints.up('600')]:{
+          width: 150, 
+          height: 150, 
+    },
+  },
   card: {
-    margin: [[0, '1rem', '1rem', '1rem']], 
+    margin: [['0.5rem', '1rem', '0.5rem', '1rem']], 
     borderRadius: 20, 
     position: "relative", 
     zIndex: 150 
+  },
+  cardContent: {
+    flex: '1 1 auto',
   }
-});
+}));
 
 const MediaCard = (props) => {
   const classes = useStyles(props.style);
@@ -47,15 +67,15 @@ const MediaCard = (props) => {
       exit: 0,
      }} in={props.data.name !== ''}>
       <Card className={classes.card} >
-        <CardActionArea className="d-flex">
+        <CardActionArea className="d-flex justify-content-between">
           {!props.disableImages && 
           <CardMedia
-            className={"d-block col-4 col-sm-4 "+classes.cardMedia}
+            className={"d-block "+classes.cardMedia}
             image={picture}
             title=""
           />
           }
-          <CardContent className="d-block col-8 col-sm-8">
+          <CardContent className={"d-block "+classes.cardContent}>
             <Box display="flex" justifyContent="space-between" alignItems="baseline">
               <Typography
                 className={classes.name}
@@ -68,8 +88,7 @@ const MediaCard = (props) => {
             </Box>
             <Typography
               className={classes.ingredients}
-              gutterBottom
-              component="p">
+              gutterBottom>
               {props.data.ingredients}
             </Typography>
             <Typography className={classes.alergens} gutterBottom component="p">

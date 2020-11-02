@@ -1,9 +1,6 @@
 import React, {
-  Component,
-  Fragment,
   useState,
   useEffect,
-  useCallback,
 } from "react";
 import { Datatable } from "../../../datatable/datatable";
 import { Link, withRouter, Prompt } from "react-router-dom";
@@ -13,10 +10,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import MediaCard from "./../../../cardboard/_card";
-import CustomList from "../../../cardboard/_list";
-import { Box } from "@material-ui/core";
-import { Grid, Button } from "@material-ui/core/";
+import Card from "./../../../cardboard/card";
+import DraggableCard from "./../../../cardboard/draggable-card";
+import { Box, Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch";
 import Header from "../menu-header.jsx";
 import { injectIntl } from 'react-intl';
@@ -29,11 +25,8 @@ const Categories = (props) => {
   const [right, setRight] = useState([]);
   const [left, setLeft] = useState([]);
   const [isEdited, setEdited] = useState(false);
-  //const [categories, setCategories] = useState([]);
 
   const moveRow = (dragIndex, hoverIndex) => {
-    //const initialArray = [1, 2, 3];
-    //const newArray = update(initialArray, [4]); // => [1, 2, 3, 4]
     const dragRecord = right[dragIndex];
     const newRecords = update(right, {
       $splice: [
@@ -47,28 +40,9 @@ const Categories = (props) => {
 
   const fetchItemsConfiguration = async () => {
     try {
-      let apiData = await fetchData( {category: category } , "menu/item/get.php");
-      console.log(apiData);
-      let config = apiData; //[0].item_configuration.split(',')
-      console.log(apiData);
-      apiData = await fetchData( { title: title, category: category } , "item/get.php");
-      let products = apiData;
-      let _left = [];
-      let _right = [];
-      config.forEach((el) => {
-        let selected = products.findIndex((_el) => _el.id == el.item_id);
-        if (selected !== -1) {
-          _right.push(products[selected]);
-          products.splice(selected, 1);
-        }
-      });
-      _left = [...products];
-      // products.forEach((el,i) => {
-      //   let selected = config.findIndex(_el => _el == el.id);
-      //   selected !== -1 ? _right.push(el) : _left.push(el)
-      // });
-      setLeft(_left);
-      setRight(_right);
+      const response = await fetchData( {category: category } , "menu/item/get.php");
+      setLeft(response.left);
+      setRight(response.right);
       //setData(apiData);
     } catch (error) {
       console.error(error);
@@ -85,9 +59,9 @@ const Categories = (props) => {
     try{
       let endpoint = "edit";
         const obj = {
-          data: right.map((el, i) => el.id),
-          category: category,
-        };
+          left: left.map((el) => el.id),
+          right: right.map((el) => el.id),
+        }
       const apiData = await fetchData( obj , "menu/item/" + endpoint + ".php");
       console.log(apiData);
       endpoint === "edit"
@@ -146,18 +120,24 @@ const Categories = (props) => {
       <Box m={5}>
         <Grid container spacing={4} justify={"center"}>
           <Grid item xs={12} sm={6} style={{ maxWidth: 600 }}>
-            {left.length ? (
-              <CustomList data={left} handleToggle={addItem} />
-            ) : (
-              ""
-            )}
+            {left.length
+            ? left.map((el, i) => (
+                <Card
+                  key={'mc'+i}
+                  index={i}
+                  add={addItem}
+                  data={el}
+                />
+              ))
+            : ""}
           </Grid>
           <Grid item xs={12} sm={6} style={{ maxWidth: 600 }}>
             <DndProvider backend={HTML5Backend}>
               {right.length
                 ? right.map((el, i) => (
-                    <MediaCard
+                    <Card
                       index={i}
+                      key={"_cimc"+i}
                       remove={removeItem}
                       moveRow={moveRow}
                       data={el}
@@ -176,7 +156,7 @@ const Categories = (props) => {
             <DndProvider backend={HTML5Backend}>
               {data &&
                 data.map((el, i) => (
-                  <MediaCard
+                  <DraggableCard
                     index={i}
                     remove={removeItem}
                     moveRow={moveRow}

@@ -39,7 +39,6 @@ import { setMedia, } from './../actions/index';
 
   // rest of your component
 }*/
-
   const App = (props) => {
   const authRedirect = ["my-account", "dashboard", "admin", "menu"];
   const id = uuid();
@@ -48,6 +47,8 @@ import { setMedia, } from './../actions/index';
   const lt600 = useMediaQuery('(max-width:599px)');
   const mobile = useMediaQuery('(max-width:499px)');
   setMedia({desktop: desktop, tablet: tablet,  mobile: mobile});
+
+
   const recordConsent = async () => {
       try {
         const response = await fetch(
@@ -75,6 +76,7 @@ import { setMedia, } from './../actions/index';
   useEffect(()=>{
     const { email, token } = props;
     let page = props.location.pathname.replace("/", ""); //match(/^(.+?)\//);
+    setMedia({desktop: desktop, tablet: tablet,  mobile: mobile});
     page = page ? page.replace(/\//g,'') : null ;
     if (!email && !token && page && authRedirect.includes(page))
       props.history.replace("/log-in");

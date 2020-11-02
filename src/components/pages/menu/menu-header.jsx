@@ -1,13 +1,13 @@
-import React from 'react';
-import { Button } from '@material-ui/core';
+import React, { useState } from 'react';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
-import { Box } from '@material-ui/core';
+import { Box, Button, Divider, Paper, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { injectIntl } from 'react-intl';
-import { Paper } from '@material-ui/core';
-import { BlurOn, Create, Dashboard, Fastfood} from '@material-ui/icons';
-import { Divider } from '@material-ui/core';
+import { BlurOn, Create, Dashboard, Fastfood } from '@material-ui/icons';
+import { Transition } from 'react-transition-group';
+import { useEffect } from 'react';
+
 const useStyles = makeStyles(theme => ({
   container: {
     top: '50%',
@@ -21,14 +21,32 @@ const useStyles = makeStyles(theme => ({
       margin: 8,
       padding: 0,
       minWidth: 24,
+    },
+    '& .MuiButton-label': {
+      display: 'flex'
     }
-  }
+  },
+  transition: {
+    transition: `all 2000ms ease-in-out 0ms`,
+    width: 'max-content',
+    position: 'absolute',
+    background: 'rgb(241,241,241)',
+    padding: '0.5rem',
+    border: '1px solid rgba(0, 0, 0, 0.23)',
+    borderLeft: '0px solid white',
+    left: -300,
+  },
+  entered:  { left: 25},
+  exiting: {left: -300}
 
 }));
 
 
+ 
+
 const Header = (props) => {
   const {formatMessage} = props.intl;
+  let [index, setIndex] = useState(-1);
   const classes = useStyles();
   const goHome = () => {
     props.history.push(`/menu/${props.match.params.title}/`);
@@ -48,6 +66,26 @@ const Header = (props) => {
     props.history.push(`/menu/${props.match.params.title}/qr-code/`);
   }
 
+  const onMouseLeave = () => setIndex(-1);
+
+  const onMouseEnter = (e,v) => setIndex(v);
+
+  useEffect(()=>{
+    console.log('mount');
+    return console.log('unmount');
+  },[]);
+  
+  const Item = ({path, text, value, icon}) => 
+  <Button key={"4d"+value} onClick={path} onMouseEnter={(e)=>onMouseEnter(e,value)} >
+      {icon}
+      <Transition timeout={5000} in={index===value}> 
+      { state => (
+        <Typography className={classes.transition+' '+classes[state]} >
+          {text}
+        </Typography> )}
+      </Transition>
+    </Button>
+
   return <Paper elevation={2}>
   <Box 
     display="flex" 
@@ -55,27 +93,20 @@ const Header = (props) => {
     flexDirection="column"
     flexWrap="wrap"
     position="fixed"
-    className={classes.container}
-    >
-    <Button onClick={goHome}>
-      <Dashboard/>
-    </Button>
-    <Divider/>
-    <Button onClick={showCategories}>
-      <Fastfood/>
-    </Button>
-    <Divider/>
-    <Button onClick={showItems}>
-      <Fastfood/>
-    </Button>
-    <Divider/>
-    <Button onClick={showDesign}>
-      <Create/>
-    </Button>
-    <Divider/>
-    <Button onClick={showQr}>
-      <BlurOn/>
-    </Button>    
+    onMouseLeave={onMouseLeave}
+    className={classes.container} >
+    {[
+      [goHome,"Build",0,<Dashboard/>],
+      [showCategories,"Categories",1,<Fastfood/>],
+      [showItems,"Products",2,<Fastfood/>],
+      [showDesign,"Design",3,<Create/>],
+      [showQr,"QR Code",4,<BlurOn/>]
+    ].map((el,i) =>
+      <>
+      <Item key={"4d"+i} path={el[0]} text={el[1]} value={el[2]} icon={el[3]} />
+      <Divider key={"4dgn"+i} />
+      </>
+    )}    
     </Box>
   </Paper>
 }

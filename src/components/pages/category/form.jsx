@@ -250,8 +250,6 @@ export class Form extends Component {
                     )}
                   </div>
                   <div className="form-group mb-3">
-                    <FormLabel className="col-xl-3 col-sm-4">
-                    </FormLabel>
                       <TextField
                         name="description"
                         label={formatMessage({id: 'description'})}

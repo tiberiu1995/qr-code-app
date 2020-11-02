@@ -18,6 +18,9 @@ import { thunkMiddleware } from 'redux-thunk';
 import { toast } from 'react-toastify';
 
 const style = theme => ({
+  formGroup: {
+    justifyContent: 'center'
+  },
   toggle: {
     '& .MuiSwitch-thumb': {
       color: '#f44336',
@@ -177,7 +180,7 @@ class Form extends Component {
       layout: "0",
       //layout: <img alt="" src={"https://menu.bathtimestories.com/assets/images/"+categoryIcons[0]}/>,
       tabIndex: 0,
-
+      backgroundCount: 1,
       description: "Descriere",
       contentType: 'h0b0',
       background: '',
@@ -193,7 +196,7 @@ class Form extends Component {
           fontSize:12,
           fontFamily:"Verdana"
         },
-        background:"#ffffff",
+        background:["#ffffff"],
         backgroundImage:""
       },
       item: {
@@ -206,15 +209,15 @@ class Form extends Component {
           "fontSize":12,
           "fontFamily":"Tahoma"},
         alergens:{
-          color:"#000",
+          color:"#000000",
           fontSize:12,
           fontFamily:"Times New Roman"},
         calories:{
-          color:"#000",
+          color:"#000000",
           fontSize:12,
           fontFamily:"Times New Roman"},
         size:{
-          color:"#000",
+          color:"#000000",
           fontSize:10,
           fontFamily:"Verdana"},
         reviewText:{
@@ -225,11 +228,10 @@ class Form extends Component {
           color:"#8b3232",
           fontSize:32}           
       },
-      toggles: {
-        ...styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {})
-      }
+      toggles: {...styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {})}
     }
   }
+
 
   setStateFromType = (event, type) => {
     var obj = {};
@@ -257,6 +259,18 @@ class Form extends Component {
     });
   };
 
+  setStateArrayFromInput = (event, root, index) => {
+    let newArray = [...this.state[root][event.target.name]];
+    newArray[index] = event.target.value;
+    this.setState({
+      [root]: { ...this.state[root],
+        [event.target.name]: newArray,
+      },
+      isEdited: true
+    });
+  }
+
+
   setStateFromInput = (event) => {
      // setLayout(event.target.value);
       this.setState({[event.target.name]: event.target.value, isEdited: true});
@@ -278,6 +292,7 @@ class Form extends Component {
     try {
       let {custom, defaults} = await fetchData({title: this.props.match.params.title}, "menu/design/get.php");
       let layout = "";
+      let backgroundCount = 1;
       switch (defaults.id.substring(0,2)) {
         case 'h0':
           layout = "0";
@@ -287,6 +302,7 @@ class Form extends Component {
           break;
         case 'h3':
           layout = "2";
+          backgroundCount = 4;
           break;
         case 'h4':
           layout = "3";
@@ -298,9 +314,10 @@ class Form extends Component {
       this.setState({
         layout: layout,
         contentType: defaults.id,
+        backgroundCount: backgroundCount,
         category: JSON.parse(custom.category_design ? custom.category_design : defaults.category_design),
         item: JSON.parse(custom.item_design ? custom.item_design : defaults.item_design),
-        toggles: custom.toggles ? JSON.parse(custom.toggles) : "",
+        toggles: custom.toggles ? JSON.parse(custom.toggles) : styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {}),
         defaults: {
           category: JSON.parse(defaults.category_design),
           item: JSON.parse(defaults.item_design),
@@ -339,6 +356,7 @@ class Form extends Component {
 
   handleLayoutChange = (event, newValue) => {
     let contentType = "";
+    let backgroundCount = 1;
     switch (newValue){
       case "0":
         contentType = "h0b0";
@@ -348,6 +366,7 @@ class Form extends Component {
         break;
       case "2":
         contentType = "h3b0";
+        backgroundCount = 4;
         break;
       case "3":
         contentType = "h4b4";
@@ -358,7 +377,11 @@ class Form extends Component {
       default:
         contentType = "h0b0" 
     }
-    this.setState({layout: newValue, contentType: contentType, isEdited: true, });
+    this.setState({
+      layout: newValue, 
+      contentType: contentType, 
+      backgroundCount: backgroundCount, 
+      isEdited: true, });
   };
 
   handleVariantChange = (event, newValue) => {
@@ -550,44 +573,50 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                     display={"flex"}
                     justifyContent="space-evenly" 
                     className="form form-label-center" >
-                    <Box mb={2} display="flex" flexDirection="column">
+                    <Box mb={2} display="flex" flexDirection="column" >
                       <FormControl component="fieldset">
                         <FormLabel component="legend">{formatMessage({id: 'background'})}</FormLabel>
-                        <RadioGroup row aria-label="background" name="backgroundOption" value={this.state.backgroundOption} onChange={this.setStateFromInput}>
-                         <FormControlLabel value="image" control={<Radio />} label="Image" />
+                        <RadioGroup 
+                          className={classes.formGroup}
+                          row 
+                          aria-label="background"  
+                          name="backgroundOption" 
+                          value={this.state.backgroundOption} 
+                          onChange={this.setStateFromInput}>
+                          <FormControlLabel value="image" control={<Radio />} label="Image" />
                           <FormControlLabel value="color" control={<Radio />} label="Color" />
-                       </RadioGroup>
-                     </FormControl>
-                      <Typography align="center" gutterBottom  component="h6"> </Typography>
-                      {this.state.backgroundOption === "image" ? 
-                        <FileInput 
-                          source={
-                            backgroundImage &&
-                            backgroundImage.indexOf("base64") >=0 ? 
-                            backgroundImage : 'https://bathtimestories.com/'+backgroundImage}
+                        </RadioGroup>
+                      </FormControl>
+                      <Box display="flex" flexDirection="row" justifyContent="space-evenly">
+                      { this.state.backgroundOption === "image" 
+                        ? <FileInput 
+                            source={
+                              backgroundImage &&
+                              backgroundImage.indexOf("base64") >=0 ? 
+                              backgroundImage : 'https://bathtimestories.com/'+backgroundImage}
 
-                          onChange={(event) => this._handleImgChange(event)} 
-                          deleteImg={(event) => this.deleteImg()}
-                          onClick={(event) => this._handleSubmit(event)}/> :
-                        <FormControl>
-                          <FormLabel  
-                            style={{
-                              position: 'absolute', 
-                              background: 'white',
-                              transform: 'translate(55px, -6px) scale(0.75)'}} 
-                            className="MuiInputLabel-outlined">{formatMessage({id: 'color'})}</FormLabel>
-                          <input
-                            name="background"
-                            label={formatMessage({id: 'color'})}
-                            type="color"
-                            style={{
-                              width: 100,
-                              height: 100,
-                              margin: 'auto',
-                              borderColor: 'rgba(0, 0, 0, 0.23)'}}
-                            onChange={(e) => this.setStateFromType(e, "category")}
-                            value={this.state.category.background}/>
-                        </FormControl>}
+                            onChange={(event) => this._handleImgChange(event)} 
+                            deleteImg={(event) => this.deleteImg()}
+                            onClick={(event) => this._handleSubmit(event)}/> 
+                        : <>                       
+                          { this.state.category.background.map((el,i) => 
+                            i<this.state.backgroundCount 
+                            ? <FormControl key={"fmk"+i}>
+                              <input
+                                name="background"
+                                label={formatMessage({id: 'color'})+i}
+                                type="color"
+                                style={{
+                                  height: 60,
+                                  width: 60,
+                                  margin: '0 5px 0 5px',
+                                  borderColor: 'rgba(0, 0, 0, 0.23)'}}
+                                onChange={(e) => this.setStateArrayFromInput(e, "category", i)}
+                                value={this.state.category.background[i]}/>
+                              </FormControl>
+                            : '' )}
+                          </> }
+                      </Box>
                     </Box> 
                   </Box>                  
                   <Box display="flex" justifyContent="center" >

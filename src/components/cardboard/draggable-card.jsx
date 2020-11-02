@@ -7,12 +7,13 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import { Edit, Delete } from "@material-ui/icons/";
+import { Edit, Delete, Remove } from "@material-ui/icons/";
 import { Box, Tooltip } from "@material-ui/core";
 
 import { useDrag, useDrop } from "react-dnd";
 import { TableRow, TableCell } from "@material-ui/core/";
-import { HelpOutline } from '@material-ui/icons';
+import { HelpOutline, BlurOn } from '@material-ui/icons';
+import { Add } from '@material-ui/icons';
 
 const DND_ITEM_TYPE = "row";
 
@@ -110,13 +111,12 @@ const MediaCard = (props) => {
           <Typography
             className="text-center"
             gutterBottom
-            variant="h5"
-            component="h5"
-          >
+            variant="subtitle1"
+            component="h5" >
             {props.data.name}
           </Typography>
           <Box className="float-right">
-            <Tooltip title={
+            {/* <Tooltip title={
               <>
                <Typography component="span">
                 Drag and drop {props.data.name} to change its position in the menu
@@ -124,24 +124,29 @@ const MediaCard = (props) => {
               </>
             }>
               <HelpOutline/>
-            </Tooltip>
-            {props.edit ? (
-               <Tooltip title="Click here to order the product this category">
-                <Edit
+            </Tooltip> */}
+            {props.data.selected}/{props.data.total}
+            { props.edit 
+              ? <Edit
+                className={classes.edit}
+                size="small"
+                color="primary"
+                onClick={(e) => props.edit(props.data.id)}/>
+              : '' }
+            { props.remove 
+              ? <Remove
+                className={classes.delete}
+                size="small"
+                color="primary"
+                onClick={(e) => props.remove(props.data.id)}/> 
+              : '' }
+            { props.add 
+              ? <Add
                   className={classes.edit}
                   size="small"
                   color="primary"
-                  onClick={(e) => props.edit(props.data.id)}
-                />
-               </Tooltip>) : ("")}
-            <Tooltip title="Click here to hide the category from the menu">
-            <Delete
-              className={classes.delete}
-              size="small"
-              color="primary"
-              onClick={(e) => props.remove(props.data.id)}
-            />
-            </Tooltip>
+                  onClick={(e) => props.add(props.data.id)}/> 
+              : '' }
           </Box>
         </CardContent>
       </CardActionArea>

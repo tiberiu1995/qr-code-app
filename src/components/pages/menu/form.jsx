@@ -9,10 +9,10 @@ import React, {
   import { Button, Box, useMediaQuery, } from "@material-ui/core";
   import { toast,} from "react-toastify";
   import "react-toastify/dist/ReactToastify.min.css";
-  import MediaCard from "./../../cardboard/_card";
+  import Card from "./../../cardboard/card";
+  import DraggableCard from "./../../cardboard/draggable-card";
   import { DndProvider } from "react-dnd";
   import { HTML5Backend } from "react-dnd-html5-backend";
-  import CustomList from "./../../cardboard/_list";
   import { Grid } from "@material-ui/core/";
   import { fetchData,  } from "../../utils/fetch";
   import Header from "./menu-header";
@@ -20,18 +20,12 @@ import { injectIntl } from 'react-intl';
 
   
   const Form = (props) => {
-    //const [data, setData] = useState([]);
     const {formatMessage} = props.intl;
     const [isEdited, setEdited] = useState(false);
-    //const id = props.match.params.id;
     const title = props.match.params.title;
-    //const [categoriesConfig, setCategoriesConfig] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [right, setRight] = useState([]);
     const [left, setLeft] = useState([]);
-   // const [items, setItems] = useState([]);
 
-  
     const moveRow = (dragIndex, hoverIndex) => {
       const dragRecord = right[dragIndex];
       const newRecords = update(right, {
@@ -47,33 +41,10 @@ import { injectIntl } from 'react-intl';
   
     const fetchCategoriesConfig = async () => {
       try {
-        let apiData = await fetchData({ title: title }, "menu/category/get.php");
-        //let categories = apiData.categories;
-        let config = apiData.categories; //[0].category_configuration.split(',')
-        console.log(apiData);
-        apiData = await fetchData({ title: title }, "category/get.php");
-        apiData = apiData.map(el => 
-          ({...el, picture: el.image_option === "library" ?
-          el.library_picture : el.upload_picture}));
-        let categories = apiData;
-        let _left = [];
-        let _right = [];
-        config.forEach((el) => {
-          let selected = categories.findIndex((_el) => _el.id == el.category_id);
-          if (selected !== -1) {
-            _right.push(categories[selected]);
-            categories.splice(selected, 1);
-          }
-        });
-        _left = [...categories];
-  
-        // categories.forEach((el,i) => {
-        //   let selected = config.findIndex(_el => _el == el.id);
-        //   selected !== -1 ? _right.push(el) : _left.push(el)
-        // });
-        setLeft(_left);
-        setRight(_right);
-        setCategories(categories);
+        const response = await fetchData({ title: title }, "menu/category/get.php");
+        setLeft(response.left);
+        setRight(response.right);
+        //setCategories(left.concat(right));
       } catch (error) {
         console.error(error);
       }
@@ -83,16 +54,14 @@ import { injectIntl } from 'react-intl';
   
     useEffect(() => {
           fetchCategoriesConfig();
-          //fetchCategories(title);
-          //fetchItems(title);
     }, []);
   
     const saveCategoriesConfig = async () => {
       let endpoint = "edit";
       try {
         const obj = {
-          data: right.map((el) => el.id),
-          title: title,
+          left: left.map((el) => el.id),
+          right: right.map((el) => el.id),
         }
         const apiData = await fetchData( obj, "menu/category/" + endpoint + ".php");
         console.log(apiData);
@@ -110,18 +79,6 @@ import { injectIntl } from 'react-intl';
       }
     };
   
-
-    // const addItem = async (item) => {
-    //   console.log(item);
-    //   if (item.id === '') {
-    //     item.id = '_'+(data.length+1);
-    //     saveItem(item, 'new')
-    //   }
-    //   else
-    //     saveItem(item, 'edit');
-    //   console.log(data);
-    //   //closeModal();
-    // }
   
     const editCat = (id) => {
       //alert(id);
@@ -148,7 +105,6 @@ import { injectIntl } from 'react-intl';
     const addItem = (value) => {
       //alert(value);
       let l = left;
-      let r = right;
       let index = l.findIndex((el) => el.id == value);
       setEdited(true);
       setRight(
@@ -178,18 +134,23 @@ import { injectIntl } from 'react-intl';
               <Header/>
               <Grid container spacing={4} justify={"center"}>
                 <Grid item xs={12} sm={12} md={6} lg={6}>
-                  {left.length ? (
-                    <CustomList data={left} handleToggle={addItem} />
-                  ) : (
-                    ""
-                  )}
+                  {left.length
+                  ? left.map((el, i) => (
+                      <Card
+                        key={'mc'+i}
+                        index={i}
+                        add={addItem}
+                        data={el}
+                      />
+                    ))
+                  : ""}
                 </Grid>
                 <Grid item xs={12} sm={12} md={6} lg={6}>
                   <DndProvider backend={HTML5Backend}>
                     {right.length
                       ? right.map((el, i) => (
-                          <MediaCard
-                            key={'mc'+i}
+                          <DraggableCard
+                            key={'_cimc'+i}
                             index={i}
                             edit={editCat}
                             remove={removeItem}
@@ -204,10 +165,6 @@ import { injectIntl } from 'react-intl';
               <Button variant="contained" color="primary" className="m-2" onClick={saveCategoriesConfig}>
                 {formatMessage({id: 'save_menu'}) }
               </Button>
-              {/* <Card
-                 edit={editCat}
-                remove={removeCat}
-                myData={[...categories.map(el => ({id: el.id, name: el.name, })   )]} /> */}
             </>
           ) : ''}
         </Box>

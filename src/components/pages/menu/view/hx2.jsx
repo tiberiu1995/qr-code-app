@@ -10,55 +10,37 @@ import { makeStyles } from "@material-ui/core/styles";
 import { withStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles((theme) => ({
+  box: {
+    width: '40%',
+    display: 'flex'
+  },
   paperLeft: {
-    height: 75, 
     borderRadius: 20, 
     zIndex: 50, 
     alignSelf: 'center',
     '& img': {
-      height: 75,
-      width: 75
+      width: '100%'
+    },
+    '& .MuiTypography-root': {
+      position: 'absolute'
     }
-  },
-  paperRight: {
-    borderRadius: 20,
-    display: 'flex', 
-    flexDirection: 'column', 
-    background: '#ffffff', 
-    justifyContent: 'center', 
-    padding: '8px 16px 8px 32px', 
-    left: -20, 
-    marginRight: -20, 
-    minHeight: 90, 
-    position: 'relative', 
-    width: '100%'
   },
   [theme.breakpoints.up('sm')]: {
     paperLeft: {
-      height: 125,
       '& img': {
-        height: 125,
-        width: 125
       }
     },
-    paperRight: {
-      minHeight: 150
-    }
   }
 }))
 
 
 const Item = ({el, style, children, onClick, media}) => {
   const classes = useStyles();
-  return <Box onClick={onClick} m={2} display="flex">
+  return <Box className={classes.box} onClick={onClick} m={2} display="flex">
         <Paper elevation={2} className={classes.paperLeft} >
           <img src={el.picture} alt={el.name} style={{borderRadius: 20, background: '#e2e2e2'}}/>
-        </Paper >
-        <Paper 
-          elevation={2} 
-          className={classes.paperRight}>
-        {children}
-        </Paper>
+          {children}
+        </Paper >  
       </Box>
 }
 /*

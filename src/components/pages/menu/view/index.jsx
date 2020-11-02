@@ -15,12 +15,13 @@ import RestaurantReviews from './review/restaurant-reviews.jsx';
 import ProductReviews from './review/product-reviews.jsx';
 import CustomTabs from './tabs.jsx';
 import Hx from './hx.jsx';
+import Hx2 from './hx2.jsx';
 import { Link } from 'react-router-dom';
 import Cx from './cx';
 import {MoreVert} from '@material-ui/icons/';
 import { Rating } from '@material-ui/lab/';
 const queryString = require('query-string');
-
+/*
 const styles = (theme) => ({
   container: {
     '& p, & span': {
@@ -36,21 +37,27 @@ const styles = (theme) => ({
     right: theme.spacing(3),
     zIndex: 1500,
   },
-  h1: {
-    '& img': {
-      borderRadius: 75
-    }
-  },
-  h2: {
-    '& .Mui-selected img': {
-      border: '1px solid rgba(255,0,0,1)'
-    }
-  },
   tabs: {
     '& .MuiTabs-scroller': {
       overflow:'overlay !important',
     },
-
+    '& img': {
+      borderRadius: 75,
+      opacity: 0.5,
+      width: 50,
+      height: 50,
+      [theme.breakpoints.up('450')]:{
+        width: 60,
+        height: 60,
+      },
+      [theme.breakpoints.up('500')]:{
+            width: 75, 
+            height: 75, 
+      },
+    },
+    '& .Mui-selected img': {
+      opacity: 1
+    },
     '& .MuiTab-root': {
       minWidth: 'auto',
       '& .MuiTab-wrapper': {
@@ -59,30 +66,29 @@ const styles = (theme) => ({
     },
     '& .MuiTabs-flexContainer': {
       justifyContent: 'center',
-      width: 'max-content'
+      width: 'auto'
     },
     '& .MuiTabs-indicator': {
       display: 'none'
     },
+  },
+  h0: {
     '& img': {
-      border: '1px solid rgba(0,0,0,0.5)'
+      border: '1px solid rgba(0,0,0,0.5)',
+      
     },
     '& .Mui-selected img': {
       border: '1px solid rgba(0,0,0,1)'
-    }
+    }, 
+  },
+  h2: {
+    display: "flex",
+    flexWrap: 'wrap',
+    flexDirection: 'column'
   }
 });
 
-const scrollToTop = () => {
-  animateScroll.scrollToTop();
-  //window.scrollTo(0, 0);
-};
-
-const scrollToBottom = () => {
-  animateScroll.scrollToBottom();
-  //window.scrollTo(0, 0);
-};
-
+*/
 
 export class Menu extends Component {
   constructor(props) {
@@ -157,6 +163,10 @@ export class Menu extends Component {
     return parseInt(size);
   }
 
+  getColor = (array, index) => {
+    return array[index%array.length]
+  }
+
   /*updateWindowDimensions = () => {
     if(window.innerWidth>600 && this.state.mobileView || window.innerWidth<600 && !this.state.mobileView){
       this.setState({mobileView: !this.state.mobileView});
@@ -193,20 +203,20 @@ export class Menu extends Component {
   componentDidMount() {
     //this.setContentType('h3b0');
     const params = queryString.parse(this.props.location.search);
-    params.preview && setInterval(this.updatePreviewStyle, 1000);
-    window.addEventListener("resize", this.updateWindowDimensions);
+    //params.preview && setInterval(this.updatePreviewStyle, 1000);
+    //window.addEventListener("resize", this.updateWindowDimensions);
     const title = this.props.match.params.title;
-    this.fetchData(title);
-    window.addEventListener("scroll", this.handleToolTip);
+    //this.fetchMenuData(title);
+    //window.addEventListener("scroll", this.handleToolTip);
   }
 
 
-  fetchData = async (title) => {
+  fetchMenuData = async (title) => {
     try {
       //let settings = await fetchData({ title: title }, "menu/category/get.php");
       let {data, layout, reviews} =  await fetchData({title: title}, "menu/view/get.php");
       let design = await fetchData({title: title}, "menu/design/get.php")
-      let toggles = JSON.parse(design.custom.toggles);
+      let toggles = design.custom.toggles ? JSON.parse(design.custom.toggles) : '';
       let preview = queryString.parse(this.props.location.search).preview;
       console.log(data);
       let newData = [];
@@ -227,7 +237,7 @@ export class Menu extends Component {
             .filter((_el, _i) => _el.category_id == el.category_id)
             .map((_el, _i) => {
               let item = {
-                id: _el.item_id,
+                id: _el.id,
                 name: _el.i_name,
                 picture: _el.i_pictures,
                 size: _el.size,
@@ -324,13 +334,13 @@ export class Menu extends Component {
       case 0:
         return <CustomTabs
                 //classes={classes.tabs}
-                classes={[classes.tabs, classes.h1].join(' ')}
+                classes={[classes.tabs, classes.h0].join(' ')}
                 //style={style.background}
                 value={this.state.tabIndex}
                 onChange={this.handleCategoryChange}
                 tabLabel={grid.map(el =>
                   <>
-                    <img alt="" width="50" height="50" style={{background: 'white'}} src={el.picture}/>
+                    <img alt="" src={el.picture}/>
                     <Typography style={{...style.name, textTransform: 'none', width: 'min-content'}}>
                       {el.name}
                     </Typography>
@@ -341,13 +351,13 @@ export class Menu extends Component {
         return <CustomTabs
                 style={{overflow: 'scroll'}}
                 //classes={classes.tabs}
-                classes={this.props.classes.tabs}
+                 classes={[classes.tabs, classes.h1].join(' ')}
                 value={this.state.tabIndex}
                 onChange={this.handleCategoryChange}
                 tabLabel={grid.map(el =>                   
                   <>
-                    <img alt="" width="50" height="50" style={{background: 'white'}} src={el.picture}/>
-                    <Typography style={{...style.name, fontSize: 'inherit', textTransform: 'none', width: 'min-content'}}>
+                    <img alt="" src={el.picture}/>
+                    <Typography style={{...style.name, textTransform: 'none', width: 'min-content'}}>
                       {el.name}
                     </Typography>
                   </>
@@ -362,15 +372,38 @@ export class Menu extends Component {
           />
       case 3: 
         return grid.map((el,i) => 
-        <Hx
-          el={el}
-          style
+        <Cx 
+          key={'chs4'+i}
+          index = {i}
+          fade 
           onClick={()=>{this.props.history.push(grid[i].id+'/')}}
-          key={'_hx3'+i}
-          children={<Typography style={style.name}>
-            {el.name}
-          </Typography>}
-        />)
+          boxStyle={{
+            alignItems: (i%2 ? 'flex-start' : 'flex-end')
+          }}
+          style={{
+            backgroundSize: '50%', 
+            backgroundRepeat: 'no-repeat', 
+            height: 130, 
+            backgroundPosition: (i%2 ? '140% 10%': '-40% 10%'),
+            backgroundColor: this.getColor(style.background,i)}}
+          el={el} >
+            <Typography align="center" style={{...style.name, width: '73%'}}>
+              {el.name}
+            </Typography>
+            <Typography style={style.description}>
+              {el.description}
+            </Typography>
+            </Cx>
+        // <Hx2
+        //   el={el}
+        //   style
+        //   onClick={()=>{this.props.history.push(grid[i].id+'/')}}
+        //   key={'_hx3'+i}
+        //   children={<Typography align="center" style={style.name}>
+        //     {el.name}
+        //   </Typography>}
+        // />
+        )
       default: 
         return ''
 
@@ -405,7 +438,7 @@ export class Menu extends Component {
           key={'_bjd'+index}
           mb={1} 
           justifyContent="space-between">
-          <Box>
+          <Box px={2} pt={2}>
             <Typography style={category_style.name}>
               {el.name}
             </Typography>
@@ -443,7 +476,7 @@ export class Menu extends Component {
                 <Typography style={{...style.name, lineHeight: '2.5em'}}>
                   {el.name}
                 </Typography>
-                { this.state.reviews.length ? this.review(isPreview, el, style) : ''}
+                { this.state.reviews ? this.review(isPreview, el, style) : ''}
               </Box>                
               <Box>          
                 <Typography style={{...style.ingredients}} >
@@ -466,7 +499,7 @@ export class Menu extends Component {
             key={'_ca1'+i} 
             style={style} 
             id={i} 
-            review={this.state.reviews.length ? this.review(isPreview,el,style) : ''}
+            review={this.state.reviews ? this.review(isPreview,el,style) : ''}
             data={el} />
       case 2:
         return <Box 
@@ -474,11 +507,11 @@ export class Menu extends Component {
             key={'_bjd'+i}
             mb={1} 
             justifyContent="space-between">
-            <Box>
+            <Box px={2} py={1}>
               <Typography style={style.name}>
                 {el.name}
               </Typography>
-              { this.state.reviews.length ? this.review(isPreview, el, style, 'left') : ''}
+              { this.state.reviews ? this.review(isPreview, el, style, 'left') : ''}
               <Typography style={{...style.ingredients}} >
                 {el.ingredients} 
               </Typography>
@@ -515,7 +548,7 @@ export class Menu extends Component {
               <Typography style={{...style.size}} >
                 {el.size} 
               </Typography>
-              { this.state.reviews.length ? this.review(isPreview, el, style) : '' }
+              { this.state.reviews ? this.review(isPreview, el, style) : '' }
           </Cx>
       default: 
         return 'error'
@@ -561,7 +594,12 @@ export class Menu extends Component {
               position: 'relative' }}
           >
             { this.getCategoryHeader(el,category_style, i) }
-            <Box display={ (([4,5].includes(this.state.headerType)) || (this.state.samePage && i==this.state.tabIndex)) ? "inherit" : "none"}>
+            <Box 
+              flexDirection="column" 
+              display={ 
+                (([4,5].includes(this.state.headerType)) || (this.state.samePage && i==this.state.tabIndex)) 
+                ? "flex" 
+                : "none"}>
               {el.items.map((_el, _i) => (
                   this.getItem(_el,_i,i)
               ))}
@@ -571,7 +609,7 @@ export class Menu extends Component {
   }
 
   render() {
-    const category_id = this.props.match.params.category;
+    /*const category_id = this.props.match.params.category;
     const { data, category, item, modalItem, modalIndex } = this.state;
     const { classes } = this.props;
     const grid = data
@@ -584,7 +622,7 @@ export class Menu extends Component {
     return (
       <Box className={"mx-auto "+ classes.container} style={{ maxWidth: 600 }}>
         {/* this.state.toggles.item_reviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
-         */}
+         *//*}
         {modalItem ? 
           <ProductReviews
           item={modalItem}
@@ -594,26 +632,21 @@ export class Menu extends Component {
           onCancel={this.hideModal} /> : ''
         }
         <Box 
-          className="display-menu" 
+          className={"display-menu "+(this.state.headerType == 3 ? classes.h2 : '') }
           style={{
             position: "relative", 
             background: (this.state.backgroundOption==="image" && category.backgroundImage) ? 
               ( category.backgroundImage.indexOf("base64") >=0 ? 
                 'url('+ category.backgroundImage +')' :
                 'url(https://bathtimestories.com/'+category.backgroundImage+')') :
-              category.background
+              (category.background ? category.background[0] : '')
               }}>
           { grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
-          { this.getBody(category_id)
-          }
+          { this.getBody(category_id) }
         </Box>
         <Box m={2}>
           { this.state.toggles.item_reviews &&
-            <>
-              <Divider/>
-              <br/>
               <RestaurantReviews menu_title={this.props.match.params.title}/>
-            </>
           }
           <Fade in={this.state.showToolTip}>
             <Tooltip
@@ -629,15 +662,18 @@ export class Menu extends Component {
           </Fade>
         </Box>
       </Box>
-    );
+    );*/
+    return <>''</>;
   }
+  
 }
+
 const mapStateToProps = (state) => ({
   layout: state.settings.layout,
   media: state.media
 })
 export default compose(
   withFirebase,
-  withStyles(styles, { withTheme: true }),
+  /*withStyles(styles, { withTheme: true }),*/
   connect(mapStateToProps)
 )(injectIntl(Menu));
