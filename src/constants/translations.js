@@ -144,7 +144,7 @@ var module = {
       wishlist: "wishlist",
       cart: "cart",
       collection: "collection",
-      forget_password: "forget password",
+      forgot_password: "forgot password",
       contact: "contact",
       checkout: "checkout",
       compare: "compare",

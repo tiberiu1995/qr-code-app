@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 
 const QrCode = (props) => {
   const [values, setValues] = useState({
-    fgColor: '#00ff00',
+    fgColor: '#000000',
     bgColor: '#ffffff',
     scale: 0.5,
     size: 256,

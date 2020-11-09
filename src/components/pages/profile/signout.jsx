@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { setUser, setMessage } from "../../actions";
-import Breadcrumb from "../common/breadcrumb";
-import { withFirebase } from "../firebase";
+import { setUser, setMessage } from "../../../actions";
+import Breadcrumb from "../../common/breadcrumb";
+import { withFirebase } from "../../firebase";
 import { injectIntl } from "react-intl";
 
 const SignOutPage = () => (

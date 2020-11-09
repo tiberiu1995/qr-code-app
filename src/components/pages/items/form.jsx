@@ -12,6 +12,7 @@ import FileInput from "../../utils/FileInput.jsx";
 import { injectIntl } from 'react-intl';
 import { compose } from 'redux';
 import { withStyles } from '@material-ui/styles';
+import { Remove } from '@material-ui/icons/';
 
 const initState = {
   validator: new SimpleReactValidator(),
@@ -22,26 +23,65 @@ const initState = {
   ingredients:
     "",
   alergens: "",
-  calories: "",
-  size: "",
+  size: [],
   picture: '',
 }
 
 const useStyles = theme => ({
+  pointerCursor: {
+    cursor: 'pointer'
+  },
   edit: {
-      backgroundColor: '#4caf50',
-      color: 'white',
+    backgroundColor: '#4caf50',
+    color: 'white',
   },
   delete: {
     backgroundColor: '#f44336',
     color: 'white',
   },
+  disabled: {
+    opacity: 0.5,
+    pointerEvents: 'none'
+  },
+  modal: {
+    '& .modal-dialog': { 
+      minWidth: '100%',
+      position: 'fixed'
+    },
+    '& .MuiTextField-root': {
+      width: '100%'
+    },
+    '& .form-group > .MuiBox-root  .MuiFormControl-root': {
+      margin: 8
+    },
+  },
   [theme.breakpoints.up('md')]: {
     modal: {
-      '& .modal-dialog': { minWidth: 600,
+      '& .modal-dialog': { 
+        minWidth: 500,
       }
     },
   },
+  [theme.breakpoints.down('md')]: {
+    imageOption: {
+      flexDirection: 'column',
+      '& .MuiFormGroup-root': {
+        flexDirection: 'row',
+        alignSelf: 'center',
+      },
+      '& > .MuiBox-root': {
+        justifyContent: 'center'
+      }
+    }
+  },
+  [theme.breakpoints.up('0')]: {
+    modal: {
+      '& .modal-body': {
+        maxHeight: 400,
+        overflow: 'scroll'
+      }
+    }
+  }
 });
 
 
@@ -111,8 +151,7 @@ export class Form extends Component {
           description: props.data.description,
           ingredients: props.data.ingredients,
           alergens: props.data.alergens,
-          calories: props.data.calories,
-          size: props.data.size,
+          size: JSON.parse(props.data.size),
           picture: props.data.picture,
           category: props.categories.find(
             (el) => el.name === props.data.category
@@ -149,9 +188,8 @@ export class Form extends Component {
       description: this.state.description,
       ingredients: this.state.ingredients,
       alergens: this.state.alergens,
-      calories: this.state.calories,
       size: this.state.size,
-      picture: this.state.picture,
+      picture: this.state.picture.replace(/.*07\//,''),
       category: this.state.category || this.props.categories[0],
       id: this.props.data ? this.props.data.id : "",
     };
@@ -195,6 +233,24 @@ export class Form extends Component {
     this.setState({picture: ''});
   }
 
+  setSizefromInput = (event,index) => {
+    const newArray = [...this.state.size];
+    newArray[index][event.target.name] = event.target.value;
+    this.setState({size: newArray});
+  }
+
+  removeSize = (index) => {
+    const newArray = [...this.state.size];
+    newArray.splice(index,1);
+    this.setState({size: newArray});
+  }
+
+  addSize = () => {
+    const newArray = [...this.state.size];
+    newArray.push({size: '', price: ''});
+    this.setState({size: newArray});
+  }
+
   render() {
     const { classes, show, onCancel, data, intl: {formatMessage} } = this.props;
     return (
@@ -211,134 +267,126 @@ export class Form extends Component {
           <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
         </Modal.Header>
         <ModalBody className="p-3">
-          <div className="container-fluid">
-            <div className="col-sm-12">
-              <div className="row">
-                <div className="col-lg-12">
-                  {/* <button onClick={(e) => this.addImageSlot(e)}>+ image slot</button>*/}
-                </div>
-              </div>
-              <div className="container-fluid">
-                <div className="col-xl-12">
-                  <form className="needs-validation add-product-form">
-                    <div className="form-group mb-3 col-lg-12">
-                      <div className="">
-                        <TextField
-                          className="col-12"
-                          name="name"
-                          label={formatMessage({id: 'name' })}
-                          value={this.state.name}
-                          onChange={this.setStateFromInput}
-                        />
-                        {this.state.validator.message(
-                          "name",
-                          this.state.name,
-                          "required|string"
-                        )}
-                      </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          {this.props.categories && (
-                            <Select
-                              label={formatMessage({id: 'category'})}
-                              default={{ value: 0, text: formatMessage({id: 'choose_category'}) }}
-                              value={this.state.category || 0}
-                              onChange={this.setStateFromInput}
-                              display={(el) => {
-                                return el.name;
-                              }}
-                              name={"category"}
-                              valueF={(el) => el.id}
-                              array={this.props.categories}
-                            />
-                          )}
-                          {this.state.validator.message(
-                            "category",
-                            this.state.category,
-                            "required"
-                          )}
-                        </div>
-                      </div>
-                      <div className="form-group mb-3 col-lg-12">
-                        <div className="description-sm">
-                          <TextField
-                            name="size"
-                            placeholder="Small €12/ Medium €15/ Large €18"
-                            label={formatMessage({id: 'size/price'})}
-                            className="col-12"
-                            value={this.state.size}
-                            onChange={this.setStateFromInput}
-                          />
-                          {this.state.validator.message(
-                            "size",
-                            this.state.size,
-                            "required"
-                          )}
-                        </div>
-                      </div>
-                    <FileInput 
-                        source={this.state.picture} 
-                        onChange={(event) => this._handleImgChange(event)} 
-                        deleteImg={(event) => this.deleteImg()}
-                        onClick={(event) => this._handleSubmit(event)}/>
-                        {this.state.validator.message(
-                          "picture",
-                          this.state.picture,
-                          "required"
-                        )}
-                    <div className="form-group mb-3 col-lg-12">
-                      <div className="description-sm">
-                        <TextField
-                          className="col-12"
-                          name="ingredients"
-                          multiline
-                          label={formatMessage({id: 'ingredients'})}
-                          value={this.state.ingredients}
-                          onChange={this.setStateFromInput}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                      <div className="description-sm">
-                        <TextField
-                          label={formatMessage({id: 'alergens'})}
-                          multiline
-                          className="col-12"
-                          name="alergens"
-                          value={this.state.alergens}
-                          onChange={this.setStateFromInput}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                      <div className="description-sm">
-                        <TextField
-                          className="col-12"
-                          name="calories"
-                          label={formatMessage({id: 'calories'})}
-                          value={this.state.calories}
-                          onChange={this.setStateFromInput}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group mb-3 col-lg-12">
-                      <div className="description-sm">
-                        <TextField
-                          name="description"
-                          label={formatMessage({id: 'description'})}
-                          multiline
-                          className="col-12"
-                          value={this.state.description}
-                          onChange={this.setStateFromInput}
-                        />
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
+          <Box display="flex" flexDirection="column">
+            <div className="form-group mb-3">
+              <TextField
+                name="name"
+                variant="outlined"
+                label={formatMessage({id: 'name' })}
+                value={this.state.name}
+                onChange={this.setStateFromInput}
+              />
+              {this.state.validator.message(
+                "name",
+                this.state.name,
+                "required|string"
+              )}
             </div>
-          </div>
+            <div className="form-group mb-3">
+              {this.props.categories && (
+                <Select
+                  label={formatMessage({id: 'category'})}
+                  default={{ value: 0, text: formatMessage({id: 'choose_category'}) }}
+                  value={this.state.category || 0}
+                  onChange={this.setStateFromInput}
+                  display={(el) => {
+                    return el.name;
+                  }}
+                  name={"category"}
+                  valueF={(el) => el.id}
+                  array={this.props.categories}
+                />
+              )}
+              {this.state.validator.message(
+                "category",
+                this.state.category,
+                "required"
+              )}
+            </div>
+            <div className="form-group mb-3">
+              <Box>
+              { this.state.size.map( (el,i) =>
+                <Box display="flex" alignItems="center">
+                  <TextField
+                    name="size"
+                    variant="outlined"
+                    label={formatMessage({id: 'size' })}
+                    value={el.size}
+                    onChange={(e) => this.setSizefromInput(e,i)}  />
+                    {this.state.validator.message(
+                      "size",
+                      el.size,
+                      "required"
+                    )}
+                  <TextField
+                    variant="outlined"
+                    name="price"
+                    label={formatMessage({id: 'price' })}
+                    value={el.price}
+                    onChange={(e) => this.setSizefromInput(e,i)} />
+                    {this.state.validator.message(
+                      "price",
+                      el.price,
+                      "required"
+                    )}
+                    <TextField
+                      variant="outlined"
+                      name="calories"
+                      label={formatMessage({id: 'calories' })}
+                      value={el.calories}
+                      onChange={(e) => this.setSizefromInput(e,i)} />
+                    {this.state.validator.message(
+                      "calories",
+                      el.calories,
+                      "required"
+                    )}
+                  <Remove className={classes.delete+" "+classes.pointerCursor} onClick={(e) => this.removeSize(i)}/>
+                </Box>
+              )}  
+              </Box>
+              <Button onClick={this.addSize}>Add new size</Button>
+            </div>
+            <FileInput 
+                source={this.state.picture} 
+                onChange={(event) => this._handleImgChange(event)} 
+                deleteImg={(event) => this.deleteImg()}
+                onClick={(event) => this._handleSubmit(event)}/>
+                {this.state.validator.message(
+                  "picture",
+                  this.state.picture,
+                  "required"
+                )}
+            <div className="form-group mb-3">
+                <TextField
+                  variant="outlined"
+                  name="ingredients"
+                  multiline
+                  label={formatMessage({id: 'ingredients'})}
+                  value={this.state.ingredients}
+                  onChange={this.setStateFromInput}
+                />
+            </div>
+            <div className="form-group mb-3">
+                <TextField
+                  label={formatMessage({id: 'alergens'})}
+                  multiline
+                  variant="outlined"
+                  name="alergens"
+                  value={this.state.alergens}
+                  onChange={this.setStateFromInput}
+                />
+              </div>
+              <div className="form-group mb-3">
+                  <TextField
+                    name="description"
+                    label={formatMessage({id: 'description'})}
+                    multiline
+                    variant="outlined"
+                    value={this.state.description}
+                    onChange={this.setStateFromInput}
+                  />
+              </div>
+        </Box>
         </ModalBody>
         <Modal.Footer>
           <Button className={classes.delete} variant="contained" onClick={onCancel}>

@@ -61,9 +61,11 @@ export class Menu extends Component {
       const obj = {
         products: this.state.products,
         title: this.state.title || this.props.match.params.id,
+        token: this.props.token
       }
       const data = await fetchData(obj, "/menu/" + endpoint + ".php");
-      console.log(data);
+      if (data.status === "fail") 
+      throw data.message;
       this.setState({
         message: data === true ? "transaction done" : "transaction void",
       });
@@ -220,7 +222,7 @@ export class Menu extends Component {
 const mapStateToProps = (state) => ({
   //symbol: state.data.symbol,
   uid: state.account.uid,
-  //token: state.account.token
+  token: state.account.token
 });
 
 export default compose(

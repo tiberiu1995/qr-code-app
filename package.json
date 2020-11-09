@@ -46,6 +46,7 @@
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
     "js-cookie": "^2.2.1",
+    "lodash": "^4.17.20",
     "match-sorter": "^4.2.0",
     "mini-css-extract-plugin": "0.4.3",
     "optimize-css-assets-webpack-plugin": "5.0.1",
@@ -123,6 +124,7 @@
     "url-loader": "1.1.1",
     "uuidv4": "^6.2.0",
     "webpack-manifest-plugin": "2.0.4",
+    "webpack-visualizer-plugin": "^0.1.11",
     "workbox-webpack-plugin": "3.6.3"
   },
   "scripts": {
@@ -190,7 +192,8 @@
     "node-sass": "^4.13.0",
     "prettier": "2.0.5",
     "sass-loader": "^7.3.1",
-    "webpack": "^4.43.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.1.0",
     "webpack-dev-server": "^3.1.9"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",

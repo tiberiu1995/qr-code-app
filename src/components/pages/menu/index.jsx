@@ -3,7 +3,7 @@ import React, {
   useEffect,
 } from "react";
 import Datatable from "../../datatable/datatable";
-import { Link, withRouter } from "react-router-dom";
+import { Link, Redirect, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 //import Form from "./form0";
 import Form from "./new-menu";
@@ -15,6 +15,7 @@ import { fetchData, fetchMenu } from "../../utils/fetch";
 import { Add } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
+import { Helmet } from 'react-helmet';
 
 const style = {
   position: "top-right",
@@ -35,8 +36,9 @@ const Categories = (props) => {
 
   const fetchMenus = async () => {
     try {
-      let apiData = await fetchData({uid: props.uid}, "menu/get.php");
-      console.log(apiData);
+      let apiData = await fetchData({uid: props.uid, token: props.token}, "menu/get.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       setData(apiData);
     } catch (error) {
       console.error(error);
@@ -51,8 +53,9 @@ const Categories = (props) => {
 
   const remove = async (item) => {
     try {
-      const apiData = await fetchData( { title: item.title }, "menu/delete.php");
-      console.log(apiData);
+      const apiData = await fetchData({ title: item.title, token: props.token}, "menu/delete.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       toast.success(formatMessage({id: "deleted_menu"}));
       await fetchMenus();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
@@ -78,8 +81,9 @@ const Categories = (props) => {
     console.log(data);
     closeModal();
     try {
-      const apiData = await fetchData(item, "menu/new.php");
-      console.log(apiData);
+      const apiData = await fetchData({...item, token: props.token}, "menu/new.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
       apiData.error ? toast.error(formatMessage({id: 'menu_exists'}), style) : (toast.success(formatMessage({id: 'menu_created'}), style) && await fetchMenus());
       window.scrollTo(0, 0);
@@ -97,7 +101,12 @@ const Categories = (props) => {
 
   return (
     <div className="my-1 mx-auto text-center">
+      { props.token ? '' : <Redirect to='/log-in' /> }
       <Box m={5}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>My Menus</title>
+      </Helmet>
         {data.length ? 
           <Datatable edit={edit} remove={remove} myData={[...data]} /> : 
           <h4>{ formatMessage({id: 'no_menu'})}</h4>
@@ -126,7 +135,8 @@ const Categories = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  uid: state.account.uid
+  uid: state.account.uid,
+  token: state.account.token
 })
 
 export default compose(

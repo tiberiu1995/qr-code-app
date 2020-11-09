@@ -26,12 +26,24 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column', 
     background: '#ffffff', 
     justifyContent: 'center', 
-    padding: '8px 16px 8px 32px', 
+    padding: '4px 16px 4px 32px', 
     left: -20, 
     marginRight: -20, 
     minHeight: 90, 
     position: 'relative', 
-    width: '100%'
+    width: '100%',
+  },
+  [theme.breakpoints.up(400)]: {
+    paperLeft: {
+      height: 90,
+      '& img': {
+        height: 90,
+        width: 90
+      }
+    },
+    paperRight: {
+      minHeight: 115
+    }
   },
   [theme.breakpoints.up('sm')]: {
     paperLeft: {
@@ -48,9 +60,9 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-const Item = ({el, style, children, onClick, media}) => {
+const Item = ({el, style, children, onClick, media, className}) => {
   const classes = useStyles();
-  return <Box onClick={onClick} m={2} display="flex">
+  return <Box onClick={onClick} m={2} className={className} display="flex">
         <Paper elevation={2} className={classes.paperLeft} >
           <img src={el.picture} alt={el.name} style={{borderRadius: 20, background: '#e2e2e2'}}/>
         </Paper >

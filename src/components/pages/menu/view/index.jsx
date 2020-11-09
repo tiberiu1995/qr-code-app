@@ -8,24 +8,33 @@ import { Typography, Box, Tooltip, Fab, Fade, Button, Divider, } from "@material
 import GridImage from "./image-grid.jsx";
 import Card from "./item-card.jsx";
 import { withStyles } from "@material-ui/styles";
-import { ArrowDropUp,  } from "@material-ui/icons/";
-import { animateScroll } from "react-scroll";
+import { ArrowDropUp, ExpandLessOutlined, ExpandLess, ExpandMore, Add,  } from "@material-ui/icons/";
 import { fetchData } from '../../../utils/fetch';
 import RestaurantReviews from './review/restaurant-reviews.jsx';
 import ProductReviews from './review/product-reviews.jsx';
 import CustomTabs from './tabs.jsx';
 import Hx from './hx.jsx';
-import Hx2 from './hx2.jsx';
-import { Link } from 'react-router-dom';
 import Cx from './cx';
-import {MoreVert} from '@material-ui/icons/';
+import { Helmet } from 'react-helmet';
 import { Rating } from '@material-ui/lab/';
+import { setProducts, addProduct } from "../../../../actions";
 const queryString = require('query-string');
-/*
+
+
 const styles = (theme) => ({
+  divider: {
+    margin: [[10, 0]],
+  },
+  pointerCursor: {
+    cursor: 'pointer'
+  },
   container: {
     '& p, & span': {
-      lineHeight: 1.2
+      lineHeight: 1.5
+    },
+    '& .MuiTypography-root + .MuiButtonBase-root': {
+      padding: 0,
+      justifyContent: 'left'
     }
   },
   fab: {
@@ -41,6 +50,7 @@ const styles = (theme) => ({
     '& .MuiTabs-scroller': {
       overflow:'overlay !important',
     },
+
     '& img': {
       borderRadius: 75,
       opacity: 0.5,
@@ -65,8 +75,9 @@ const styles = (theme) => ({
       }
     },
     '& .MuiTabs-flexContainer': {
-      justifyContent: 'center',
-      width: 'auto'
+      width: 'fit-content',
+      margin: 'auto',
+      justifyContent: 'center'
     },
     '& .MuiTabs-indicator': {
       display: 'none'
@@ -85,10 +96,81 @@ const styles = (theme) => ({
     display: "flex",
     flexWrap: 'wrap',
     flexDirection: 'column'
+  },
+  h3: {
+    overflow: 'hidden',
+    position: 'relative',
+    display: 'flex',
+    backgroundSize: '50%', 
+    backgroundRepeat: 'no-repeat', 
+    height: 100, 
+    [theme.breakpoints.up(500)]: {
+      height: 130
+    },
+    [theme.breakpoints.up(900)]: {
+      backgroundSize: 'auto', 
+      height: 180
+    },
+    '& img': {
+      position: 'absolute',
+      height: '250%'
+    },
+    '& .MuiBox-root': {
+      flex: '1 1 auto',
+    },
+    '&:nth-child(odd)': {
+      flexDirection:' row-reverse',
+      '& .MuiTypography-root': {
+        left: 30,   
+      },
+      '& img':{
+        right: -150,
+        [theme.breakpoints.down(500)]: {
+          right: -120
+        }
+      }
+    },    
+    '&:nth-child(even)': {
+      flexDirection:' row',
+      '& .MuiTypography-root': {
+        right: 30,   
+      },
+      '& img':{
+        left: -150,
+        [theme.breakpoints.down(500)]: {
+          left: -120
+        }
+      }
+    },
+    '& .MuiTypography-root': {
+      position: 'absolute',
+      width: '60%',
+      [theme.breakpoints.up(600)]: {
+        width: '70%',
+      }
+    }
+
+  },
+  b0: {
+    margin: [[0, 16, 16, 16]],
+    '&:first-child': {
+      marginTop: 16
+    },
+  },
+  b4: {
+    '& img': {
+      alignSelf: 'center'
+    },
+  },
+  maxContainer: {
+    [theme.breakpoints.up('600')]: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      width: 568
+    }
   }
 });
 
-*/
 
 export class Menu extends Component {
   constructor(props) {
@@ -109,12 +191,13 @@ export class Menu extends Component {
       showToolTip: false,
       item: "",
       category: "",
-      mobileView: window.innerWidth<600,
       isVisible: false,
       modalIndex: -1,
       toggles: {
 
-      }
+      },
+      showMore: -1,
+      addToCartModal: -1,
     };
     this.edit = false;
   }
@@ -127,12 +210,15 @@ export class Menu extends Component {
     this.setState({modalIndex: -1, modalItem: ''});
   }
 
-   review = (isPreview, el, style, align="right") => {
+   review = (isPreview, el, style, align="left") => {
     let count = this.state.reviews.find(r => r.id === el.id);
     count = count.rating ? count.count : 0;
     let reviewType = 'stars';
     return (this.state.reviews ?
           <Box 
+            className={!isPreview ? this.props.classes.pointerCursor : ''}
+            display="flex"
+            flexDirection="column"
             onClick={(e) => this.showModal(el)}> 
             { this.state.toggles.item_reviewStars ?
               <Rating 
@@ -155,10 +241,27 @@ export class Menu extends Component {
         : ''
     )}
 
+    getExtra = (el,style) => 
+      <>{this.state.showMore==el.id
+        ? <>
+            <Typography style={{...style.alergens}} >
+            {this.props.intl.formatMessage({id: 'alergens'}) + ': ' + el.alergens}
+            </Typography>
+            <Typography style={style.calories} >
+            {this.props.intl.formatMessage({id: 'calories'})+ ': ' +el.size.map(el => el.size=="{}" ? el.calories : el.size+" "+el.calories).join(" | ")}
+            </Typography>
+          </>
+        : '' }
+      <Button onClick={(e) => this.showMoreHandler(el.id)}>
+      { this.state.showMore==el.id ? <ExpandLess/> :  <ExpandMore/> }
+      </Button>
+      </>
+
+
   value = (size) => {
     if (this.props.media.mobile)
      return (100 * parseInt(size)) / 400 + "vw";
-    if (this.props.media.tablet)
+    if (this.props.media.lt600)
      return (100 * parseInt(size)) / 500 + "vw";    
     return parseInt(size);
   }
@@ -190,8 +293,9 @@ export class Menu extends Component {
                 _el.ingredients = "";
             if (!toggles.item_alergens)
                 _el.alergens = "";
-            if (!toggles.item_calories)
-                _el.calories = "";
+                _el.size.forEach(el => {
+                  el.calories = (!toggles.item_calories) ? '' : el.calories
+                })
           })    
         })
         this.setState({data: data});
@@ -203,11 +307,11 @@ export class Menu extends Component {
   componentDidMount() {
     //this.setContentType('h3b0');
     const params = queryString.parse(this.props.location.search);
-    //params.preview && setInterval(this.updatePreviewStyle, 1000);
-    //window.addEventListener("resize", this.updateWindowDimensions);
+    params.preview && setInterval(this.updatePreviewStyle, 1000);
+    window.addEventListener("resize", this.updateWindowDimensions);
     const title = this.props.match.params.title;
-    //this.fetchMenuData(title);
-    //window.addEventListener("scroll", this.handleToolTip);
+    this.fetchMenuData(title);
+    window.addEventListener("scroll", this.handleToolTip);
   }
 
 
@@ -220,39 +324,28 @@ export class Menu extends Component {
       let preview = queryString.parse(this.props.location.search).preview;
       console.log(data);
       let newData = [];
-      data.forEach((el, i) => {
-        if (i === 0 || data[i - 1].category_id !== el.category_id) {
-          let category = {
-            category_id: el.category_id,
-            name: el.c_name,
-            items: [],
-            picture: el.image_option === "library" ?
+      newData = data.map(el => ({
+        ...el,
+        picture: el.image_option === "library" ?
             el.library_picture : el.upload_picture,
-            background: el.background,
-          };
-          if (toggles.category_description || preview)
-            category = {...category, description: el.description};
-          //data.push();
-          category.items = data
-            .filter((_el, _i) => _el.category_id == el.category_id)
-            .map((_el, _i) => {
-              let item = {
-                id: _el.id,
-                name: _el.i_name,
-                picture: _el.i_pictures,
-                size: _el.size,
-              }
-              if (toggles.item_ingredients || preview)
-                item = {...item, ingredients: _el.ingredients}
-              if (toggles.item_alergens || preview)
-                item = {...item, alergens: _el.alergens}
-              if (toggles.item_calories || preview)
-                item = {...item, calories: _el.calories}
-              return item
-            });
-          newData.push(category);
-        }
-      });
+        description: ((toggles.category_description || preview) ? el.description : ''),
+        items: 
+          JSON
+          .parse(el.items)
+          .map(el => ({
+              ...el,
+              size: el.size
+                    .map(el =>
+                      ({
+                        ...el, 
+                        calories: ((toggles.item_calories || preview) ? el.calories : '')})
+                    ),
+              ingredients: ((toggles.item_ingredients || preview) ? el.ingredients : ''),
+              alergens: ((toggles.item_alergens || preview) ? el.alergens : ''),
+            })
+          )
+      }) );
+      //setProducts(data.map(el => JSON.parse(el.items)).reduce((el,acc) => el.concat(acc), []));
       preview && this.setState({originalData: JSON.parse(JSON.stringify(newData))});
       this.setState({
         reviews: reviews,
@@ -293,6 +386,12 @@ export class Menu extends Component {
     this.setState({tabIndex: value});
   }
 
+  showMoreHandler = (id) => {
+    this.state.showMore == id 
+    ? this.setState({showMore: -1})
+    : this.setState({showMore: id});
+  }
+
   setContentType = (type) => {
     switch (type) {
         case 'h0b0':
@@ -326,7 +425,7 @@ export class Menu extends Component {
   }
 
   tableOfContent = (grid, category_style) => {
-    const {classes} = this.props;
+    const {classes, media} = this.props;
     let style =  JSON.parse(JSON.stringify(category_style));
     style.name.fontSize = this.value(style.name.fontSize);
     style.description.fontSize = this.value(style.description.fontSize);
@@ -376,33 +475,22 @@ export class Menu extends Component {
           key={'chs4'+i}
           index = {i}
           fade 
+          h3
+          className={[classes.h3, classes.pointerCursor, classes.maxContainer].join(' ')}
           onClick={()=>{this.props.history.push(grid[i].id+'/')}}
           boxStyle={{
-            alignItems: (i%2 ? 'flex-start' : 'flex-end')
+            /*alignItems: (i%2 ? 'flex-start' : 'flex-end')*/
           }}
           style={{
-            backgroundSize: '50%', 
-            backgroundRepeat: 'no-repeat', 
-            height: 130, 
-            backgroundPosition: (i%2 ? '140% 10%': '-40% 10%'),
             backgroundColor: this.getColor(style.background,i)}}
           el={el} >
-            <Typography align="center" style={{...style.name, width: '73%'}}>
+            <Typography align="center" style={style.name}>
               {el.name}
             </Typography>
             <Typography style={style.description}>
               {el.description}
             </Typography>
             </Cx>
-        // <Hx2
-        //   el={el}
-        //   style
-        //   onClick={()=>{this.props.history.push(grid[i].id+'/')}}
-        //   key={'_hx3'+i}
-        //   children={<Typography align="center" style={style.name}>
-        //     {el.name}
-        //   </Typography>}
-        // />
         )
       default: 
         return ''
@@ -419,6 +507,7 @@ export class Menu extends Component {
           key={'chs4'+index}
           index = {index}
           fade 
+          className={[this.props.classes.pointerCursor,this.props.classes.h4, this.props.classes.maxContainer].join(' ')}
           onClick={()=>{this.setState({
               catIndex: this.state.catIndex !== index ? index : -1
           }) }}
@@ -433,34 +522,29 @@ export class Menu extends Component {
             </Typography>
             </Cx>
       case 5:
-        return <Box 
-          display="flex" 
-          key={'_bjd'+index}
-          mb={1} 
-          justifyContent="space-between">
-          <Box px={2} pt={2}>
-            <Typography style={category_style.name}>
+        return <Box px={2} pt={3} pb={2}>
+            <Typography align="center" style={category_style.name}>
               {el.name}
             </Typography>
+            <Typography align="center" style={category_style.description}>
+              {el.description}
+            </Typography>
           </Box>
-        </Box>
       default: 
         return ''
     }
-    switch (this.props.layout) {
-     // case 'layout1':
-      //  return <GridImage /*disableImages={this.state.settings.disableImages}*/ data={[el]} style={style} />
-
-      default:
-        return ''/*<Typography style={{...style, textAlign: "center", whiteSpace: "break-spaces",}} align="center">
-            {el.name}
-        </Typography>*/
-
-    }
+  }
+  openModal = (e, id) => {
+    this.setState({ addToCartModal: this.state.addToCartModal === id ? -1 : id })
   }
 
-  getItem = (el,i, index) => {
-    const {item, isPreview, bodyType, toggles} = this.state;
+  closeModal = () => { this.setState({ addToCartModal: -1}) }
+
+  addItem = (data) => addProduct(data)
+
+  getItem = (el, itemIndex, catIndex) => {
+    const {classes, intl: {formatMessage}} = this.props;
+    const {item, isPreview, bodyType, toggles, category: {background}} = this.state;
     let style = JSON.parse(JSON.stringify(item)); //{...item};
     for (const [key, value] of Object.entries(style)) {
       style[key].fontSize = this.value(value.fontSize)
@@ -468,87 +552,85 @@ export class Menu extends Component {
     switch (bodyType) {
       case 0:
         return <Hx
-          key={'_xsd0'+i}
+          key={'_xsd0'+itemIndex}
           el={el}
+          className={[classes.b0, classes.maxContainer].join(' ')}
           children={
-            <>
-              <Box display="flex" justifyContent="space-between" alignItems="baseline">        
-                <Typography style={{...style.name, lineHeight: '2.5em'}}>
+              <Box >        
+                <Typography style={{...style.name, }}>
                   {el.name}
                 </Typography>
                 { this.state.reviews ? this.review(isPreview, el, style) : ''}
-              </Box>                
-              <Box>          
                 <Typography style={{...style.ingredients}} >
                   {el.ingredients} 
                 </Typography>
-                <Typography style={{...style.alergens}} >
-                {el.alergens}
-              </Typography>
-              <Typography style={{...style.calories}} >
-                {el.calories} 
-              </Typography> 
-              </Box>
-              <Typography style={{...style.size, lineHeight: '2.5em', textAlign: 'right'/*whiteSpace: "nowrap"*/}} >
-                  {el.size}
-              </Typography>
-            </>}
+                <Typography style={style.size} >
+                {el.size.map(el => el.size=="{}" ? el.price : el.size+" "+el.price).join(" | ")}
+                </Typography>
+                {this.getExtra(el,style)}
+              </Box> }
         />
       case 1:
         return <Card 
-            key={'_ca1'+i} 
+            key={'_ca1'+itemIndex} 
             style={style} 
-            id={i} 
+            id={itemIndex} 
             review={this.state.reviews ? this.review(isPreview,el,style) : ''}
+            getExtra={this.getExtra(el,style)}
             data={el} />
       case 2:
         return <Box 
-            display="flex" 
-            key={'_bjd'+i}
-            mb={1} 
-            justifyContent="space-between">
-            <Box px={2} py={1}>
-              <Typography style={style.name}>
+            key={'_bjd'+itemIndex}
+            className={[classes.b2, classes.maxContainer].join(' ')}
+            m={1} >
+            <Box display="flex" justifyContent="space-between">
+              <Typography style={{...style.name, }}>
                 {el.name}
               </Typography>
-              { this.state.reviews ? this.review(isPreview, el, style, 'left') : ''}
-              <Typography style={{...style.ingredients}} >
-                {el.ingredients} 
-              </Typography>
-              <Typography style={{...style.alergens}} >
-                {el.alergens}
-              </Typography>
-              <Typography style={{...style.calories}} >
-                {el.calories} 
-              </Typography> 
-              <Typography style={{...style.size, whiteSpace: "nowrap"}} >
-              {el.size}
+              <Typography style={style.size} >
+              {el.size.map(el => el.size=="{}" ? el.price : el.size+" "+el.price).join(" | ")}
               </Typography>
             </Box>
+            { this.state.reviews ? this.review(isPreview, el, style) : ''}
+            <Typography style={style.ingredients} >
+              {el.ingredients} 
+            </Typography>
+            <Typography style={style.alergens} >
+              {el.alergens && formatMessage({id: 'alergens'}) + ': ' + el.alergens}
+            </Typography>
+            <Typography style={style.calories} >
+            { (el.size && el.size[0].calories) && formatMessage({id: 'calories'}) + ': ' +
+                el.size.map(el => (el.size=="{}" || el.calories=="") ? "" : el.size+" "+el.calories).join(" | ")}
+            </Typography>
+            {/* <Add onClick={(e) => this.openModal(e, el.id)}></Add> */}
+            { itemIndex < this.state.data[catIndex].items.length-1 &&
+            <Divider 
+              className={classes.divider} 
+              style={{
+                backgroundImage: '-webkit-gradient( linear, left bottom, right bottom, color-stop(0, '+background[1]+'), color-stop(0.3, '+background[1]+'), color-stop(0.7, transparent), color-stop(1, transparent) )'}} />
+              }      
           </Box>
+          
       case 4:
         return <Cx 
-          index={i}
-          key={'cxs4'+i}
+          index={itemIndex}
+          key={'cxs4'+itemIndex}
           el={el} 
-          fade={this.state.catIndex == index}
+          className={[classes.b4, classes.maxContainer].join(' ')}
+          b4
+          fade={this.state.catIndex == catIndex}
           style={{backgroundSize: 'contain', backgroundRepeat: 'no-repeat', position: 'relative'}}>
-            <Typography style={style.name}>
-                {el.name}
-              </Typography>
-              <Typography style={{...style.ingredients}} >
-                {el.ingredients} 
-              </Typography>
-              <Typography style={{...style.alergens}} >
-                {el.alergens}
-              </Typography>
-              <Typography style={{...style.calories}} >
-                {el.calories} 
-              </Typography>              
-              <Typography style={{...style.size}} >
-                {el.size} 
-              </Typography>
-              { this.state.reviews ? this.review(isPreview, el, style) : '' }
+            <Typography style={{...style.name, }}>
+              {el.name}
+            </Typography>
+            { this.state.reviews ? this.review(isPreview, el, style) : ''}
+            <Typography style={{...style.ingredients}} >
+              {el.ingredients} 
+            </Typography>
+            <Typography style={style.size} >
+            {el.size.map(el => el.size=="{}" ? el.price : el.size+" "+el.price).join(" | ")}
+            </Typography>
+            {this.getExtra(el,style)}
           </Cx>
       default: 
         return 'error'
@@ -578,7 +660,7 @@ export class Menu extends Component {
           
             { el && this.getCategoryHeader(el,category_style, '') }
             <Box>
-              {el.items.map((_el, _i) => (
+              {el.items.map((_el,_i) => (
                   this.getItem(_el,_i,'')
               ))}
             </Box>
@@ -609,7 +691,7 @@ export class Menu extends Component {
   }
 
   render() {
-    /*const category_id = this.props.match.params.category;
+    const category_id = this.props.match.params.category;
     const { data, category, item, modalItem, modalIndex } = this.state;
     const { classes } = this.props;
     const grid = data
@@ -619,51 +701,60 @@ export class Menu extends Component {
 
 
     //this.state.products && (document.querySelector(".loader-wrapper").style = "display: none");
-    return (
-      <Box className={"mx-auto "+ classes.container} style={{ maxWidth: 600 }}>
-        {/* this.state.toggles.item_reviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
-         *//*}
-        {modalItem ? 
-          <ProductReviews
-          item={modalItem}
-          key="pr23"
-          style={JSON.parse(JSON.stringify(item))}
-          show={modalIndex>=0}
-          onCancel={this.hideModal} /> : ''
-        }
-        <Box 
-          className={"display-menu "+(this.state.headerType == 3 ? classes.h2 : '') }
-          style={{
-            position: "relative", 
-            background: (this.state.backgroundOption==="image" && category.backgroundImage) ? 
-              ( category.backgroundImage.indexOf("base64") >=0 ? 
-                'url('+ category.backgroundImage +')' :
-                'url(https://bathtimestories.com/'+category.backgroundImage+')') :
-              (category.background ? category.background[0] : '')
-              }}>
-          { grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
-          { this.getBody(category_id) }
-        </Box>
-        <Box m={2}>
-          { this.state.toggles.item_reviews &&
-              <RestaurantReviews menu_title={this.props.match.params.title}/>
+    return <>
+        {/* <Navbar/>
+        <AddToCart 
+          id={this.state.addToCartModal} 
+          addItem={this.addItem}
+          show={this.state.addToCartModal!==-1}
+          onCancel={this.closeModal} /> */}
+        <Box className={"mx-auto "+ classes.container}>
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>{this.props.match.params.title}</title>
+          </Helmet>
+          {/* this.state.toggles.item_reviews && <Button onClick={scrollToBottom}>Vezi recenziile restaurantului</Button>
+          */}
+          {modalItem ? 
+            <ProductReviews
+            item={modalItem}
+            key="pr23"
+            style={JSON.parse(JSON.stringify(item))}
+            show={modalIndex>=0}
+            onCancel={this.hideModal} /> : ''
           }
-          <Fade in={this.state.showToolTip}>
-            <Tooltip
-              title="Cuprins"
-              aria-label="cuprins"
-              arrow={true}
-              onClick={scrollToTop}
-            >
-              <Fab color="secondary" className={classes.absolute}>
-                <ArrowDropUp />
-              </Fab>
-            </Tooltip>
-          </Fade>
+          <Box 
+            className={"display-menu "+(this.state.headerType == 3 ? classes.h2 : '') }
+            style={{
+              position: "relative", 
+              background: (this.state.backgroundOption==="image" && category.backgroundImage) ? 
+                ( category.backgroundImage.indexOf("base64") >=0 ? 
+                  'url('+ category.backgroundImage +')' :
+                  'url(https://bathtimestories.com/'+category.backgroundImage+')') :
+                (category.background ? category.background[0] : '')
+                }}>
+            { grid && category_style && !category_id && this.tableOfContent(grid, category_style) }
+            { this.getBody(category_id) }
+          </Box>
+          <Box m={2} className={classes.maxContainer}>
+            { this.state.toggles.item_reviews &&
+                <RestaurantReviews menu_title={this.props.match.params.title}/>
+            }
+            {/* <Fade in={this.state.showToolTip}>
+              <Tooltip
+                title="Cuprins"
+                aria-label="cuprins"
+                arrow={true}
+                onClick={scrollToTop}
+              >
+                <Fab color="secondary" className={classes.absolute}>
+                  <ArrowDropUp />
+                </Fab>
+              </Tooltip>
+            </Fade> */}
+          </Box>
         </Box>
-      </Box>
-    );*/
-    return <>''</>;
+      </>
   }
   
 }
@@ -674,6 +765,6 @@ const mapStateToProps = (state) => ({
 })
 export default compose(
   withFirebase,
-  /*withStyles(styles, { withTheme: true }),*/
+  withStyles(styles, { withTheme: true }),
   connect(mapStateToProps)
 )(injectIntl(Menu));

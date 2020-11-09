@@ -166,7 +166,7 @@ const Reviews = (props) => {
               </>
               
                :
-              <Box mx={2}>Inca nu exista recenzii</Box>
+              <Box mx={2}>No reviews yet</Box>
             }
           </Grid>
       </Box>

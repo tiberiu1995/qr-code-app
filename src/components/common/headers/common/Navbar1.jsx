@@ -138,19 +138,17 @@ const NavBar = (props) => {
 
   const arr1 = [
     {id: 'menu_admin', url: 'menu'}, 
-    {url: 'tutorials'}, 
-    {id: 'profile', url: 'account/profile'}, 
-    {id: 'plan', url: 'account/plan'}, 
-    {id: 'settings', url: 'account/settings'}];
+    {id: 'profile', url: 'my-account/profile'}, 
+    {id: 'plan', url: 'my-account/plan'}, 
+    {id: 'settings', url: 'my-account/settings'}];
   const arr2 = [
      {id: 'menu_admin', url: 'menu'}, 
     {url: 'tutorials'}];
   const arr3 = [
     {url: 'home'}, 
-    {url: 'tutorials'}];
+  ];
   const arr6 = [
      {id: 'menu_admin', url: 'menu'}, 
-    {url: 'tutorials'}, 
     {url: 'log-in'}, 
     {url: 'register'}];
   
@@ -170,7 +168,7 @@ const NavBar = (props) => {
                 <MenuIcon />
               </IconButton>
               <img src="https://bathtimestories.com/wp-content/uploads/2020/07/smartphone.png" height="50"/>
-              { props.email ? 
+              { props.token ? 
                 ( props.history.location.pathname.indexOf("account")>=0 ?
                     generateMenu(arr1, {className: classes.sectionDesktop}) :
                     generateMenu(arr2, {className: classes.sectionDesktop})
@@ -180,7 +178,7 @@ const NavBar = (props) => {
             </Box>
             { 
               <Box display="flex">  
-              { props.email ?
+              { props.token ?
                 <>
                   <Typography style={{alignSelf: 'center'}}  className={classes.link} variant="subtitle2" align="center">  
                     { formatMessage({id: 'greeting'}) }, {props.name}
@@ -209,7 +207,7 @@ const NavBar = (props) => {
              onClick={toggleDrawer}
              onKeyDown={toggleDrawer}
            >
-            { props.email ? 
+            { props.token ? 
               ( props.history.location.pathname.indexOf("account")>=0 ?
                 generateMenu(arr1, {className: classes.sectionMobile}) :
                 generateMenu(arr2, {className: classes.sectionMobile})

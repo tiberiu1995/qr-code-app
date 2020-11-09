@@ -23,8 +23,9 @@ import { setMedia, } from './../actions/index';
 const App = (props) => {
   const desktop = useMediaQuery('(min-width:900px)');
   const tablet = useMediaQuery('(min-width:500px) and (max-width:899px)');
+  const lt600 = useMediaQuery('(max-width:599px)');
   const mobile = useMediaQuery('(max-width:499px)');
-  setMedia({desktop: desktop, tablet: tablet,  mobile: mobile});
+  setMedia({desktop: desktop, tablet: tablet, lt600: lt600, mobile: mobile});
 
 
   useEffect(()=>{ },[]);

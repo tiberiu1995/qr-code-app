@@ -41,6 +41,9 @@ const categoryIcons = [
 ];
 
 const useStyles = theme => ({
+  pointerCursor: {
+    cursor: 'pointer'
+  },
   edit: {
       backgroundColor: '#4caf50',
       color: 'white',
@@ -49,12 +52,38 @@ const useStyles = theme => ({
     backgroundColor: '#f44336',
     color: 'white',
   },
+  disabled: {
+    opacity: 0.5,
+    pointerEvents: 'none'
+  },
+  modal: {
+    '& .modal-dialog': { 
+      minWidth: '100%',
+      position: 'fixed'
+    },
+    '& .MuiTextField-root': {
+      width: '100%'
+    }
+  },
   [theme.breakpoints.up('md')]: {
     modal: {
-      '& .modal-dialog': { minWidth: 600,
+      '& .modal-dialog': { 
+        minWidth: 500,
       }
     },
   },
+  [theme.breakpoints.down('md')]: {
+    imageOption: {
+      flexDirection: 'column',
+      '& .MuiFormGroup-root': {
+        flexDirection: 'row',
+        alignSelf: 'center',
+      },
+      '& > .MuiBox-root': {
+        justifyContent: 'center'
+      }
+    }
+  }
 });
 
 const initState = { 
@@ -233,71 +262,75 @@ export class Form extends Component {
           <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
         </Modal.Header>
         <ModalBody className="p-3">
-          <div className="container-fluid">
-            <div className="col-xl-12">
-                <Box display="flex" flexDirection="column">
-                  <div className="form-group mb-3">
-                    <TextField
-                      name="name"
-                      label={formatMessage({id: 'name'})}
-                      value={this.state.name}
-                      onChange={this.setStateFromInput}
-                    />
-                    {this.state.validator.message(
-                      "name",
-                      this.state.name,
-                      "required|string"
-                    )}
-                  </div>
-                  <div className="form-group mb-3">
-                      <TextField
-                        name="description"
-                        label={formatMessage({id: 'description'})}
-                        multiline
-                        value={this.state.description}
-                        onChange={this.setStateFromInput}
-                      />
-                      {this.state.validator.message(
-                        "description",
-                        this.state.description,
-                        "string"
-                      )}
-                  </div>
-                  <Box display="flex" flexDirection="column">
-                    <FormControl component="fieldset">
-                        <FormLabel>{formatMessage({id: 'picture'})}</FormLabel>
-                        <RadioGroup row aria-label="image-source" name="imageOption" value={this.state.imageOption} onChange={this.setStateFromInput}>
-                         <FormControlLabel value="library" control={<Radio />} label="Library" />
-                          <FormControlLabel value="upload" control={<Radio />} label="Upload" />
-                       </RadioGroup>
-                    </FormControl>
-                    {this.state.imageOption === "upload" ? 
-                      <FileInput 
-                        source={this.state.upload_picture} 
-                        onChange={(event) => this._handleImgChange(event,"upload_picture")} 
-                        deleteImg={(event) => this.deleteImg("upload_picture")}
-                        onClick={(event) => this._handleSubmit(event)}/> :
-                      <Select
-                        name="library_picture"
-                        onChange={this.setStateFromInput}
-                        value={this.state.library_picture} 
-                        array={categoryIcons.map((el,i) => 
-                          <img src={"https://menu.bathtimestories.com/assets/images/"+el} alt={el.replace(/(icons8-|-100.png)/g,'')} height="50"/>
-                          )}/> }
-                  </Box>
-                  {/* <div className="form-group mb-3 col-lg-12">
-                    <label className="col-xl-3 col-sm-4">
-                      Imagine fundal categorie
-                    </label>
-                    <FileInput 
-                            source={this.state.background} 
-                            onChange={(event) => this._handleImgChange(event,"background")} 
-                            deleteImg={(event) => this.deleteImg("background")}
-                            onClick={(event) => this._handleSubmit(event)} />
-                   </div> */}
-                </Box>
+          <Box display="flex" flexDirection="column">
+            <div className="form-group mb-3">
+              <TextField
+                name="name"
+                variant="outlined"
+                label={formatMessage({id: 'name'})}
+                value={this.state.name}
+                onChange={this.setStateFromInput}
+              />
+              {this.state.validator.message(
+                "name",
+                this.state.name,
+                "required|string"
+              )}
             </div>
-          </div>
+            <div className="form-group mb-3">
+                <TextField
+                  name="description"
+                  variant="outlined"
+                  label={formatMessage({id: 'description'})}
+                  multiline
+                  value={this.state.description}
+                  onChange={this.setStateFromInput}
+                />
+                {this.state.validator.message(
+                  "description",
+                  this.state.description,
+                  "string"
+                )}
+            </div>
+            <Box display="flex" justifyContent="space-between" className={classes.imageOption}>
+              <FormControl component="fieldset">
+                  <FormLabel>{formatMessage({id: 'picture'})}</FormLabel>
+                  <RadioGroup aria-label="image-source" name="imageOption" value={this.state.imageOption} onChange={this.setStateFromInput}>
+                    <FormControlLabel value="upload" control={<Radio />} label="Upload" />
+                    <FormControlLabel value="library" control={<Radio />} label="Library" />
+                  </RadioGroup>
+              </FormControl>
+              <Box display="flex">
+                <Box className = {this.state.imageOption !== "upload" ? classes.disabled : ''}>
+                  <FileInput 
+                    source={this.state.upload_picture} 
+                    className = {classes.disabled}
+                    onChange={(event) => this._handleImgChange(event,"upload_picture")} 
+                    deleteImg={(event) => this.deleteImg("upload_picture")}
+                    onClick={(event) => this._handleSubmit(event)}/>
+                </Box>
+                <Box className = {this.state.imageOption !== "library" ? classes.disabled : ''}>
+                  <Select
+                    name="library_picture"
+                    onChange={this.setStateFromInput}
+                    value={this.state.library_picture} 
+                    array={categoryIcons.map((el,i) => 
+                      <img src={"https://menu.bathtimestories.com/assets/images/"+el} alt={el.replace(/(icons8-|-100.png)/g,'')} height="50"/>
+                      )}/> 
+                </Box>
+              </Box>
+            </Box>
+            {/* <div className="form-group mb-3 col-lg-12">
+              <label className="col-xl-3 col-sm-4">
+                Imagine fundal categorie
+              </label>
+              <FileInput 
+                      source={this.state.background} 
+                      onChange={(event) => this._handleImgChange(event,"background")} 
+                      deleteImg={(event) => this.deleteImg("background")}
+                      onClick={(event) => this._handleSubmit(event)} />
+              </div> */}
+          </Box>
         </ModalBody>
         <Modal.Footer>
           <Button className={classes.delete} variant="contained" onClick={onCancel}>

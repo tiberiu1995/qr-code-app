@@ -6,6 +6,7 @@ import { IntlProvider, addLocaleData } from "react-intl";
 import { ScrollContext } from "react-router-scroll-4";
 import "./index.scss";
 import "./components/common/index.scss";
+import "./fonts.css";
 import AdminLayout from "./components/App.jsx";
 import MenuLayout from "./components/App-menu.jsx";
 import * as serviceWorker from "./serviceWorker";
@@ -20,13 +21,11 @@ import Categories from "./components/pages/category/";
 import Items from "./components/pages/items/";
 import Design from "./components/pages/menu/design/";
 import CustomerMenu from "./components/pages/menu/view/";
-import ItemReviews from "./components/pages/menu/view/review/product-reviews.jsx";
-import RestaurantReviews from "./components/pages/menu/view/review/restaurant-reviews.jsx";
-import Login from "./components/pages/log-in";
-import Register from "./components/pages/register";
-import Profile from "./components/pages/profile.jsx";
-import ForgetPassword from "./components/pages/forget-password.jsx";
-import ChangePassword from "./components/pages/change-password.jsx";
+import Login from "./components/pages/profile/log-in";
+import Register from "./components/pages/profile/register";
+import Profile from "./components/pages/profile/profile.jsx";
+import Settings from "./components/pages/profile/settings.jsx";
+import ChangePassword from "./components/pages/profile/change-password.jsx";
 
 import messages from "./language.json";
 
@@ -42,7 +41,7 @@ import { PlayCircleFilledWhite } from "@material-ui/icons";
 import { colors, rgbToHex } from "@material-ui/core";
 import { FirebaseContext } from "./components/firebase";
 import Firebase from './components/firebase/firebase';
-import ForgetPasswordForm from './components/pages/forget-password';
+import ForgetPassword from './components/pages/profile/forgot-password';
 import QrCode from './components/pages/menu/qr-code';
 
 
@@ -179,16 +178,21 @@ class Root extends React.Component {
                       exact
                       path={`${process.env.PUBLIC_URL}/register`}
                       component={Register}
-                    />                          
+                    />  
+                   <Route
+                      exact
+                      path={`${process.env.PUBLIC_URL}/forgot-password`}
+                      component={ForgetPassword}
+                    />                
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/my-account/profile`}
                       component={Profile}
-                    /> 
+                    />
                     <Route
                       exact
-                      path={`${process.env.PUBLIC_URL}/my-account/forget-password`}
-                      component={ForgetPassword}
+                      path={`${process.env.PUBLIC_URL}/my-account/settings`}
+                      component={Settings}
                     /> 
                     <Route
                       exact

@@ -52,6 +52,7 @@
     "saved_menu": "Menu saved",
     "deleted_category": "Category deleted",
     "deleted_item": "Product deleted",
+    "deleted_menu": "Menu deleted",
     "error_category": "Failed operation",
     "error_item": "Failed operation",
     "error_menu": "Failed operation",
@@ -66,7 +67,9 @@
     "layout": "Layout",
     "color": "Color",
     "reviewStars": "Review - stars",
-    "reviewText": "Review - total"
+    "reviewText": "Review - total",
+    "register": "Register",
+    "log-in": "Log In"
 
   },
   "es": {},

@@ -4,7 +4,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import Cookies from "js-cookie";
 import { setUser, setToken, setMessage, filterName } from "../../../../actions";
-import SignOutForm from "../../../pages/signout";
+import SignOutForm from "../../../pages/profile/signout";
 import { withFirebase } from "../../../firebase";
 import { injectIntl } from "react-intl";
 //import { getUser } from '../../../../actions';

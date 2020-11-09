@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import Datatable from "../../datatable/datatable";
-import { Link, withRouter } from "react-router-dom";
+import { Link, Redirect, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import Form from "./form";
 import { update } from "immutability-helper";
@@ -18,6 +18,8 @@ import { Button, Box } from "@material-ui/core";
 import { Save, Add } from "@material-ui/icons";
 import Header from "../menu/menu-header.jsx";
 import { injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
 const style = {
   position: "top-right",
@@ -39,7 +41,9 @@ const Categories = (props) => {
 
   const fetchCategories = async () => {
     try {
-      let apiData = await fetchData({title: title}, "category/get.php");
+      let apiData = await fetchData({title: title, token: props.token}, "category/get.php");
+      if (apiData.status === "fail") 
+      throw apiData.message;
       apiData = apiData.map(el => 
         ({...el, picture: el.image_option === "library" ?
         el.library_picture : el.upload_picture}));
@@ -57,8 +61,9 @@ const Categories = (props) => {
 
   const saveItem = async (item, endpoint) => {
     try {
-      const apiData = await fetchData({ title: title, data: item }, "category/" + endpoint + ".php");
-      console.log(apiData);
+      const apiData = await fetchData({ title: title, data: item, token: props.token}, "category/" + endpoint + ".php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       endpoint === "edit"
         ? toast.success(formatMessage({id: 'edited_category'}), style)
         : toast.success(formatMessage({id: 'saved_category'}), style);
@@ -74,8 +79,9 @@ const Categories = (props) => {
 
   const removeItem = async (item) => {
     try {
-      const apiData = await fetchData({ data: item }, "category/delete.php");
-      console.log(apiData);
+      const apiData = await fetchData({ data: item, token: props.token }, "category/delete.php");
+      if (apiData.success !== "fail") 
+        throw apiData.message;
       toast.success(formatMessage({id: 'deleted_category'}), style);
       await fetchCategories();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
@@ -107,6 +113,11 @@ const Categories = (props) => {
   const {intl: {formatMessage}} = props;
   return (
     <div className="my-1 mx-auto col-lg-10">
+      { props.token ? '' : <Redirect to='/log-in' /> }
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Menu Categories</title>
+      </Helmet>
       <div className="form-group mb-3">
         <Header/>
         <Box m={2} display="flex" justifyContent="center" flexDirection="column" >
@@ -143,4 +154,13 @@ const Categories = (props) => {
   );
 };
 
-export default compose(withRouter)(injectIntl(Categories));
+const mapStateToProps = (state) => ({
+  //symbol: state.data.symbol,
+  //email: state.account.email,
+  token: state.account.token
+});
+
+export default compose(
+  withRouter,
+  connect(mapStateToProps)
+  )(injectIntl(Categories));

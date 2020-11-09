@@ -2,6 +2,7 @@ import React from 'react';
 import { Close } from '@material-ui/icons';
 import { Box } from '@material-ui/core';
 import { Button } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
 const FileInput = ({source, onChange, onClick, deleteImg}) => {
 
@@ -26,7 +27,7 @@ const FileInput = ({source, onChange, onClick, deleteImg}) => {
           position="relative"
           my={1}
           mx="auto">
-          <Button variant="contained" color="primary">Choose file</Button>
+          <Button variant="contained" color="primary"><Typography>Choose file</Typography></Button>
           <input 
             className="upload mx-auto"
             type="file"

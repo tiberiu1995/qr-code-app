@@ -1,5 +1,4 @@
 import React, { Component, Fragment, useState, useCallback } from "react";
-import { Editor } from "@tinymce/tinymce-react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { connect } from "react-redux";
@@ -7,26 +6,28 @@ import { injectIntl } from "react-intl";
 //import { withFirebase } from "../../firebase";
 //import Breadcrumb from "../breadcrumb";
 import SimpleReactValidator from "simple-react-validator";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import update from "immutability-helper";
-import { fetchMenu, fetchData } from "../utils/fetch";
-import Modal from "react-bootstrap/Modal";
-import ModalBody from "react-bootstrap/ModalBody";
+import { fetchMenu, fetchData } from "../../utils/fetch";
 
 //import data from './../../../../all_in_one_multikart_react/front-end/src/admin/assets/data/digital-category';
 import { TextField, OutlinedInput, InputAdornment } from '@material-ui/core';
-import { FormLabel } from '@material-ui/core';
-import { FormControl } from '@material-ui/core';
+import { FormControl, Button } from '@material-ui/core';
 import { InputLabel, IconButton } from '@material-ui/core/';
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { setToken, setUser, setName } from "../../actions";
+import { setToken, setUser, setName } from "../../../actions";
 import { Box } from '@material-ui/core';
-import { Button } from '@material-ui/core';
-import Cookie from 'js-cookie';
-import { withFirebase } from '../firebase';
+import { withFirebase } from '../../firebase';
 import Cookies from 'js-cookie';
-import { setUid } from './../../actions/index';
+import { setUid } from '../../../actions/index';
+import ForgetPassword from './forgot-password';
+import { makeStyles } from '@material-ui/core/styles';
+import { Helmet } from "react-helmet";
+
+const useStyles = makeStyles(theme => ({
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+}))
 
 const Form = (props) => {
 	const [values, setValues] = React.useState({
@@ -41,7 +42,7 @@ const Form = (props) => {
     uid: '',
 		showPassword: false,
 	});
-
+  const classes = useStyles();
   const {firebase, location, history} = props;
 
   const fetchUser = async (email, uid) => {
@@ -49,8 +50,11 @@ const Form = (props) => {
       const obj = {
         email: email,
         uid: uid,
+        token: props.token
       }
-      let apiData = await fetchData( obj, "user/get.php");
+	  let apiData = await fetchData( obj, "user/get.php");
+	  if (apiData.status === "fail") 
+        throw apiData.message;
       console.log(apiData);
       setName(apiData.name);
     } catch (error) {
@@ -66,7 +70,7 @@ const Form = (props) => {
 			return "";
 		}
 		try {
-			await firebase.doSignInWithEmailAndPassword(values.email, values.password);
+		  await firebase.doSignInWithEmailAndPassword(values.email, values.password);
 			const token = await firebase.getUser().getIdToken();
 			console.log(token);
 			const response = await fetch('https://bathtimestories.com/api/validation.php', {
@@ -74,7 +78,7 @@ const Form = (props) => {
 			  mode: 'cors',
 			  body: JSON.stringify({token: token, action: 'set', csrf: Cookies.get('csrf')}),
 			  headers: {
-				'Content-Type': 'application/json'
+				  'Content-Type': 'application/json'
 			  },
 			});
       const data = await response.json();
@@ -83,31 +87,15 @@ const Form = (props) => {
 			  location.search.includes("ref") ? history.goBack() : history.push('/menu');
 			  console.log('set '+data);
 			  setUser(values.email);
-			  //setMessage(data.message);
         setToken(token);
         setUid(firebase.getUser().uid);
 			}
-		  } catch (error) {
-			console.log(error);
+		} catch (error) {
+		console.log(error);
 		//	this.setState({ error })
-		  }
+		}
 
-   /* try {
-	  const obj = {
-		products: this.state.products,
-		title: this.state.title || this.props.match.params.id,
-	  }
-	  const data = await fetchData(obj, "/menu/" + endpoint + ".php");
-	  console.log(data);
-	  this.setState({
-		message: data === true ? "transaction done" : "transaction void",
-	  });
-	  window.scrollTo(0, 0);
-	} catch (error) {
-	  this.setState({ message: error.message });
-	  window.scrollTo(0, 0);
-	}*/
-  };
+	}
 
 
 	const handleChange = (prop) => (event) => {
@@ -130,6 +118,10 @@ const Form = (props) => {
 		<div className="container-fluid">
 			<div className="form form-label-center row">
 				<Box my="2.5" mx="auto" display="grid">
+				<Helmet>
+					<meta charSet="utf-8" />
+					<title>Log In</title>
+				</Helmet>
 					<TextField 
 						margin="normal"
 						label="Email"
@@ -143,7 +135,7 @@ const Form = (props) => {
 							"required|email"
 						)}
 					<FormControl margin="normal" /*className={clsx(classes.margin, classes.textField)}*/ variant="outlined">
-							<InputLabel htmlFor="outlined-adornment-password">Token</InputLabel>
+							<InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
 							<OutlinedInput
 									id="outlined-adornment-password"
 									type={values.showPassword ? 'text' : 'password'}
@@ -168,21 +160,27 @@ const Form = (props) => {
 							"password",
 							values.password,
 							"required"
-						)}                   
-					<Button margin="normal" onClick={addItem}>
-							Log In
-					</Button>    
+						)}
+          <Box align="center" mb={1}>
+            <Button margin="normal" className={classes.edit} onClick={addItem}>
+              Log In
+            </Button>
+          </Box>                   
+					<Link align="center" to={'/forgot-password/'} >
+						Reset Password
+					</Link>
 				</Box>
 			</div>
 		</div>
 	);
+
 }
 
 
 const mapStateToProps = (state) => ({
   //symbol: state.data.symbol,
   //email: state.account.email,
-  //token: state.account.token
+  token: state.account.token
 });
 
 export default compose(

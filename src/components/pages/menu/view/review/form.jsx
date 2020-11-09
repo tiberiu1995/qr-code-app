@@ -8,20 +8,39 @@ import { withRouter } from 'react-router-dom';
 import AverageRating from './../rating-stars';
 import { Rating } from '@material-ui/lab/';
 import { injectIntl } from 'react-intl';
+import { makeStyles } from '@material-ui/core/styles';
 
+const useStyles = makeStyles((theme) => ({
+  pointerCursor: {
+    cursor: 'pointer'
+  },
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+  delete: {
+    backgroundColor: '#f44336',
+    color: 'white',
+  },
+  disabled: {
+    opacity: 0.5,
+    pointerEvents: 'none'
+  },
+  modal: {
+    '& .MuiTextField-root': {
+      width: '100%'
+    }
+  },
+}));
 
 const Form = (props) => {
+    const classes = useStyles();
     let [name, setName] = useState('');
     let [rating, setRating] = useState(0);
     let [text, setText] = useState('');
     let [error, setError] = useState(false);
     let [validator] = new useState(new SimpleReactValidator());
-    console.log(rating+'_');
-    useEffect(() => {
-      console.log("Mount");
-      return () => console.log("Unmount");
-    }, []);
-
+  
     const setStateFromInput = (event) => {
       let { name, value } = event.target;
       switch (name) {
@@ -58,29 +77,12 @@ const Form = (props) => {
     const {intl: {formatMessage}} = props;
     return (
       <>
-      <Box m={2}>
+      <Box m={2} className={classes.modal}>
         <Typography variant="h5">
           {formatMessage({id: 'write_review'})}
         </Typography>
-        <form className="needs-validation add-product-form">
-          <div className="form form-label-center row">
-            <div className="form-group my-1 col-lg-12">
-              <div className="description-sm">
-                <TextField
-                  label={formatMessage({id: 'name'})}
-                  name="name"
-                  value={name} variant="outlined"
-                  onChange={setStateFromInput}
-                />
-                { validator.message(
-                  "name",
-                  name,
-                  "required|string"
-                )}
-              </div>
-            </div>
-            <div className="form-group my-1 col-lg-12">
-              <div className="description-sm">
+        <Box display="flex" flexDirection="column">
+          <div className="form-group my-1">
               <Rating
                 name="rating"
                 value={rating}
@@ -91,26 +93,38 @@ const Form = (props) => {
                   "required|numeric|min:1,num"
                 )}
                 {/* <AverageRating data={rating} key={"_f"} onClick={handleRating} />   */}
-              </div>
-            </div>            
-            <div className="form-group my-1 col-lg-12">
-              <div className="description-sm">
-                <TextField
-                  label={formatMessage({id: 'comment'})}
-                  name="text"
-                  value={text}
-                  onChange={setStateFromInput}
-                />
-                { validator.message(
-                  "text",
-                  text,
-                  "required|string"
-                )}
-              </div>
-            </div>
           </div>
-          <Button variant="contained" color="primary" onClick={submit}>{formatMessage({id: 'send'})}</Button>
-        </form>
+          <div className="form-group mb-3">
+              <TextField
+                label={formatMessage({id: 'name'})}
+                name="name"
+                value={name} variant="outlined"
+                onChange={setStateFromInput}
+              />
+              { validator.message(
+                "name",
+                name,
+                "required|string"
+              )}
+          </div>           
+          <div className="form-group my-1">
+              <TextField
+                label={formatMessage({id: 'comment'})}
+                name="text"
+                value={text}
+                variant="outlined"
+                onChange={setStateFromInput}
+              />
+              { validator.message(
+                "text",
+                text,
+                "required|string"
+              )}
+          </div>
+          <Box align="center" mt={1}>
+            <Button variant="contained" className={classes.edit} onClick={submit}>{formatMessage({id: 'send'})}</Button>
+          </Box>      
+        </Box>    
       </Box>
       </>
     );

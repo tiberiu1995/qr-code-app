@@ -16,6 +16,7 @@ import { Box, Grid, Button } from "@material-ui/core/";
 import { fetchData } from "../../../utils/fetch";
 import Header from "../menu-header.jsx";
 import { injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
 
 const Categories = (props) => {
   const { formatMessage } = props.intl;
@@ -40,7 +41,9 @@ const Categories = (props) => {
 
   const fetchItemsConfiguration = async () => {
     try {
-      const response = await fetchData( {category: category } , "menu/item/get.php");
+      const response = await fetchData( {category: category, token: props.token } , "menu/item/get.php");
+      if (response.status === "fail") 
+      throw response.message;
       setLeft(response.left);
       setRight(response.right);
       //setData(apiData);
@@ -61,9 +64,11 @@ const Categories = (props) => {
         const obj = {
           left: left.map((el) => el.id),
           right: right.map((el) => el.id),
+          token: props.token
         }
       const apiData = await fetchData( obj , "menu/item/" + endpoint + ".php");
-      console.log(apiData);
+      if (apiData.status === "fail") 
+        throw apiData.message;
       endpoint === "edit"
         ? toast.success(formatMessage({id: "edited_menu"}))
         : toast.success(formatMessage({id: "menu_saved"}));
@@ -174,4 +179,9 @@ const Categories = (props) => {
   );
 };
 
-export default compose(withRouter)(injectIntl(Categories));
+const mapStateToProps = (state) => ({
+  token: state.account.token
+});
+
+
+export default compose(withRouter,connect(mapStateToProps))(injectIntl(Categories));

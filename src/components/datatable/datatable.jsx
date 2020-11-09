@@ -13,9 +13,11 @@ import { Delete, Edit, Image } from '@material-ui/icons/';
 
 const useStyles = makeStyles(theme => ({
   edit: {
+      cursor: 'pointer',
       color: '#4caf50',
   },
   delete: {
+    cursor: 'pointer',
     color: '#f44336',
   }
 }));
@@ -56,7 +58,7 @@ const Datatable = (props) => {
   };
   const columns = [];
   for (var key in myData[0]) {
-    if (["description", "ingredients", "alergens", "calories", "id", "upload_picture", "library_picture", "image_option"].includes(key))
+    if (["description", "ingredients", "alergens", "calories", "id", "upload_picture", "library_picture", "image_option", "size"].includes(key))
       continue;
    // if(matches && !["name", "category", "picture"].includes(key))
    //   continue;
@@ -78,9 +80,10 @@ const Datatable = (props) => {
       column.filter = "includes";
     }
     if (["picture", "background", "pictures"].includes(key)) {
-      column.Cell = ({ cell: { value } }) => ((value.includes('jpeg') || value.includes('png')) ? <img src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
+      column.Cell = ({ cell: { value } }) => ((value.includes('jpeg') || value.includes('png')) ? <img alt="" src={value} width={mobile ? "50px" : "100px"} /> : <Image/>)
       column.filterable = false;
       column.sortable = false;
+      column.disableFilters = true;
     }
     columns.push(column);
 

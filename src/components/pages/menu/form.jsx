@@ -2,7 +2,7 @@ import React, {
     useState,
     useEffect,
   } from "react";
-  import { withRouter, Prompt } from "react-router-dom";
+  import { withRouter, Prompt, Redirect } from "react-router-dom";
   import { compose } from "recompose";
   //import Form from "./form0";
   import update from "immutability-helper";
@@ -17,6 +17,8 @@ import React, {
   import { fetchData,  } from "../../utils/fetch";
   import Header from "./menu-header";
 import { injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
   
   const Form = (props) => {
@@ -41,7 +43,9 @@ import { injectIntl } from 'react-intl';
   
     const fetchCategoriesConfig = async () => {
       try {
-        const response = await fetchData({ title: title }, "menu/category/get.php");
+        const response = await fetchData({ title: title, token: props.token }, "menu/category/get.php");
+        if (response.status === "fail") 
+          throw response.message;
         setLeft(response.left);
         setRight(response.right);
         //setCategories(left.concat(right));
@@ -62,9 +66,11 @@ import { injectIntl } from 'react-intl';
         const obj = {
           left: left.map((el) => el.id),
           right: right.map((el) => el.id),
+          token: props.token
         }
         const apiData = await fetchData( obj, "menu/category/" + endpoint + ".php");
-        console.log(apiData);
+        if (apiData.status === "fail") 
+          throw apiData.message;
         endpoint === "edit"
           ? toast.success(formatMessage({id: "edited_menu"}))
           : toast.success(formatMessage({id: "menu_saved"}));
@@ -128,6 +134,11 @@ import { injectIntl } from 'react-intl';
             when={isEdited}
             message={`Are you sure you want to exit without saving?`}
           />
+        { props.token ? '' : <Redirect to='/log-in' /> }
+        <Helmet>
+          <meta charSet="utf-8" />
+          <title>{'Menu edit - ' + title}</title>
+        </Helmet>
         <Box mx={desktop ? "auto" : 2} my={2} style={{maxWidth: 850}}>
           {title ? (
             <>
@@ -171,6 +182,10 @@ import { injectIntl } from 'react-intl';
       </div>
     );
   };
+
+  const mapStateToProps = (state) => ({
+    token: state.account.token
+  });
   
-  export default compose(withRouter)(injectIntl(Form));
+  export default compose(connect(mapStateToProps),withRouter)(injectIntl(Form));
   

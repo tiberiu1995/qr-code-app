@@ -67,6 +67,21 @@ export const setLayout = (layout) => {
 }
 
 
+export const setProducts = (products) => {
+  store.dispatch({
+    type: "SET_PRODUCTS",
+    payload: {products: products},
+  });
+}
+
+export const addProduct = (product) => {
+  store.dispatch({
+    type: "ADD_PRODUCT",
+    payload: {...product},
+  });
+}
+
+
 export const setMessage = (message) => {
   store.dispatch({
     type: types.ADD_MSG,

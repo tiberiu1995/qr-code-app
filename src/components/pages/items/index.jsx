@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import Datatable from "../../datatable/datatable";
-import { Link, withRouter } from "react-router-dom";
+import { Link, Redirect, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import Form from "./form";
 import { update } from "immutability-helper";
@@ -18,6 +18,8 @@ import { Button, Box } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import Header from "../menu/menu-header.jsx";
 import { injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
 const style = {
   position: "top-right",
@@ -40,8 +42,9 @@ const Items = (props) => {
 
   const fetchItems = async () => {
     try {
-      let apiData = await fetchData({ title: title }, "item/get.php");
-      console.log(apiData);
+      let apiData = await fetchData({ title: title, token: props.token }, "item/get.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       setData(apiData);
     } catch (error) {
       console.error(error);
@@ -50,8 +53,9 @@ const Items = (props) => {
 
   const fetchCategories = async () => {
     try {
-      let apiData = await fetchData({ title: title }, "category/get.php");
-      console.log(apiData);
+      let apiData = await fetchData({ title: title, token: props.token }, "category/get.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       setCategories(apiData);
     } catch (error) {
       console.error(error);
@@ -67,8 +71,9 @@ const Items = (props) => {
 
   const saveItem = async (item, endpoint) => {
     try {
-      const apiData = await fetchData({ title: title, data: item, }, "item/" + endpoint + ".php");
-      console.log(apiData);
+      const apiData = await fetchData({ title: title, data: item, token: props.token}, "item/" + endpoint + ".php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       endpoint === "edit"
         ? toast.success(formatMessage({id: 'edited_item'}), style)
         : toast.success(formatMessage({id: 'saved_item'}), style);
@@ -84,8 +89,9 @@ const Items = (props) => {
 
   const removeItem = async (item) => {
     try {
-      const apiData = await fetchData({ data: item, }, "item/delete.php");
-      console.log(apiData);
+      const apiData = await fetchData({ data: item, token: props.token}, "item/delete.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
       toast.success(formatMessage({id: 'deleted_category'}), style);
       await fetchItems();
       // this.setState({ message: (data===true) ? 'transaction done' : 'transaction void' });
@@ -123,11 +129,16 @@ const Items = (props) => {
   const {intl: {formatMessage}} = props;
   return (
     <div className="my-1 mx-auto col-lg-10">
+      { props.token ? '' : <Redirect to='/log-in' /> }
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Menu Products</title>
+      </Helmet>
       <div className="form-group mb-3">
         <Header/>
         <Box m={2} display="flex" justifyContent="center" flexDirection="column" >
-          {categories.length && (
-            <Form
+          {categories.length 
+          ? <Form
               key={new Date().valueOf()}
               addItem={addItem}
               data={item}
@@ -135,7 +146,7 @@ const Items = (props) => {
               categories={categories}
               onCancel={closeModal}
             />
-          )}
+          : '' }
           {data.length ? (
             <Datatable edit={edit} remove={removeItem} myData={[...data]} />
           ) : (
@@ -159,4 +170,14 @@ const Items = (props) => {
   );
 };
 
-export default compose(withRouter)(injectIntl(Items));
+const mapStateToProps = (state) => ({
+  //symbol: state.data.symbol,
+  //email: state.account.email,
+  token: state.account.token
+});
+
+export default 
+compose(
+  connect(mapStateToProps),
+  withRouter
+  )(injectIntl(Items));

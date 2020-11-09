@@ -16,6 +16,7 @@ import CustomTabs from '../view/tabs.jsx';
 import Layout from './radio-layout.jsx';
 import { thunkMiddleware } from 'redux-thunk';
 import { toast } from 'react-toastify';
+import { debounce } from 'lodash';
 
 const style = theme => ({
   formGroup: {
@@ -55,6 +56,9 @@ const style = theme => ({
       form: {
       '& h6': {
         display: 'none'
+      },
+      '& input[type=color]:not(:disabled)': {
+        cursor: 'pointer'
       }
     }
   },
@@ -70,14 +74,6 @@ const style = theme => ({
 });
 
 
-/*
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper
-  }
-}));*/
-
 const tabLabel = (text, size) => (
     <>
         <PhoneAndroid style={{fontSize: size}} />
@@ -86,7 +82,40 @@ const tabLabel = (text, size) => (
 )
 
 const layoutArray = ["h0b0", "h0b1", "h1b0", "h1b1", "h2b1", "h3b0", "h3b1", "h3b2", 'h4b4'];
-const fontArray = ["Arial", "Courier New", "Georgia", "Palatino", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"];
+const fontArray = [
+  'Alegreya', 
+  'Alegreya Sans', 
+  'Anton',
+  'Archivo',
+  'Arial',
+  'B612',
+  'Cairo',
+  'Cardo',
+  'Concert One',
+  'Cormorant',
+  'Courier New',
+  'Fjalla One',
+  'Georgia',
+  'Karla',
+  'Lato',
+  'Lobster',
+  'Montserrat',
+  'Mulish',
+  'Palatino',
+  'Rakkas',
+  'Roboto',
+  'Rubik',
+  'Source Pro',
+  'Source Sans Pro',
+  'Spectral',
+  'Tahoma',
+  'Times New Roman',
+  'Titillium',
+  'Trebuchet MS',
+  'Ubuntu',
+  'Varela',
+  'Verdana',
+  'Work Sans'];
 const categoryIcons = [
   'icons8-banana-split-100.png',   
   'icons8-beer-100.png',
@@ -137,9 +166,9 @@ const iframeStyle = mobile => (
   mobile ? 
   [
     {top: '10%', left: '7%', height: '80%', width: '86%'},
-    {top: '9%', left: '6%', height: '83%',width: '88%'},
-    {top: '12%', left: '15%', height: '76%',width: '70%'},
-    {top: '12%', left: '15%', height: '76%',width: '70%'}
+    {top: '9%', left: '6%', height: '83%', width: '88%'},
+    {top: '10%', left: '6%', height: '80%', width: '89%'},
+    {top: '9%', left: '5%', height: '82%', width: '90%'}
   ] :
   [
     {top: 0, left: '50%',  transform: 'translate(-50%, 18%) scale(1.1)'},
@@ -230,16 +259,78 @@ class Form extends Component {
       },
       toggles: {...styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {})}
     }
+
   }
 
+  fetchDesign = async () => {
+    try {
+      let {custom, defaults, id} = await fetchData({title: this.props.match.params.title, all: true, token: this.props.token}, "menu/design/get.php");
+
+      let layout = "";
+      switch (id.substring(0,2)) {
+        case 'h0':
+          layout = "0";
+          break;
+       case 'h1':
+          layout = "1";
+          break;
+        case 'h3':
+          layout = "2";
+          break;
+        case 'h4':
+          layout = "3";
+          break;
+        case 'h5':
+          layout = "4";
+          break;
+        default:
+          layout = "0";
+      }
+      let selectedLayout = defaults.find(el => el.id == id);
+      this.setState({
+        layout: layout,
+        contentType: id,
+        backgroundCount: selectedLayout.background_count,
+        category: JSON.parse(custom.category_design ? custom.category_design : selectedLayout.category_design),
+        item: JSON.parse(custom.item_design ? custom.item_design : selectedLayout.item_design),
+        toggles: custom.toggles ? JSON.parse(custom.toggles) : styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {}),
+        defaults: defaults
+        /*defaults: {
+          category: JSON.parse(selectedLayout.category_design),
+          item: JSON.parse(selectedLayout.item_design),
+          backgroundOption: selectedLayout.background_option
+        }*/,
+        backgroundOption: custom.background_option || selectedLayout.background_option
+      });
+    } catch (error) {
+    }
+  };
+
+  saveDesign = async () => {
+    const {formatMessage} = this.props.intl;
+    try {
+      const obj = {
+        title: this.props.match.params.title,
+        category: JSON.stringify(this.state.category),
+        item: JSON.stringify(this.state.item),
+        layout_id: this.state.contentType,
+        background_option: this.state.backgroundOption,
+        toggles: JSON.stringify(this.state.toggles),
+        token: this.props.token
+      }
+      let apiData = await fetchData( obj, "menu/design/edit.php");
+      if (apiData.status === "fail") 
+        throw apiData.message;
+      toast.success(formatMessage({id: 'edited_menu'}));
+      this.setState({isEdited: false});
+    } catch (error) {
+      toast.error(formatMessage({id: "error_menu"}));
+    }
+  };
 
   setStateFromType = (event, type) => {
     var obj = {};
-    //console.log(`/my-menu/${this.props.match.params.title}?category=${JSON.stringify(this.state.category)}&item=${JSON.stringify(this.state.item)}`);
     obj[event.target.name] = event.target.value;
-
-    //const {category, item, contentType} = this.state;
-    //sessionStorage.setItem('style', JSON.stringify({category, item, contentType}));
     Array.isArray(type) ?
       this.setState({
         [type[0]]: {
@@ -259,6 +350,8 @@ class Form extends Component {
     });
   };
 
+  debouncedStateFromType  = debounce(this.setStateFromType,500);
+
   setStateArrayFromInput = (event, root, index) => {
     let newArray = [...this.state[root][event.target.name]];
     newArray[index] = event.target.value;
@@ -270,9 +363,7 @@ class Form extends Component {
     });
   }
 
-
   setStateFromInput = (event) => {
-     // setLayout(event.target.value);
       this.setState({[event.target.name]: event.target.value, isEdited: true});
   }
 
@@ -285,70 +376,6 @@ class Form extends Component {
       isEdited: true
     });
   }
-
-  //handleBackgroundChange = ()
-
-  fetchDesign = async () => {
-    try {
-      let {custom, defaults} = await fetchData({title: this.props.match.params.title}, "menu/design/get.php");
-      let layout = "";
-      let backgroundCount = 1;
-      switch (defaults.id.substring(0,2)) {
-        case 'h0':
-          layout = "0";
-          break;
-       case 'h1':
-          layout = "1";
-          break;
-        case 'h3':
-          layout = "2";
-          backgroundCount = 4;
-          break;
-        case 'h4':
-          layout = "3";
-          break;
-        default:
-          layout = "0"
-      }
-      console.log(custom);
-      this.setState({
-        layout: layout,
-        contentType: defaults.id,
-        backgroundCount: backgroundCount,
-        category: JSON.parse(custom.category_design ? custom.category_design : defaults.category_design),
-        item: JSON.parse(custom.item_design ? custom.item_design : defaults.item_design),
-        toggles: custom.toggles ? JSON.parse(custom.toggles) : styleElements.reduce((acc,el) => ({...acc, [el[0]+'_'+el[1]]:false}), {}),
-        defaults: {
-          category: JSON.parse(defaults.category_design),
-          item: JSON.parse(defaults.item_design),
-          backgroundOption: defaults.background_option
-        },
-        backgroundOption: custom.background_option || defaults.background_option
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  saveDesign = async () => {
-    const {formatMessage} = this.props.intl;
-    try {
-      const obj = {
-        title: this.props.match.params.title,
-        category: JSON.stringify(this.state.category),
-        item: JSON.stringify(this.state.item),
-        layout_id: this.state.contentType,
-        background_option: this.state.backgroundOption,
-        toggles: JSON.stringify(this.state.toggles)
-      }
-      let apiData = await fetchData( obj, "menu/design/edit.php");
-      console.log(apiData);
-      toast.success(formatMessage({id: 'edited_menu'}));
-      this.setState({isEdited: false});
-    } catch (error) {
-      toast.error(formatMessage({id: "error_menu"}));
-    }
-  };
 
   handlePreviewChange = (event, newValue) => {
     this.setState({tabIndex: newValue});
@@ -373,11 +400,17 @@ class Form extends Component {
         break
       case "4":
         contentType = "h5b2";
+        backgroundCount = 2;
         break
       default:
-        contentType = "h0b0" 
+        contentType = "h0b0";
     }
+    let bgColors = [...this.state.category.background];
+    backgroundCount > bgColors.length && (bgColors = bgColors.concat([...Array(backgroundCount-bgColors.length).keys()].map(el => "#ffffff")))
     this.setState({
+      category: {
+        ...this.state.category, 
+        background: bgColors},
       layout: newValue, 
       contentType: contentType, 
       backgroundCount: backgroundCount, 
@@ -398,7 +431,6 @@ class Form extends Component {
 
   _handleImgChange(e) {
     e.preventDefault();
-
     let reader = new FileReader();
     let file = e.target.files[0];
 
@@ -422,8 +454,15 @@ class Form extends Component {
   }
 
   restorePresets = () => {
-    this.setState({...this.state.defaults, isEdited: true,});
+    let newLayout = this.state.defaults.find(el => el.id == this.state.contentType);
+    this.setState({
+      backgroundCount: newLayout.background_count,
+      category: JSON.parse(newLayout.category_design),
+      item: JSON.parse(newLayout.item_design),
+       isEdited: true});
   }
+
+
 
   render() {
     const { intl, media, classes} = this.props;
@@ -504,7 +543,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             style={{width: 86}}
                             label={formatMessage({id: 'size'})}
                             value={this.state[el[0]][el[1]].fontSize}
-                            onChange={(e) => this.setStateFromType(e, el)}
+                            onChange={ (e) => this.setStateFromType(e,el) }
                             array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
                             display={(val) => (val+' px') }
                             />
@@ -530,7 +569,10 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                                 borderColor: 'rgba(0, 0, 0, 0.23)'
 
                               }}
-                              onChange={(e) => this.setStateFromType(e, el)}
+                              onChange={(e) => {
+                                e.persist();
+                                this.ddd(e,el)
+                              }}
                               value={this.state[el[0]][el[1]].color}
                             />
                           </FormControl>
@@ -544,8 +586,8 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             style={{width: 185, textAlign: 'left'}}
                             name="fontFamily"
                             label="Font"
-                            value={this.state[el[0]][el[1]].fontFamily}
-                            onChange={(e) => this.setStateFromType(e, el)}
+                            value={this.state[el[0]][el[1]].fontFamily || fontArray[0]}
+                            onChange={ (e) => this.setStateFromType(e,el) }
                             array={fontArray}
                             display={(val) => (<Typography style={{fontFamily: val}}>{val}</Typography>)}
                           />
@@ -598,13 +640,12 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             onChange={(event) => this._handleImgChange(event)} 
                             deleteImg={(event) => this.deleteImg()}
                             onClick={(event) => this._handleSubmit(event)}/> 
-                        : <>                       
-                          { this.state.category.background.map((el,i) => 
-                            i<this.state.backgroundCount 
+                        : this.state.category.background
+                          .map((el,i) => 
+                            i<this.state.backgroundCount
                             ? <FormControl key={"fmk"+i}>
                               <input
                                 name="background"
-                                label={formatMessage({id: 'color'})+i}
                                 type="color"
                                 style={{
                                   height: 60,
@@ -614,8 +655,9 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                                 onChange={(e) => this.setStateArrayFromInput(e, "category", i)}
                                 value={this.state.category.background[i]}/>
                               </FormControl>
-                            : '' )}
-                          </> }
+                            : '' )
+                        
+                      }
                       </Box>
                     </Box> 
                   </Box>                  
@@ -661,7 +703,8 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
 
 
 const mapStateToProps = (state) => ({
-  media: state.media
+  media: state.media,
+  token: state.account.token
 });
 
 

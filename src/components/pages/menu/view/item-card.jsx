@@ -37,13 +37,25 @@ const useStyles = makeStyles(theme => ({
     },
   },
   card: {
-    margin: [['0.5rem', '1rem', '0.5rem', '1rem']], 
     borderRadius: 20, 
     position: "relative", 
-    zIndex: 150 
+    zIndex: 150,
+    margin: [[0, 16, 16, 16]],
+    '& > button': {
+      cursor: 'initial',
+    },
+    '&:first-child': {
+      marginTop: 16
+    },
+    [theme.breakpoints.up('600')]: {
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      width: 568
+    }
   },
   cardContent: {
     flex: '1 1 auto',
+    padding: '4px 4px 4px 16px',
   }
 }));
 
@@ -63,43 +75,34 @@ const MediaCard = (props) => {
   return (
     <Fade timeout={{
       appear: 1000,
-      enter: 1000+props.id*2500,
+      enter: 1000+props.id*1000,
       exit: 0,
      }} in={props.data.name !== ''}>
       <Card className={classes.card} >
         <CardActionArea className="d-flex justify-content-between">
-          {!props.disableImages && 
           <CardMedia
             className={"d-block "+classes.cardMedia}
             image={picture}
             title=""
           />
-          }
-          <CardContent className={"d-block "+classes.cardContent}>
-            <Box display="flex" justifyContent="space-between" alignItems="baseline">
-              <Typography
-                className={classes.name}
-                gutterBottom
-                variant="h5"
-                component="h2">
-                {props.data.name}
-              </Typography>
-              { props.review }
-            </Box>
+          <CardContent className={classes.cardContent}>
+            <Typography
+              className={classes.name}
+              gutterBottom
+              variant="h5"
+              component="h2">
+              {props.data.name}
+            </Typography>
+            { props.review }
             <Typography
               className={classes.ingredients}
               gutterBottom>
               {props.data.ingredients}
             </Typography>
-            <Typography className={classes.alergens} gutterBottom component="p">
-              {props.data.alergens}
-            </Typography>
-            <Typography className={classes.calories} gutterBottom component="p">
-              {props.data.calories}
-            </Typography>
             <Typography className={classes.size} gutterBottom component="p">
-              {props.data.size}
+              {props.data.size.map(el => el.size=="{}" ? el.price : el.size+" "+el.price).join(" | ")}
             </Typography>
+            { props.getExtra }
           </CardContent>
         </CardActionArea>
       </Card>

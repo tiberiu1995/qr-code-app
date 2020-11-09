@@ -1,10 +1,15 @@
 import React, {Component} from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
-import { setUser, setMessage } from '../../actions';
-import Breadcrumb from "../common/breadcrumb";
-import { withFirebase } from '../firebase';
+import { setUser, setMessage } from '../../../actions';
+import { withFirebase } from '../../firebase';
 import SimpleReactValidator from 'simple-react-validator';
+import { withStyles } from '@material-ui/styles';
+import { Button, TextField } from '@material-ui/core';
+import { Box } from '@material-ui/core';
+import { InputLabel } from '@material-ui/core/';
+import { Typography } from '@material-ui/core';
+import { Helmet } from 'react-helmet';
 
 
 const INITIAL_STATE = {
@@ -12,6 +17,13 @@ const INITIAL_STATE = {
   error: null,
   confirm: false,
 };
+
+const useStyles = theme => ({
+  edit: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+  },
+})
 
 class ForgetPasswordFormBase extends Component {
 
@@ -54,41 +66,42 @@ class ForgetPasswordFormBase extends Component {
         return ( 
           confirm ? 
           <div className="col-lg-4 mx-auto text-center">
-          <h4>Un email pentru resetarea parolei a fost trimis.</h4>
-          <Link to="/shop">Mergi la pagina principala</Link>
+            <Helmet>
+<meta charSet="utf-8" />
+<title>Change Password</title>
+</Helmet>
+          <Typography>An email has been sent to recover your account.</Typography>
+          <Link to="/home">Go home</Link>
           </div>
           :
-          <form onSubmit={this.onSubmit} className="theme-form col-lg-4 mx-auto">
-            <div className="form-row">
+          <Box mt={1} align="center" display="flex" flexDirection="column">
+              <InputLabel htmlFor="outlined-adornment-password">Reset password</InputLabel>
               <div className="col-md-10 mx-auto">
-                <label htmlFor="review">Adresa de email</label>
-                <input
-                  className="form-control"
+                <TextField 
+                  margin="normal"
+                  label="Email"
+                  variant="outlined" 
                   name="email"
                   value={this.state.email}
                   onChange={this.onChange}
-                  type="email"
-                  placeholder="Introdu adresa de email"
-                />
+                  type="email"/>             
                 {this.state.validator.message('email', this.state.email, 'required|email')}
               </div>
-            </div>
-            <div className="text-center">
-              <button className="btn btn-solid m-2" type="submit">
-                Reseteaza parola
-              </button>
-            </div>
-            {error && <p>{error.message}</p>}
-          </form>
+            <Box align="center">
+              <Button onClick={this.onSubmit} className={this.props.classes.edit} type="submit">
+                Reset
+              </Button>
+            </Box>
+          </Box>
         )
     }
 }
 
  
-const ForgetPasswordForm = compose(
+export default compose(
+  withStyles(useStyles),
   withRouter,
   withFirebase,
 )(ForgetPasswordFormBase);
 
-export default ForgetPasswordForm;
  

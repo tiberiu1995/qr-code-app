@@ -49,29 +49,29 @@ import { setMedia, } from './../actions/index';
   setMedia({desktop: desktop, tablet: tablet,  mobile: mobile});
 
 
-  const recordConsent = async () => {
-      try {
-        const response = await fetch(
-          "https://bathtimestories.com/apim/cookie-consent.php",
-          {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              uuid: Cookie.get("cookie-consent"),
-            }),
-          }
-        );
-        const data = await response.json();
-        console.log(data);
-        window.location.reload(false);
-        return data;
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  // const recordConsent = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://bathtimestories.com/apim/cookie-consent.php",
+  //         {
+  //           method: "POST",
+  //           mode: "cors",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({
+  //             uuid: Cookie.get("cookie-consent"),
+  //           }),
+  //         }
+  //       );
+  //       const data = await response.json();
+  //       console.log(data);
+  //       window.location.reload(false);
+  //       return data;
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
   useEffect(()=>{
     const { email, token } = props;
@@ -114,7 +114,7 @@ import { setMedia, } from './../actions/index';
 
   return (
     <div>
-      {console.log(Cookie.get("cookie-consent"))}
+      {/* {console.log(Cookie.get("cookie-consent"))}
       <CookieConsent
         location="bottom"
         buttonText="Accept"
@@ -134,7 +134,7 @@ import { setMedia, } from './../actions/index';
         </span>
       </CookieConsent>
       {/*<LoadScript url="https://userlike-cdn-widgets.s3-eu-west-1.amazonaws.com/7091674c0b9318cd33984355b12b3aad28db43ba01548d4ff012bcd0b043b67c.js"/>
-          <LoadScript url="https://checkout.stripe.com/checkout.js"/> */}
+          <LoadScript url="https://checkout.stripe.com/checkout.js"/> } */}
       <HeaderOne logoName={"logo.png"} />
       <Box>
         {props.children}

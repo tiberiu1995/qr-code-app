@@ -1,0 +1,106 @@
+@font-face {
+    font-family: 'Alegreya';
+    src: local('Alegreya'), url(./fonts/Alegreya-Regular.ttf) format('truetype');
+  }
+@font-face {
+    font-family: 'Alegreya Sans';
+    src: local('Alegreya Sans'), url(./fonts/AlegreyaSans-Regular.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'Anton';
+    src: local('Anton'), url(./fonts/Anton-Regular.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'Archivo';
+    src: local('Archivo'), url(./fonts/Archivo-Regular.ttf) format('truetype');
+}
+  @font-face {
+    font-family: 'B612';
+    src: local('B612'), url(./fonts/B612-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Cairo';
+    src: local('Cairo'), url(./fonts/Cairo-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Cardo';
+    src: local('Cardo'), url(./fonts/Cardo-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Concert One';
+    src: local('Concert One'), url(./fonts/ConcertOne-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Cormorant';
+    src: local('Cormorant'), url(./fonts/Cormorant-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Fjalla One';
+    src: local('Fjalla One'), url(./fonts/FjallaOne-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Karla';
+    src: local('Karla'), url(./fonts/Karla-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Lato';
+    src: local('Lato'), url(./fonts/Lato-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Lobster';
+    src: local('Lobster'), url(./fonts/Lobster-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat'), url(./fonts/Montserrat-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Mulish';
+    src: local('Mulish'), url(./fonts/Mulish-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Rakkas';
+    src: local('Rakkas'), url(./fonts/Rakkas-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src: local('Roboto'), url(./fonts/Roboto-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Rubik';
+    src: local('Rubik'), url(./fonts/Rubik-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Source Pro';
+    src: local('Source Pro'), url(./fonts/SourceCodePro-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Source Sans Pro';
+    src: local('Source Sans Pro'), url(./fonts/SourceSansPro-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Spectral';
+    src: local('Spectral'), url(./fonts/Spectral-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Titillium';
+    src: local('Titillium'), url(./fonts/TitilliumWeb-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Ubuntu';
+    src: local('Ubuntu'), url(./fonts/Ubuntu-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Varela';
+    src: local('Varela'), url(./fonts/Varela-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Work Sans';
+    src: local('Work Sans'), url(./fonts/WorkSans-Regular.ttf) format('truetype');
+  }
+
+
+
+
+
+

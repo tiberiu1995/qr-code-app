@@ -21,7 +21,7 @@ const Row = ({ media, row, index, moveRow, style }) => {
          </TableCell>
      );
     else
-     return row.cells.map((cell) => ["name", "category", "title", "cat_no", "item_no", "move"].includes(cell.column.id) &&
+     return row.cells.map((cell) => ["name", "category", "title", "cat_no", "item_no", "move", "picture"].includes(cell.column.id) &&
      <TableCell align="center" padding={media.mobile ? "none" : "none" } {...cell.getCellProps()}>
        {cell.render("Cell")}
      </TableCell>);
