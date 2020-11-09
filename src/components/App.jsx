@@ -83,9 +83,7 @@ import { setMedia, } from './../actions/index';
     props.firebase.auth.onAuthStateChanged((user) => {
         if (user) {
           user.getIdToken().then(function (idToken) {
-            console.log(idToken);
             console.log(user.email);
-            console.log(user.metadata.creationTime);
             setToken(idToken);
             setUid(user.uid);
           });
@@ -136,7 +134,7 @@ import { setMedia, } from './../actions/index';
       {/*<LoadScript url="https://userlike-cdn-widgets.s3-eu-west-1.amazonaws.com/7091674c0b9318cd33984355b12b3aad28db43ba01548d4ff012bcd0b043b67c.js"/>
           <LoadScript url="https://checkout.stripe.com/checkout.js"/> } */}
       <HeaderOne logoName={"logo.png"} />
-      <Box>
+      <Box style={{minHeight: 'calc(100vh - 64px)'}}>
         {props.children}
       </Box>
       <FooterOne logoName={"logo.png"} />

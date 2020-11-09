@@ -141,12 +141,8 @@ const NavBar = (props) => {
     {id: 'profile', url: 'my-account/profile'}, 
     {id: 'plan', url: 'my-account/plan'}, 
     {id: 'settings', url: 'my-account/settings'}];
-  const arr2 = [
-     {id: 'menu_admin', url: 'menu'}, 
-    {url: 'tutorials'}];
-  const arr3 = [
-    {url: 'home'}, 
-  ];
+  const arr2 = [ {id: 'menu_admin', url: 'menu'} ];
+  const arr3 = [ {url: 'home'}, ];
   const arr6 = [
      {id: 'menu_admin', url: 'menu'}, 
     {url: 'log-in'}, 

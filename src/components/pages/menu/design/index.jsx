@@ -544,7 +544,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                             label={formatMessage({id: 'size'})}
                             value={this.state[el[0]][el[1]].fontSize}
                             onChange={ (e) => this.setStateFromType(e,el) }
-                            array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32]}
+                            array={[8, 9, 10, 11, 12, 14, 16, 20, 24, 32, 40]}
                             display={(val) => (val+' px') }
                             />
                         </Box>                   
@@ -569,10 +569,7 @@ isc=${item.size.color.replace("#",'')}&iss=${item.size.size}&isf=${item.size.fon
                                 borderColor: 'rgba(0, 0, 0, 0.23)'
 
                               }}
-                              onChange={(e) => {
-                                e.persist();
-                                this.ddd(e,el)
-                              }}
+                              onChange={ (e) => this.setStateFromType(e,el) }
                               value={this.state[el[0]][el[1]].color}
                             />
                           </FormControl>

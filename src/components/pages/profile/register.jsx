@@ -4,10 +4,11 @@ import { compose } from 'recompose';
 
 import Breadcrumb from "../../common/breadcrumb";
 import { withFirebase } from '../../firebase';
-import { TextField } from '@material-ui/core';
+import { TextField, Typography } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import { Box } from '@material-ui/core';
 import { Helmet } from 'react-helmet';
+import { setName, setToken } from '../../../actions';
 
 
 const SignUpPage = () => (
@@ -49,6 +50,9 @@ class SignUpFormBase extends Component {
       });
       const data = await response.json();
       console.log(data);
+      setToken(info.token);
+      setName(info.name)
+      
       //console.log(address);
     }
 
@@ -60,7 +64,8 @@ class SignUpFormBase extends Component {
         console.log(authUser);
         this.setState({ ...INITIAL_STATE });
         await this.props.firebase.doSendVerificationEmail();
-        await this.createCustomer({name, email, uid: authUser.user.uid});
+        const token = await this.props.firebase.getUser().getIdToken();
+        await this.createCustomer({name, email, uid: authUser.user.uid, token: token});
         this.props.history.push('/menu');
       }
       catch(error){
@@ -126,6 +131,7 @@ class SignUpFormBase extends Component {
             type="submit" >
             Sign Up
           </Button>
+          <Typography>{error ? error.message : ''}</Typography>
         </Box>
         )
     }

@@ -30,7 +30,7 @@ const styles = (theme) => ({
   },
   container: {
     '& p, & span': {
-      lineHeight: 1.5
+      lineHeight: 1.8
     },
     '& .MuiTypography-root + .MuiButtonBase-root': {
       padding: 0,
@@ -50,7 +50,9 @@ const styles = (theme) => ({
     '& .MuiTabs-scroller': {
       overflow:'overlay !important',
     },
-
+    '& p, & span': {
+      lineHeight: 1.1
+    },
     '& img': {
       borderRadius: 75,
       opacity: 0.5,
@@ -107,10 +109,6 @@ const styles = (theme) => ({
     [theme.breakpoints.up(500)]: {
       height: 130
     },
-    [theme.breakpoints.up(900)]: {
-      backgroundSize: 'auto', 
-      height: 180
-    },
     '& img': {
       position: 'absolute',
       height: '250%'
@@ -156,6 +154,11 @@ const styles = (theme) => ({
     '&:first-child': {
       marginTop: 16
     },
+  },
+  b2: {
+    '& .MuiTypography-root': {
+      alignSelf: 'baseline'
+    }
   },
   b4: {
     '& img': {
@@ -241,21 +244,29 @@ export class Menu extends Component {
         : ''
     )}
 
-    getExtra = (el,style) => 
-      <>{this.state.showMore==el.id
+    getExtra = (el,style) => {
+      const calories = el.size.filter(el => el.calories != '');
+      if (calories.length == 0 && el.alergens == '')
+        return '';
+      return <>
+      { this.state.showMore==el.id
         ? <>
             <Typography style={{...style.alergens}} >
             {this.props.intl.formatMessage({id: 'alergens'}) + ': ' + el.alergens}
             </Typography>
             <Typography style={style.calories} >
-            {this.props.intl.formatMessage({id: 'calories'})+ ': ' +el.size.map(el => el.size=="{}" ? el.calories : el.size+" "+el.calories).join(" | ")}
+            { calories.length 
+              ? this.props.intl.formatMessage({id: 'calories'})+ ': ' +
+                calories.map(el => el.size=="{}" ? el.calories : el.size+" "+el.calories).join(" | ") 
+              : ''
+            }
             </Typography>
           </>
         : '' }
       <Button onClick={(e) => this.showMoreHandler(el.id)}>
       { this.state.showMore==el.id ? <ExpandLess/> :  <ExpandMore/> }
       </Button>
-      </>
+      </>}
 
 
   value = (size) => {
@@ -599,8 +610,11 @@ export class Menu extends Component {
               {el.alergens && formatMessage({id: 'alergens'}) + ': ' + el.alergens}
             </Typography>
             <Typography style={style.calories} >
-            { (el.size && el.size[0].calories) && formatMessage({id: 'calories'}) + ': ' +
-                el.size.map(el => (el.size=="{}" || el.calories=="") ? "" : el.size+" "+el.calories).join(" | ")}
+            { (el.size && el.size.filter(el => el.calories != '').length)
+                ? formatMessage({id: 'calories'})+ ': ' +
+                el.size.filter(el => el.calories != '').map(el => el.size=="{}" ? el.calories : el.size+" "+el.calories).join(" | ") 
+                : ''
+            }
             </Typography>
             {/* <Add onClick={(e) => this.openModal(e, el.id)}></Add> */}
             { itemIndex < this.state.data[catIndex].items.length-1 &&
@@ -654,7 +668,15 @@ export class Menu extends Component {
             
             ref={this.addRef}
             key={'_jk'+0}
-            style={{ /*backgroundImage: 'url("' + el.background + '")',*/ position: 'relative' }}
+            style={{ 
+              background: (this.state.backgroundOption==="image" && category.backgroundImage) 
+              ? (category.backgroundImage.indexOf("base64") >=0 
+                ? 'url('+ category.backgroundImage +')' 
+                : 'url(https://bathtimestories.com/'+category.backgroundImage+')') 
+              : ( category.background 
+                 ? category.background[0] 
+                 : ''), 
+              position: 'relative' }}
           >
           <Button onClick={this.goBack}>Go back</Button>
           
@@ -727,7 +749,7 @@ export class Menu extends Component {
             className={"display-menu "+(this.state.headerType == 3 ? classes.h2 : '') }
             style={{
               position: "relative", 
-              background: (this.state.backgroundOption==="image" && category.backgroundImage) ? 
+              background: this.state.headerType == 3 ? 'white' : (this.state.backgroundOption==="image" && category.backgroundImage) ? 
                 ( category.backgroundImage.indexOf("base64") >=0 ? 
                   'url('+ category.backgroundImage +')' :
                   'url(https://bathtimestories.com/'+category.backgroundImage+')') :

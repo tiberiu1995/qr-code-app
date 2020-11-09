@@ -247,7 +247,7 @@ export class Form extends Component {
 
   addSize = () => {
     const newArray = [...this.state.size];
-    newArray.push({size: '', price: ''});
+    newArray.push({size: '', price: '', calories: ''});
     this.setState({size: newArray});
   }
 
@@ -313,11 +313,6 @@ export class Form extends Component {
                     label={formatMessage({id: 'size' })}
                     value={el.size}
                     onChange={(e) => this.setSizefromInput(e,i)}  />
-                    {this.state.validator.message(
-                      "size",
-                      el.size,
-                      "required"
-                    )}
                   <TextField
                     variant="outlined"
                     name="price"
@@ -335,11 +330,6 @@ export class Form extends Component {
                       label={formatMessage({id: 'calories' })}
                       value={el.calories}
                       onChange={(e) => this.setSizefromInput(e,i)} />
-                    {this.state.validator.message(
-                      "calories",
-                      el.calories,
-                      "required"
-                    )}
                   <Remove className={classes.delete+" "+classes.pointerCursor} onClick={(e) => this.removeSize(i)}/>
                 </Box>
               )}  

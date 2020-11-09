@@ -43,6 +43,7 @@ import { FirebaseContext } from "./components/firebase";
 import Firebase from './components/firebase/firebase';
 import ForgetPassword from './components/pages/profile/forgot-password';
 import QrCode from './components/pages/menu/qr-code';
+import Home from './components/pages/home';
 
 
 class Root extends React.Component {
@@ -168,7 +169,12 @@ class Root extends React.Component {
                       path={`${process.env.PUBLIC_URL}/menu/:title/qr-code/`}
                       component={QrCode}
                     />
+                    <Route
+                      exact
+                      path={'/home'}
+                      component={Home}
 
+                      />
                     <Route
                       exact
                       path={`${process.env.PUBLIC_URL}/log-in`}

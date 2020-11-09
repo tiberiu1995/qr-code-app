@@ -55,7 +55,8 @@ const Form = (props) => {
 	  let apiData = await fetchData( obj, "user/get.php");
 	  if (apiData.status === "fail") 
         throw apiData.message;
-      console.log(apiData);
+	  console.log(apiData);
+	  setToken(props.token);
       setName(apiData.name);
     } catch (error) {
       console.log(error);
