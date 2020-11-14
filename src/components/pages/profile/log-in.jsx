@@ -45,18 +45,17 @@ const Form = (props) => {
   const classes = useStyles();
   const {firebase, location, history} = props;
 
-  const fetchUser = async (email, uid) => {
+  const fetchUser = async (email, token, uid) => {
     try {
       const obj = {
         email: email,
         uid: uid,
-        token: props.token
+        token: token
       }
 	  let apiData = await fetchData( obj, "user/get.php");
 	  if (apiData.status === "fail") 
         throw apiData.message;
 	  console.log(apiData);
-	  setToken(props.token);
       setName(apiData.name);
     } catch (error) {
       console.log(error);
@@ -71,26 +70,12 @@ const Form = (props) => {
 			return "";
 		}
 		try {
-		  await firebase.doSignInWithEmailAndPassword(values.email, values.password);
+			await firebase.doSignInWithEmailAndPassword(values.email, values.password);
 			const token = await firebase.getUser().getIdToken();
-			console.log(token);
-			const response = await fetch('https://bathtimestories.com/api/validation.php', {
-			  method: 'POST',
-			  mode: 'cors',
-			  body: JSON.stringify({token: token, action: 'set', csrf: Cookies.get('csrf')}),
-			  headers: {
-				  'Content-Type': 'application/json'
-			  },
-			});
-      const data = await response.json();
-			if(data.status === 'success') {
-        await fetchUser(values.email, firebase.getUser().uid);
-			  location.search.includes("ref") ? history.goBack() : history.push('/menu');
-			  console.log('set '+data);
-			  setUser(values.email);
-        setToken(token);
-        setUid(firebase.getUser().uid);
-			}
+        	await fetchUser(values.email, token, firebase.getUser().uid);
+			location.search.includes("ref") ? history.goBack() : history.push('/menu');
+			setUser(values.email);
+        	setToken(token);
 		} catch (error) {
 		console.log(error);
 		//	this.setState({ error })

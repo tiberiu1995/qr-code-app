@@ -3,7 +3,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import { withFirebase } from "./firebase";
 import { injectIntl } from "react-intl";
-import { setToken, setUid  } from "../actions";
+import { setName, setToken, setUid  } from "../actions";
 import { withRouter } from "react-router-dom";
 
 // Custom Components
@@ -18,6 +18,7 @@ import { v4 as uuid } from "uuid";
 import { Box } from '@material-ui/core';
 import { useMediaQuery } from '@material-ui/core/';
 import { setMedia, } from './../actions/index';
+import { fetchData } from './utils/fetch';
 
 
 /*const LoadScript = props => {
@@ -73,24 +74,35 @@ import { setMedia, } from './../actions/index';
   //     }
   //   };
 
+  const getUser = async () => {
+    const { email, token } = props;
+    const obj = {
+      email: email,
+      token: token
+    }
+    let apiData = await fetchData( obj, "user/get.php");
+    console.log(apiData);
+    setName(apiData.name);
+  }
   useEffect(()=>{
+    getUser();
     const { email, token } = props;
     let page = props.location.pathname.replace("/", ""); //match(/^(.+?)\//);
     setMedia({desktop: desktop, tablet: tablet,  mobile: mobile});
     page = page ? page.replace(/\//g,'') : null ;
     if (!email && !token && page && authRedirect.includes(page))
       props.history.replace("/log-in");
+
+
     props.firebase.auth.onAuthStateChanged((user) => {
         if (user) {
           user.getIdToken().then(function (idToken) {
-            console.log(user.email);
             setToken(idToken);
             setUid(user.uid);
           });
         } //else props.history.push("/login?ref=" + page);
       });
-
-  },[]);
+    },[]);
 
 
   /*async componentDidMount() {

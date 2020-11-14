@@ -94,7 +94,7 @@ class Root extends React.Component {
 
   */
   render() {
-    const locale = store.getState().settings.language;
+    const locale = store.getState().settings.language || 'en';
     console.log(locale);
     return (
       <Provider store={store}>
